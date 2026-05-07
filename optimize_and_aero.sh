@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Frutiger Aero Optimizer & System Cleaner v2.7
+# Frutiger Aero Optimizer & System Cleaner v2.9
 # DESARROLLADO CON IA GENERATIVA (GEMINI)
 # SOLO PARA KUBUNTU 24.04 LTS (NOBLE)
 
@@ -50,7 +50,7 @@ init_state() {
     if [ ! -f "$STATE_FILE" ]; then
         echo "# Archivo de estado Frutiger Aero" > "$STATE_FILE"
         for svc in cups bluetooth ModemManager; do
-            state=$(systemctl is-enabled $svc 2>/dev/null || echo "disabled")
+            state=$(systemctl is-enabled "$svc" 2>/dev/null || echo "disabled")
             echo "SVC_$svc=\"$state\"" >> "$STATE_FILE"
         done
         baloo_state=$(balooctl status 2>&1 | grep -q "is running" && echo "enabled" || echo "disabled")
@@ -79,12 +79,14 @@ restore_system() {
     restore_setting kdeglobals KDE AnimationDurationFactor
     restore_setting kdeglobals Sounds EnableSounds
     restore_setting kdeglobals Sounds Theme
+    restore_setting plasmarc Theme name
 
     if [ -n "$OLD_kvantum_kvconfig" ]; then
         echo -e "[General]\ntheme=$OLD_kvantum_kvconfig" > ~/.config/Kvantum/kvantum.kvconfig
     fi
     rm -rf ~/.config/Kvantum/AeroGlass
     rm -rf ~/.local/share/sounds/frutiger-aero
+    rm -rf ~/.local/share/icons/crystal-remix-icon-theme-diinki-version
 
     for svc in cups bluetooth ModemManager; do
         var="SVC_$svc"
@@ -116,7 +118,7 @@ optimize_system() {
 
 install_dependencies() {
     echo -e "${GREEN}[*] Instalando dependencias estéticas...${NC}"
-    sudo apt install -y gamemode qt5-style-kvantum qt5-style-kvantum-themes oxygen-cursor-theme oxygen-cursor-theme-extra jq
+    sudo apt install -y gamemode qt5-style-kvantum qt5-style-kvantum-themes oxygen-cursor-theme oxygen-cursor-theme-extra jq git
 }
 
 apply_visuals() {
@@ -148,6 +150,31 @@ apply_visuals() {
     kwriteconfig5 --file kwinrc --group Plugins --key wobblywindowsEnabled true
     kwriteconfig5 --file kwinrc --group Plugins --key blurEnabled true
     kwriteconfig5 --file kdeglobals --group KDE --key AnimationDurationFactor 1.2
+}
+
+apply_bar_and_icons() {
+    echo -e "${GREEN}[*] Mejorando Barra de Tareas (Panel) e Iconos...${NC}"
+    init_state
+    
+    # 1. Mejorar el Panel (Plasma Style Oxygen)
+    save_setting plasmarc Theme name
+    echo -e "${BLUE}[*] Aplicando estilo de Panel Oxygen (Efecto cristal)...${NC}"
+    kwriteconfig5 --file plasmarc --group Theme --key name oxygen
+
+    # 2. Instalar Iconos Crystal Remix (Frutiger Aero Style)
+    echo -e "${BLUE}[*] Descargando iconos Crystal Remix...${NC}"
+    TEMP_ICONS="/tmp/aero_icons"
+    rm -rf "$TEMP_ICONS"
+    git clone --depth 1 https://github.com/diinki/diinki-aero.git "$TEMP_ICONS"
+    
+    mkdir -p "$HOME/.local/share/icons"
+    cp -r "$TEMP_ICONS/IconTheme/crystal-remix-icon-theme-diinki-version" "$HOME/.local/share/icons/"
+    
+    save_setting kdeglobals Icons Theme
+    kwriteconfig5 --file kdeglobals --group Icons --key Theme crystal-remix-icon-theme-diinki-version
+    
+    rm -rf "$TEMP_ICONS"
+    echo -e "${GREEN}[V] Barra e Iconos actualizados.${NC}"
 }
 
 apply_wallpaper() {
@@ -230,11 +257,12 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     fi
 
     # Menu Interactivo
-    CHOICES=$(whiptail --title "Frutiger Aero Optimizer v2.7" --checklist \
-    "Selecciona las acciones a realizar (Espacio para marcar):" 20 75 7 \
+    CHOICES=$(whiptail --title "Frutiger Aero Optimizer v2.9" --checklist \
+    "Selecciona las acciones a realizar (Espacio para marcar):" 20 75 8 \
     "OPTIMIZE" "Limpieza de sistema y APT" ON \
-    "DEPS" "Instalar temas y dependencias (jq)" ON \
+    "DEPS" "Instalar temas y dependencias" ON \
     "VISUALS" "Kvantum AeroGlass y efectos KDE" ON \
+    "BAR_ICONS" "Estilo Oxygen para Panel e Iconos Crystal" ON \
     "SOUNDS" "Esquema de sonidos Oxygen" ON \
     "WALLPAPER" "Elegir fondo de pantalla" ON \
     "CHROME" "Bordes Aero y Tema para Chrome" ON \
@@ -250,6 +278,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
             "\"OPTIMIZE\"") optimize_system ;;
             "\"DEPS\"") install_dependencies ;;
             "\"VISUALS\"") apply_visuals ;;
+            "\"BAR_ICONS\"") apply_bar_and_icons ;;
             "\"SOUNDS\"") apply_sounds ;;
             "\"WALLPAPER\"") apply_wallpaper ;;
             "\"CHROME\"") apply_chrome_tweaks ;;
