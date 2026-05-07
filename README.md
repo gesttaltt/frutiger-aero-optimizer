@@ -60,5 +60,18 @@ Este script transforma tu instalación de **Kubuntu 24.04 LTS** en una cápsula 
 - `assets/wallpapers/`: Colección curada de fondos 4K.
 - `assets/sounds/`: Recursos sonoros adicionales.
 
+## 🛠️ Solución de Problemas (Troubleshooting)
+- **Kvantum no aplica:** Asegúrate de abrir `Kvantum Manager` manualmente una vez y verificar que `AeroGlass` está seleccionado si el script falla en la detección.
+- **Iconos no cambian:** A veces KDE necesita una limpieza de cache de iconos: `rm ~/.cache/icon-cache.kcache`.
+- **Efectos lentos:** Si los efectos como *Blur* ralentizan tu PC, puedes ajustar la velocidad de las animaciones en el script o en Preferencias del Sistema > Comportamiento del Escritorio.
+
+## 🤝 Créditos y Agradecimientos
+Este proyecto integra el trabajo de talentosos artistas de la comunidad:
+- **Iconos Crystal Remix:** Por [diinki](https://github.com/diinki/diinki-aero).
+- **Temas SDDM/Plasma:** Inspirados en el trabajo de [AeroThemePlasma](https://github.com/aeroshell-desktop/aerothemeplasma).
+- **Plymouth Vista:** Por [furkrn](https://github.com/furkrn/PlymouthVista).
+- **Wallpaper Assets:** Colección curada de diversas fuentes de la comunidad Frutiger Aero.
+
 ---
 *Dedicado a la era del optimismo digital, la transparencia y el agua.* 🫧🐬✨
+
