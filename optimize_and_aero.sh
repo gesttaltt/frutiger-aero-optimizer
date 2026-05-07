@@ -215,48 +215,50 @@ disable_services() {
 
 # --- LÓGICA PRINCIPAL ---
 
-if [[ "$1" == "--restore" ]] || [[ "$1" == "-r" ]]; then
-    restore_system
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    if [[ "$1" == "--restore" ]] || [[ "$1" == "-r" ]]; then
+        restore_system
+    fi
+
+    # Comprobación de sistema
+    OS_VER=$(grep "VERSION_ID" /etc/os-release | cut -d'"' -f2)
+    OS_NAME=$(grep "^ID=" /etc/os-release | cut -d'=' -f2)
+
+    if [[ "$OS_NAME" != "ubuntu" ]] || [[ "$OS_VER" != "24.04" ]]; then
+        echo -e "${RED}[!] ERROR: Sistema no compatible.${NC}"
+        exit 1
+    fi
+
+    # Menu Interactivo
+    CHOICES=$(whiptail --title "Frutiger Aero Optimizer v2.7" --checklist \
+    "Selecciona las acciones a realizar (Espacio para marcar):" 20 75 7 \
+    "OPTIMIZE" "Limpieza de sistema y APT" ON \
+    "DEPS" "Instalar temas y dependencias (jq)" ON \
+    "VISUALS" "Kvantum AeroGlass y efectos KDE" ON \
+    "SOUNDS" "Esquema de sonidos Oxygen" ON \
+    "WALLPAPER" "Elegir fondo de pantalla" ON \
+    "CHROME" "Bordes Aero y Tema para Chrome" ON \
+    "SERVICES" "Deshabilitar Impresoras/BT/Baloo" OFF 3>&1 1>&2 2>&3)
+
+    if [ -z "$CHOICES" ]; then
+        echo "Cancelado por el usuario."
+        exit 0
+    fi
+
+    for choice in $CHOICES; do
+        case $choice in
+            "\"OPTIMIZE\"") optimize_system ;;
+            "\"DEPS\"") install_dependencies ;;
+            "\"VISUALS\"") apply_visuals ;;
+            "\"SOUNDS\"") apply_sounds ;;
+            "\"WALLPAPER\"") apply_wallpaper ;;
+            "\"CHROME\"") apply_chrome_tweaks ;;
+            "\"SERVICES\"") disable_services ;;
+        esac
+    done
+
+    echo -e "${CYAN}---------------------------------------------------${NC}"
+    echo -e "${GREEN}  ¡Operación completada con éxito!                ${NC}"
+    echo -e "${BLUE}  Por favor, reinicia sesión para ver los cambios. ${NC}"
+    echo -e "${CYAN}---------------------------------------------------${NC}"
 fi
-
-# Comprobación de sistema
-OS_VER=$(grep "VERSION_ID" /etc/os-release | cut -d'"' -f2)
-OS_NAME=$(grep "^ID=" /etc/os-release | cut -d'=' -f2)
-
-if [[ "$OS_NAME" != "ubuntu" ]] || [[ "$OS_VER" != "24.04" ]]; then
-    echo -e "${RED}[!] ERROR: Sistema no compatible.${NC}"
-    exit 1
-fi
-
-# Menu Interactivo
-CHOICES=$(whiptail --title "Frutiger Aero Optimizer v2.7" --checklist \
-"Selecciona las acciones a realizar (Espacio para marcar):" 20 75 7 \
-"OPTIMIZE" "Limpieza de sistema y APT" ON \
-"DEPS" "Instalar temas y dependencias (jq)" ON \
-"VISUALS" "Kvantum AeroGlass y efectos KDE" ON \
-"SOUNDS" "Esquema de sonidos Oxygen" ON \
-"WALLPAPER" "Elegir fondo de pantalla" ON \
-"CHROME" "Bordes Aero y Tema para Chrome" ON \
-"SERVICES" "Deshabilitar Impresoras/BT/Baloo" OFF 3>&1 1>&2 2>&3)
-
-if [ -z "$CHOICES" ]; then
-    echo "Cancelado por el usuario."
-    exit 0
-fi
-
-for choice in $CHOICES; do
-    case $choice in
-        "\"OPTIMIZE\"") optimize_system ;;
-        "\"DEPS\"") install_dependencies ;;
-        "\"VISUALS\"") apply_visuals ;;
-        "\"SOUNDS\"") apply_sounds ;;
-        "\"WALLPAPER\"") apply_wallpaper ;;
-        "\"CHROME\"") apply_chrome_tweaks ;;
-        "\"SERVICES\"") disable_services ;;
-    esac
-done
-
-echo -e "${CYAN}---------------------------------------------------${NC}"
-echo -e "${GREEN}  ¡Operación completada con éxito!                ${NC}"
-echo -e "${BLUE}  Por favor, reinicia sesión para ver los cambios. ${NC}"
-echo -e "${CYAN}---------------------------------------------------${NC}"
