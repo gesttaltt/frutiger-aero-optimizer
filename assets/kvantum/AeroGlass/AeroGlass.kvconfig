@@ -1,0 +1,18 @@
+[General]
+author=Gemini CLI
+comment=A Frutiger Aero inspired glass theme for Kvantum.
+parent=KvGlass
+
+[Base]
+background_color=#e0f0ff
+text_color=#000000
+selection_color=#3a9cd6
+selection_text_color=#ffffff
+window_background_color=#f0f8ff
+
+[Effects]
+blur_radius=20
+opacity=0.85
+glass_effect=true
+rounded_corners=8
+shadow_size=10

@@ -46,9 +46,20 @@ sudo apt install -y gamemode qt5-style-kvantum qt5-style-kvantum-themes oxygen-c
 # 3. Configuración Estética (KDE Plasma)
 echo -e "${GREEN}[*] Aplicando configuraciones visuales Frutiger Aero...${NC}"
 
-# Configurar Kvantum (KvGlass)
-mkdir -p ~/.config/Kvantum
-echo -e "[General]\ntheme=KvGlass" > ~/.config/Kvantum/kvantum.kvconfig
+# Configurar e instalar tema Kvantum (AeroGlass)
+KVANTUM_DIR="$HOME/.config/Kvantum"
+mkdir -p "$KVANTUM_DIR"
+THEME_SOURCE="$(dirname "$(readlink -f "$0")")/assets/kvantum/AeroGlass"
+
+if [ -d "$THEME_SOURCE" ]; then
+    echo -e "${BLUE}[*] Instalando tema Kvantum AeroGlass...${NC}"
+    mkdir -p "$KVANTUM_DIR/AeroGlass"
+    cp -r "$THEME_SOURCE/"* "$KVANTUM_DIR/AeroGlass/"
+    echo -e "[General]\ntheme=AeroGlass" > "$KVANTUM_DIR/kvantum.kvconfig"
+else
+    echo -e "${YELLOW}[!] No se encontró el tema AeroGlass en assets, usando KvGlass por defecto.${NC}"
+    echo -e "[General]\ntheme=KvGlass" > "$KVANTUM_DIR/kvantum.kvconfig"
+fi
 
 # Aplicar configuraciones de KDE mediante kwriteconfig5
 kwriteconfig5 --file kdeglobals --group General --key widgetStyle kvantum
@@ -64,31 +75,38 @@ echo -e "${GREEN}[*] Configurando el fondo de pantalla...${NC}"
 ASSETS_DIR="$(dirname "$(readlink -f "$0")")/assets/wallpapers"
 
 if [ -d "$ASSETS_DIR" ]; then
-    echo -e "${BLUE}[?] Elige un fondo de pantalla Frutiger Aero:${NC}"
-    options=($(ls "$ASSETS_DIR"))
-    select opt in "${options[@]}" "Usar predeterminado de KDE" "Omitir"; do
-        case $opt in
-            "Usar predeterminado de KDE")
-                if [ -f "/usr/share/wallpapers/Next/contents/images/1920x1080.png" ]; then
-                    plasma-apply-wallpaperimage /usr/share/wallpapers/Next/contents/images/1920x1080.png
-                fi
-                break
-                ;;
-            "Omitir")
-                echo "Saltando configuración de fondo."
-                break
-                ;;
-            *)
-                if [ -n "$opt" ]; then
-                    plasma-apply-wallpaperimage "$ASSETS_DIR/$opt"
-                    echo -e "${GREEN}Fondo '$opt' aplicado.${NC}"
-                    break
-                else
-                    echo "Opción inválida."
-                fi
-                ;;
-        esac
-    done
+    if [ -n "$WALLPAPER_CHOICE" ]; then
+        opt="$WALLPAPER_CHOICE"
+        echo -e "${BLUE}[!] Usando wallpaper seleccionado: $opt${NC}"
+    else
+        echo -e "${BLUE}[?] Elige un fondo de pantalla Frutiger Aero:${NC}"
+        options=($(ls "$ASSETS_DIR"))
+        select opt in "${options[@]}" "Usar predeterminado de KDE" "Omitir"; do
+            break
+        done
+    fi
+
+    case $opt in
+        "Usar predeterminado de KDE")
+            if [ -f "/usr/share/wallpapers/Next/contents/images/1920x1080.png" ]; then
+                plasma-apply-wallpaperimage /usr/share/wallpapers/Next/contents/images/1920x1080.png
+            fi
+            ;;
+        "Omitir")
+            echo "Saltando configuración de fondo."
+            ;;
+        *)
+            if [ -f "$ASSETS_DIR/$opt" ]; then
+                plasma-apply-wallpaperimage "$ASSETS_DIR/$opt"
+                echo -e "${GREEN}Fondo '$opt' aplicado.${NC}"
+            elif [ -f "$opt" ]; then
+                plasma-apply-wallpaperimage "$opt"
+                echo -e "${GREEN}Fondo '$opt' aplicado.${NC}"
+            else
+                echo -e "${RED}[!] Fondo no encontrado: $opt${NC}"
+            fi
+            ;;
+    esac
 else
     echo -e "${NC}[!] No se encontró la carpeta de assets, usando fondo por defecto."
     if [ -f "/usr/share/wallpapers/Next/contents/images/1920x1080.png" ]; then
