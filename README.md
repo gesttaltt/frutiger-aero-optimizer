@@ -1,60 +1,64 @@
-# Frutiger Aero Optimizer & KDE Customizer v2.0 🫧🐬
+# Frutiger Aero Optimizer & KDE Customizer v3.0 (Master Release) 🫧🐬✨
 
-Este script automatiza el proceso de optimización de sistema y personalización estética bajo la icónica estética **Frutiger Aero** para usuarios de KDE Plasma.
-# Frutiger Aero Optimizer & KDE Customizer v2.2 🫧🐬🐬
+Este script transforma tu instalación de **Kubuntu 24.04 LTS** en una cápsula del tiempo de la estética **Frutiger Aero** (circa 2004-2013), combinando optimización de rendimiento moderno con la nostalgia visual del brillo, el agua y la transparencia.
 
-> [!CAUTION]
-> **DISCLAIMER / AVISO IMPORTANTE:**
-> - **Compatibilidad:** Este script ha sido diseñado y probado **únicamente** para **Kubuntu 24.04 LTS (Noble Numbat)**. Su uso en otras versiones o distribuciones puede causar inestabilidad o fallos críticos.
-> - **Uso bajo discreción:** Esta optimización y personalización no están exentas de errores. El usuario asume toda la responsabilidad por cualquier fallo en el sistema. Se recomienda encarecidamente realizar un backup antes de ejecutarlo.
-> - **IA Generativa:** Este proyecto ha sido desarrollado íntegramente con la asistencia de **IA generativa (Gemini)**.
+> [!IMPORTANT]
+> **Aviso de Seguridad:** Este proyecto ha sido desarrollado con la asistencia de **IA generativa (Gemini)**. Está diseñado **exclusivamente** para **Kubuntu 24.04**. Ejecútalo bajo tu propia responsabilidad y siempre realiza un backup previo.
 
 ---
 
-## ✨ Novedades de la v2.2
-- **🔊 Inmersión Sonora:** Implementación automática del esquema de sonidos "Frutiger Aero" basado en los sonidos clásicos de Oxygen.
-- **Aviso Legal:** Se añaden advertencias de seguridad y compatibilidad.
-- **Menú Interactivo:** Elige tu fondo de pantalla favorito desde la carpeta de `assets` incluida.
-- **Comprobación de Entorno:** Ahora el script verifica si estás en KDE Plasma.
-- **Soporte de Assets Locales:** Colección de fondos de pantalla curados.
+## ✨ Novedades de la v3.0 (Master Release)
+- **🖥️ Inicio y Cierre Aero:** Integración de temas **SDDM** (Pantalla de login) y **Plymouth** (Splash de arranque) basados en el estilo clásico de Aero.
+- **🎨 Iconografía Crystal:** Instalación automática del set de iconos **Crystal Remix**, con degradados vibrantes y skeuomorfismo puro.
+- **📱 Panel Oxygen:** Configuración del estilo de panel (taskbar) **Oxygen** para recuperar los reflejos y el efecto cristal profundo.
+- **🛡️ Sistema de Seguridad (Undo):** Nueva bandera `--restore` para revertir todos los cambios y volver al estado original del sistema en cualquier momento.
+- **🌐 Optimización para Chrome:** Configuración automática para que Google Chrome herede los bordes de ventana del sistema y soporte para temas Aero de la Web Store.
+- **🕹️ Menú Interactivo:** Interfaz basada en `whiptail` para elegir exactamente qué componentes aplicar.
 
-## 🚀 ¿Qué hace este script?
+---
 
-### Rendimiento
-- Limpia cachés de APT, paquetes huérfanos y miniaturas.
-- Reduce el tamaño de los logs del sistema.
-- Instala **GameMode** para mejorar el rendimiento en juegos.
-- Deshabilita servicios innecesarios (Impresoras, Bluetooth, etc.) para ahorrar recursos.
-- Activa el mantenimiento automático de SSD (`fstrim`).
+## 🚀 Características Principales
 
-### Estética Frutiger Aero
-- **Sonidos:** Esquema de sonidos clásicos (Log-in, Log-out, Papelera).
-- **Kvantum:** Configura el estilo `KvGlass` (Efecto cristal líquido).
-- **Iconos y Cursores:** Estilo **Oxygen** (El estándar de oro de 2007).
-- **Efectos visuales:** **Lámpara Mágica**, **Ventanas Gelatinosas** y **Blur** intenso.
-- **Wallpapers:** Galería de fondos de pantalla integrada.
+### 🛠️ Optimización y Rendimiento
+- **Limpieza Profunda:** Purga de caches de APT, diarios del sistema y miniaturas.
+- **GameMode:** Instalación de herramientas de optimización para gaming.
+- **Servicios:** Deshabilitación opcional de servicios innecesarios (Impresoras, Bluetooth, Baloo) para ahorrar RAM y CPU.
+- **SSD Trim:** Activación de mantenimiento automático de discos sólidos.
 
-## 🛠️ Cómo usarlo
+### 🫧 Estética Frutiger Aero
+- **Efectos KDE:** Activación de **Lámpara Mágica**, **Ventanas Gelatinosas** y **Blur** intenso.
+- **Kvantum Glass:** Instalación del tema **AeroGlass** para transparencia real en aplicaciones Qt.
+- **Sonidos:** Esquema sonoro completo basado en los sonidos clásicos de Oxygen.
+- **Wallpapers:** Galería integrada con los paisajes de burbujas y naturaleza más icónicos.
 
-1. Clona el repositorio:
+---
+
+## 🛠️ Instalación y Uso
+
+1. **Clonar y Preparar:**
    ```bash
-   git clone https://github.com/TU_USUARIO/frutiger-aero-optimizer.git
+   git clone https://github.com/gesttaltt/frutiger-aero-optimizer.git
    cd frutiger-aero-optimizer
-   ```
-2. Dale permisos de ejecución:
-   ```bash
    chmod +x optimize_and_aero.sh
    ```
-3. Ejecuta el script:
+
+2. **Ejecutar el Menú Maestro:**
    ```bash
    ./optimize_and_aero.sh
    ```
-4. **Cierra sesión y vuelve a entrar** para disfrutar de la experiencia completa.
 
-## 📂 Estructura del Proyecto
-- `optimize_and_aero.sh`: Script principal de automatización.
-- `assets/wallpapers/`: Colección de fondos de pantalla de alta calidad.
-- `assets/`: Otros recursos visuales e iconos.
+3. **Restaurar el Sistema (Si es necesario):**
+   ```bash
+   ./optimize_and_aero.sh --restore
+   ```
 
 ---
-*Hecho con nostalgia por la era de la transparencia, el agua y el optimismo digital.* 🫧✨
+
+## 📂 Estructura del Proyecto
+- `optimize_and_aero.sh`: Script principal modular.
+- `assets/kvantum/`: Tema AeroGlass personalizado.
+- `assets/wallpapers/`: Colección curada de fondos 4K.
+- `assets/sounds/`: Recursos sonoros adicionales.
+
+---
+*Dedicado a la era del optimismo digital, la transparencia y el agua.* 🫧🐬✨

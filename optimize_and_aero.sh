@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Frutiger Aero Optimizer & System Cleaner v2.9
+# Frutiger Aero Optimizer & System Cleaner v3.0 (Master Release) 🫧🐬✨
 # DESARROLLADO CON IA GENERATIVA (GEMINI)
 # SOLO PARA KUBUNTU 24.04 LTS (NOBLE)
 
@@ -158,7 +158,6 @@ apply_bar_and_icons() {
     
     # 1. Mejorar el Panel (Plasma Style Oxygen)
     save_setting plasmarc Theme name
-    echo -e "${BLUE}[*] Aplicando estilo de Panel Oxygen (Efecto cristal)...${NC}"
     kwriteconfig5 --file plasmarc --group Theme --key name oxygen
 
     # 2. Instalar Iconos Crystal Remix (Frutiger Aero Style)
@@ -174,7 +173,39 @@ apply_bar_and_icons() {
     kwriteconfig5 --file kdeglobals --group Icons --key Theme crystal-remix-icon-theme-diinki-version
     
     rm -rf "$TEMP_ICONS"
-    echo -e "${GREEN}[V] Barra e Iconos actualizados.${NC}"
+}
+
+apply_startup_shutdown() {
+    echo -e "${GREEN}[*] Aplicando Temas de Inicio y Cierre (SDDM y Plymouth)...${NC}"
+    
+    # SDDM Theme (Login Screen)
+    echo -e "${BLUE}[*] Instalando tema SDDM Aero...${NC}"
+    TEMP_SDDM="/tmp/aero_sddm"
+    rm -rf "$TEMP_SDDM"
+    git clone --depth 1 https://github.com/aeroshell-desktop/aerothemeplasma.git "$TEMP_SDDM"
+    
+    sudo mkdir -p /usr/share/sddm/themes/
+    # Usar el mod de SDDM disponible en el repo
+    if [ -d "$TEMP_SDDM/plasma/sddm/sddm-theme-mod" ]; then
+        sudo cp -r "$TEMP_SDDM/plasma/sddm/sddm-theme-mod" /usr/share/sddm/themes/Aero
+        echo -e "[Theme]\nCurrent=Aero" | sudo tee /etc/sddm.conf.d/aero.conf > /dev/null
+    fi
+
+    # Plymouth Theme (Boot Splash)
+    echo -e "${BLUE}[*] Instalando tema Plymouth Aero Vista...${NC}"
+    TEMP_PLYMOUTH="/tmp/aero_plymouth"
+    rm -rf "$TEMP_PLYMOUTH"
+    git clone --depth 1 https://github.com/furkrn/PlymouthVista.git "$TEMP_PLYMOUTH"
+    
+    sudo mkdir -p /usr/share/plymouth/themes/
+    if [ -d "$TEMP_PLYMOUTH/PlymouthVista" ]; then
+        sudo cp -r "$TEMP_PLYMOUTH/PlymouthVista" /usr/share/plymouth/themes/
+        echo -e "${YELLOW}[!] Reconstruyendo initramfs (tardará unos segundos)...${NC}"
+        sudo plymouth-set-default-theme -R PlymouthVista || true
+    fi
+
+    rm -rf "$TEMP_SDDM" "$TEMP_PLYMOUTH"
+    echo -e "${GREEN}[V] Temas de Inicio/Cierre aplicados.${NC}"
 }
 
 apply_wallpaper() {
@@ -220,7 +251,6 @@ apply_chrome_tweaks() {
         if pgrep -x "chrome" > /dev/null; then
             echo -e "${YELLOW}[!] Chrome está abierto. Ciérralo para aplicar cambios de borde.${NC}"
         fi
-        # Usar jq para modificar el JSON de forma segura
         jq '.browser.custom_chrome_frame = true' "$CHROME_PREFS" > "$CHROME_PREFS.tmp" && mv "$CHROME_PREFS.tmp" "$CHROME_PREFS"
     fi
 
@@ -257,13 +287,14 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     fi
 
     # Menu Interactivo
-    CHOICES=$(whiptail --title "Frutiger Aero Optimizer v2.9" --checklist \
-    "Selecciona las acciones a realizar (Espacio para marcar):" 20 75 8 \
+    CHOICES=$(whiptail --title "Frutiger Aero Optimizer v3.0 (Master Release)" --checklist \
+    "Selecciona las acciones a realizar (Espacio para marcar):" 22 75 9 \
     "OPTIMIZE" "Limpieza de sistema y APT" ON \
     "DEPS" "Instalar temas y dependencias" ON \
     "VISUALS" "Kvantum AeroGlass y efectos KDE" ON \
     "BAR_ICONS" "Estilo Oxygen para Panel e Iconos Crystal" ON \
     "SOUNDS" "Esquema de sonidos Oxygen" ON \
+    "BOOT_LOGIN" "Temas Aero para SDDM y Plymouth" ON \
     "WALLPAPER" "Elegir fondo de pantalla" ON \
     "CHROME" "Bordes Aero y Tema para Chrome" ON \
     "SERVICES" "Deshabilitar Impresoras/BT/Baloo" OFF 3>&1 1>&2 2>&3)
@@ -280,6 +311,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
             "\"VISUALS\"") apply_visuals ;;
             "\"BAR_ICONS\"") apply_bar_and_icons ;;
             "\"SOUNDS\"") apply_sounds ;;
+            "\"BOOT_LOGIN\"") apply_startup_shutdown ;;
             "\"WALLPAPER\"") apply_wallpaper ;;
             "\"CHROME\"") apply_chrome_tweaks ;;
             "\"SERVICES\"") disable_services ;;
@@ -287,7 +319,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     done
 
     echo -e "${CYAN}---------------------------------------------------${NC}"
-    echo -e "${GREEN}  ¡Operación completada con éxito!                ${NC}"
-    echo -e "${BLUE}  Por favor, reinicia sesión para ver los cambios. ${NC}"
+    echo -e "${GREEN}  ¡Operación v3.0 completada con éxito!            ${NC}"
+    echo -e "${BLUE}  Por favor, reinicia para ver los cambios totales. ${NC}"
     echo -e "${CYAN}---------------------------------------------------${NC}"
 fi
