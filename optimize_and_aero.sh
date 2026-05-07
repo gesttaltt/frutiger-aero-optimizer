@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Frutiger Aero Optimizer & System Cleaner v2.5
+# Frutiger Aero Optimizer & System Cleaner v2.7
 # DESARROLLADO CON IA GENERATIVA (GEMINI)
 # SOLO PARA KUBUNTU 24.04 LTS (NOBLE)
 
@@ -89,7 +89,7 @@ restore_system() {
     for svc in cups bluetooth ModemManager; do
         var="SVC_$svc"
         if [ "${!var}" == "enabled" ]; then
-            sudo systemctl enable --now $svc || true
+            sudo systemctl enable --now "$svc" || true
         fi
     done
     
@@ -116,7 +116,7 @@ optimize_system() {
 
 install_dependencies() {
     echo -e "${GREEN}[*] Instalando dependencias estéticas...${NC}"
-    sudo apt install -y gamemode qt5-style-kvantum qt5-style-kvantum-themes oxygen-cursor-theme oxygen-cursor-theme-extra
+    sudo apt install -y gamemode qt5-style-kvantum qt5-style-kvantum-themes oxygen-cursor-theme oxygen-cursor-theme-extra jq
 }
 
 apply_visuals() {
@@ -184,6 +184,27 @@ apply_sounds() {
     kwriteconfig5 --file kdeglobals --group Sounds --key Theme frutiger-aero
 }
 
+apply_chrome_tweaks() {
+    echo -e "${GREEN}[*] Optimizando Google Chrome para Frutiger Aero...${NC}"
+    CHROME_PREFS="$HOME/.config/google-chrome/Default/Preferences"
+    
+    if [ -f "$CHROME_PREFS" ]; then
+        echo -e "${BLUE}[!] Activando borde de ventana del sistema (Aero Glass)...${NC}"
+        if pgrep -x "chrome" > /dev/null; then
+            echo -e "${YELLOW}[!] Chrome está abierto. Ciérralo para aplicar cambios de borde.${NC}"
+        fi
+        # Usar jq para modificar el JSON de forma segura
+        jq '.browser.custom_chrome_frame = true' "$CHROME_PREFS" > "$CHROME_PREFS.tmp" && mv "$CHROME_PREFS.tmp" "$CHROME_PREFS"
+    fi
+
+    echo -e "${CYAN}---------------------------------------------------${NC}"
+    echo -e "${YELLOW}PASO MANUAL PARA CHROME:${NC}"
+    echo -e "Para completar el look, instala este tema de la Web Store:"
+    echo -e "${BLUE}https://chromewebstore.google.com/detail/frutiger-aero-neue-wii-te/cnahbmhhiegadigdjaldcioapappfmik${NC}"
+    echo -e "${CYAN}---------------------------------------------------${NC}"
+    sleep 3
+}
+
 disable_services() {
     echo -e "${GREEN}[*] Deshabilitando servicios innecesarios...${NC}"
     init_state
@@ -208,13 +229,14 @@ if [[ "$OS_NAME" != "ubuntu" ]] || [[ "$OS_VER" != "24.04" ]]; then
 fi
 
 # Menu Interactivo
-CHOICES=$(whiptail --title "Frutiger Aero Optimizer v2.5" --checklist \
-"Selecciona las acciones a realizar (Espacio para marcar):" 18 70 6 \
+CHOICES=$(whiptail --title "Frutiger Aero Optimizer v2.7" --checklist \
+"Selecciona las acciones a realizar (Espacio para marcar):" 20 75 7 \
 "OPTIMIZE" "Limpieza de sistema y APT" ON \
-"DEPS" "Instalar temas y GameMode" ON \
+"DEPS" "Instalar temas y dependencias (jq)" ON \
 "VISUALS" "Kvantum AeroGlass y efectos KDE" ON \
 "SOUNDS" "Esquema de sonidos Oxygen" ON \
 "WALLPAPER" "Elegir fondo de pantalla" ON \
+"CHROME" "Bordes Aero y Tema para Chrome" ON \
 "SERVICES" "Deshabilitar Impresoras/BT/Baloo" OFF 3>&1 1>&2 2>&3)
 
 if [ -z "$CHOICES" ]; then
@@ -229,6 +251,7 @@ for choice in $CHOICES; do
         "\"VISUALS\"") apply_visuals ;;
         "\"SOUNDS\"") apply_sounds ;;
         "\"WALLPAPER\"") apply_wallpaper ;;
+        "\"CHROME\"") apply_chrome_tweaks ;;
         "\"SERVICES\"") disable_services ;;
     esac
 done
