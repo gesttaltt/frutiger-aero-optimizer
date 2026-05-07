@@ -1,12 +1,21 @@
 # Frutiger Aero Optimizer & KDE Customizer v2.0 🫧🐬
 
 Este script automatiza el proceso de optimización de sistema y personalización estética bajo la icónica estética **Frutiger Aero** para usuarios de KDE Plasma.
+# Frutiger Aero Optimizer & KDE Customizer v2.1 🫧🐬
 
-## ✨ Novedades de la v2.0
+> [!CAUTION]
+> **DISCLAIMER / AVISO IMPORTANTE:**
+> - **Compatibilidad:** Este script ha sido diseñado y probado **únicamente** para **Kubuntu 24.04 LTS (Noble Numbat)**. Su uso en otras versiones o distribuciones puede causar inestabilidad o fallos críticos.
+> - **Uso bajo discreción:** Esta optimización y personalización no están exentas de errores. El usuario asume toda la responsabilidad por cualquier fallo en el sistema. Se recomienda encarecidamente realizar un backup antes de ejecutarlo.
+> - **IA Generativa:** Este proyecto ha sido desarrollado íntegramente con la asistencia de **IA generativa (Gemini)**.
+
+---
+
+## ✨ Novedades de la v2.1
+- **Aviso Legal:** Se añaden advertencias de seguridad y compatibilidad.
 - **Menú Interactivo:** Elige tu fondo de pantalla favorito desde la carpeta de `assets` incluida.
-- **Comprobación de Entorno:** Ahora el script verifica si estás en KDE Plasma para evitar configuraciones erróneas.
-- **Soporte de Assets Locales:** Incluye una colección de fondos de pantalla curados para completar el look.
-- **Interfaz mejorada:** Mensajes en color y mejor gestión de errores.
+- **Comprobación de Entorno:** Ahora el script verifica si estás en KDE Plasma.
+- **Soporte de Assets Locales:** Colección de fondos de pantalla curados.
 
 ## 🚀 ¿Qué hace este script?
 

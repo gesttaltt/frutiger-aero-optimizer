@@ -1,28 +1,34 @@
 #!/bin/bash
 
-# Frutiger Aero Optimizer & System Cleaner v2.0
-# Un script para optimizar el rendimiento y aplicar la estetica Frutiger Aero en KDE Plasma.
+# Frutiger Aero Optimizer & System Cleaner v2.1
+# DESARROLLADO CON IA GENERATIVA (GEMINI)
+# SOLO PARA KUBUNTU 24.04 LTS (NOBLE)
 
 set -e
 
 # Colores para la terminal
+RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 CYAN='\033[0;36m'
-NC='\033[0m' # No Color
+YELLOW='\033[1;33m'
+NC='\033[0m'
 
-echo -e "${CYAN}---------------------------------------------------${NC}"
-echo -e "${BLUE}  Frutiger Aero Optimizer & Customizer v2.0        ${NC}"
-echo -e "${CYAN}---------------------------------------------------${NC}"
+echo -e "${RED}!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!${NC}"
+echo -e "${YELLOW}  ADVERTENCIA: USO BAJO SU PROPIA DISCRECIÓN       ${NC}"
+echo -e "${YELLOW}  Este script fue creado con IA (Gemini).          ${NC}"
+echo -e "${YELLOW}  Diseñado EXCLUSIVAMENTE para Kubuntu 24.04.      ${NC}"
+echo -e "${RED}!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!${NC}"
+echo ""
 
-# 0. Comprobación de entorno
-if [[ "$XDG_CURRENT_DESKTOP" != *"KDE"* ]]; then
-    echo -e "${NC}[!] Este script está diseñado específicamente para KDE Plasma."
-    echo -e "[?] ¿Deseas continuar de todas formas? (s/n)"
-    read -r response
-    if [[ "$response" != "s" ]]; then
-        exit 1
-    fi
+# 0. Comprobación estricta de sistema
+OS_VER=$(grep "VERSION_ID" /etc/os-release | cut -d'"' -f2)
+OS_NAME=$(grep "^ID=" /etc/os-release | cut -d'=' -f2)
+
+if [[ "$OS_NAME" != "ubuntu" ]] || [[ "$OS_VER" != "24.04" ]]; then
+    echo -e "${RED}[!] ERROR: Sistema no compatible.${NC}"
+    echo -e "Este script requiere Kubuntu 24.04. Tu sistema: $OS_NAME $OS_VER"
+    exit 1
 fi
 
 # 1. Optimización de Sistema
