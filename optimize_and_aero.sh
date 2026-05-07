@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Frutiger Aero Optimizer & System Cleaner v3.0 (Master Release) 🫧🐬✨
+# Frutiger Aero Optimizer & System Cleaner v3.1 (Master Release) 🫧🐬✨
 # DESARROLLADO CON IA GENERATIVA (GEMINI)
 # SOLO PARA KUBUNTU 24.04 LTS (NOBLE)
 
@@ -105,6 +105,34 @@ restore_system() {
 }
 
 # --- FUNCIONES DE ACCIÓN ---
+
+optimize_nvidia() {
+    echo -e "${GREEN}[*] Optimizando GPU NVIDIA para Gaming y Fluidez...${NC}"
+    
+    # 1. Forzar Full Composition Pipeline (Evita tearing en X11)
+    if command -v nvidia-settings > /dev/null; then
+        echo -e "${BLUE}[*] Activando ForceFullCompositionPipeline...${NC}"
+        nvidia-settings --assign CurrentMetaMode="nvidia-auto-select +0+0 {ForceFullCompositionPipeline=On}" || true
+    fi
+
+    # 2. Habilitar DRM Modeset (Mejora estabilidad y Wayland)
+    if [ -f /etc/default/grub ]; then
+        if ! grep -q "nvidia_drm.modeset=1" /etc/default/grub; then
+            echo -e "${BLUE}[*] Configurando NVIDIA DRM Modeset en GRUB...${NC}"
+            sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="nvidia_drm.modeset=1 /' /etc/default/grub
+            echo -e "${YELLOW}[!] Actualizando GRUB...${NC}"
+            sudo update-grub
+        else
+            echo -e "${GREEN}[V] DRM Modeset ya está configurado.${NC}"
+        fi
+    fi
+
+    # 3. Optimización de Energía para NVIDIA
+    if command -v nvidia-smi > /dev/null; then
+        echo -e "${BLUE}[*] Estableciendo modo de persistencia...${NC}"
+        sudo nvidia-smi -pm 1 || true
+    fi
+}
 
 optimize_system() {
     echo -e "${GREEN}[*] Limpiando caches y optimizando sistema...${NC}"
@@ -287,9 +315,10 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     fi
 
     # Menu Interactivo
-    CHOICES=$(whiptail --title "Frutiger Aero Optimizer v3.0 (Master Release)" --checklist \
-    "Selecciona las acciones a realizar (Espacio para marcar):" 22 75 9 \
+    CHOICES=$(whiptail --title "Frutiger Aero Optimizer v3.1 (Master Release)" --checklist \
+    "Selecciona las acciones a realizar (Espacio para marcar):" 22 75 10 \
     "OPTIMIZE" "Limpieza de sistema y APT" ON \
+    "NVIDIA" "Optimización GPU NVIDIA & Gaming Boost" ON \
     "DEPS" "Instalar temas y dependencias" ON \
     "VISUALS" "Kvantum AeroGlass y efectos KDE" ON \
     "BAR_ICONS" "Estilo Oxygen para Panel e Iconos Crystal" ON \
@@ -307,6 +336,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     for choice in $CHOICES; do
         case $choice in
             "\"OPTIMIZE\"") optimize_system ;;
+            "\"NVIDIA\"") optimize_nvidia ;;
             "\"DEPS\"") install_dependencies ;;
             "\"VISUALS\"") apply_visuals ;;
             "\"BAR_ICONS\"") apply_bar_and_icons ;;
@@ -319,7 +349,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     done
 
     echo -e "${CYAN}---------------------------------------------------${NC}"
-    echo -e "${GREEN}  ¡Operación v3.0 completada con éxito!            ${NC}"
+    echo -e "${GREEN}  ¡Operación v3.1 completada con éxito!            ${NC}"
     echo -e "${BLUE}  Por favor, reinicia para ver los cambios totales. ${NC}"
     echo -e "${CYAN}---------------------------------------------------${NC}"
 fi

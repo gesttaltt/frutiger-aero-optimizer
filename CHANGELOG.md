@@ -2,6 +2,13 @@
 
 Todas las novedades y cambios notables de este proyecto serán documentados en este archivo.
 
+## [3.1] - NVIDIA Gaming Boost - 2026-05-07
+### Añadido
+- **NVIDIA Optimization:** Activación de `ForceFullCompositionPipeline` para eliminar el tearing.
+- **Kernel/GRUB:** Soporte para habilitar `nvidia_drm.modeset=1` automáticamente.
+- **Power Management:** Activación del modo de persistencia para GPUs NVIDIA.
+- **UI:** Actualizado el menú interactivo con la opción de optimización de GPU.
+
 ## [3.0] - Master Release - 2026-05-07
 ### Añadido
 - **Inmersión Total:** Integración de temas para SDDM (Login) y Plymouth (Arranque).
