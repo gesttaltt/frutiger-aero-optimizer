@@ -96,7 +96,21 @@ else
     fi
 fi
 
-# 5. Servicios e Inercia
+# 5. Inmersión Sonora (Sonidos Oxygen/Aero)
+echo -e "${GREEN}[*] Configurando esquema de sonidos Frutiger Aero...${NC}"
+mkdir -p ~/.local/share/sounds/frutiger-aero/stereo
+echo -e "[Sound Theme]\nName=Frutiger Aero\nExample=Oxygen-Sys-Log-In\nInherits=oxygen" > ~/.local/share/sounds/frutiger-aero/index.theme
+
+# Enlaces simbólicos a sonidos Oxygen del sistema
+ln -sf /usr/share/sounds/Oxygen-Sys-Log-In.ogg ~/.local/share/sounds/frutiger-aero/stereo/service-login.ogg || true
+ln -sf /usr/share/sounds/Oxygen-Sys-Log-Out.ogg ~/.local/share/sounds/frutiger-aero/stereo/service-logout.ogg || true
+ln -sf /usr/share/sounds/Oxygen-Sys-Trash-Emptied.ogg ~/.local/share/sounds/frutiger-aero/stereo/trash-empty.ogg || true
+
+# Activar en KDE
+kwriteconfig5 --file kdeglobals --group Sounds --key EnableSounds true
+kwriteconfig5 --file kdeglobals --group Sounds --key Theme frutiger-aero
+
+# 6. Servicios e Inercia
 echo -e "${GREEN}[*] Ajustando servicios y mantenimiento...${NC}"
 sudo systemctl stop cups bluetooth ModemManager || true
 sudo systemctl disable cups bluetooth ModemManager || true

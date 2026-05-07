@@ -1,7 +1,7 @@
 # Frutiger Aero Optimizer & KDE Customizer v2.0 🫧🐬
 
 Este script automatiza el proceso de optimización de sistema y personalización estética bajo la icónica estética **Frutiger Aero** para usuarios de KDE Plasma.
-# Frutiger Aero Optimizer & KDE Customizer v2.1 🫧🐬
+# Frutiger Aero Optimizer & KDE Customizer v2.2 🫧🐬🐬
 
 > [!CAUTION]
 > **DISCLAIMER / AVISO IMPORTANTE:**
@@ -11,7 +11,8 @@ Este script automatiza el proceso de optimización de sistema y personalización
 
 ---
 
-## ✨ Novedades de la v2.1
+## ✨ Novedades de la v2.2
+- **🔊 Inmersión Sonora:** Implementación automática del esquema de sonidos "Frutiger Aero" basado en los sonidos clásicos de Oxygen.
 - **Aviso Legal:** Se añaden advertencias de seguridad y compatibilidad.
 - **Menú Interactivo:** Elige tu fondo de pantalla favorito desde la carpeta de `assets` incluida.
 - **Comprobación de Entorno:** Ahora el script verifica si estás en KDE Plasma.
@@ -27,10 +28,11 @@ Este script automatiza el proceso de optimización de sistema y personalización
 - Activa el mantenimiento automático de SSD (`fstrim`).
 
 ### Estética Frutiger Aero
-- Configura **Kvantum** con el estilo `KvGlass` (Efecto cristal líquido).
-- Iconos y Cursores **Oxygen** (El estándar de oro de 2007).
-- Efectos visuales: **Lámpara Mágica**, **Ventanas Gelatinosas** y **Blur** intenso.
-- Galería de fondos de pantalla integrada.
+- **Sonidos:** Esquema de sonidos clásicos (Log-in, Log-out, Papelera).
+- **Kvantum:** Configura el estilo `KvGlass` (Efecto cristal líquido).
+- **Iconos y Cursores:** Estilo **Oxygen** (El estándar de oro de 2007).
+- **Efectos visuales:** **Lámpara Mágica**, **Ventanas Gelatinosas** y **Blur** intenso.
+- **Wallpapers:** Galería de fondos de pantalla integrada.
 
 ## 🛠️ Cómo usarlo
 
