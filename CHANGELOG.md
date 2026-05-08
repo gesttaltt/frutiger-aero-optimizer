@@ -2,6 +2,12 @@
 
 Todas las novedades y cambios notables de este proyecto serán documentados en este archivo.
 
+## [3.2] - Professional Update - 2026-05-07
+### Añadido
+- **Logging System:** Implementación de un sistema de registros en `~/.frutiger_aero.log` para trazabilidad.
+- **Requirements Check:** Función automática que verifica e instala dependencias (git, jq, wget, etc.).
+- **Connectivity Check:** Validación de conexión a internet antes de operaciones críticas.
+
 ## [3.1] - NVIDIA Gaming Boost - 2026-05-07
 ### Añadido
 - **NVIDIA Optimization:** Activación de `ForceFullCompositionPipeline` para eliminar el tearing.

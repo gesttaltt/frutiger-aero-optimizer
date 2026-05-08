@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Frutiger Aero Optimizer & System Cleaner v3.1 (Master Release) 🫧🐬✨
+# Frutiger Aero Optimizer & System Cleaner v3.2 (Professional Edition) 🫧🐬✨
 # DESARROLLADO CON IA GENERATIVA (GEMINI)
 # SOLO PARA KUBUNTU 24.04 LTS (NOBLE)
 
@@ -15,6 +15,49 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 STATE_FILE="$HOME/.frutiger_aero_state.sh"
+LOG_FILE="$HOME/.frutiger_aero.log"
+
+# --- SISTEMA DE LOGS ---
+
+log_message() {
+    local level=$1
+    local message=$2
+    local timestamp
+    timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+    echo "[$timestamp] [$level] $message" >> "$LOG_FILE"
+    if [[ "$level" == "ERROR" ]]; then
+        echo -e "${RED}[!] $message${NC}"
+    elif [[ "$level" == "WARNING" ]]; then
+        echo -e "${YELLOW}[?] $message${NC}"
+    fi
+}
+
+# --- COMPROBACIÓN DE REQUISITOS ---
+
+check_requirements() {
+    log_message "INFO" "Iniciando comprobación de requisitos..."
+    local deps=("git" "jq" "whiptail" "kwriteconfig5" "wget" "curl")
+    local missing=()
+
+    for dep in "${deps[@]}"; do
+        if ! command -v "$dep" &> /dev/null; then
+            missing+=("$dep")
+        fi
+    done
+
+    if [ ${#missing[@]} -ne 0 ]; then
+        log_message "WARNING" "Faltan dependencias: ${missing[*]}. Intentando instalar..."
+        sudo apt update && sudo apt install -y "${missing[@]}"
+    else
+        log_message "INFO" "Todos los requisitos básicos están presentes."
+    fi
+
+    # Verificar conexión a internet
+    if ! ping -c 1 8.8.8.8 &> /dev/null; then
+        log_message "ERROR" "No hay conexión a internet. Algunas funciones fallarán."
+        exit 1
+    fi
+}
 
 # --- FUNCIONES DE SEGURIDAD ---
 
@@ -107,34 +150,35 @@ restore_system() {
 # --- FUNCIONES DE ACCIÓN ---
 
 optimize_nvidia() {
+    log_message "INFO" "Iniciando optimización NVIDIA..."
     echo -e "${GREEN}[*] Optimizando GPU NVIDIA para Gaming y Fluidez...${NC}"
     
     # 1. Forzar Full Composition Pipeline (Evita tearing en X11)
     if command -v nvidia-settings > /dev/null; then
+        log_message "INFO" "Activando ForceFullCompositionPipeline"
         echo -e "${BLUE}[*] Activando ForceFullCompositionPipeline...${NC}"
-        nvidia-settings --assign CurrentMetaMode="nvidia-auto-select +0+0 {ForceFullCompositionPipeline=On}" || true
+        nvidia-settings --assign CurrentMetaMode="nvidia-auto-select +0+0 {ForceFullCompositionPipeline=On}" || log_message "WARNING" "Fallo al asignar MetaMode NVIDIA"
     fi
 
     # 2. Habilitar DRM Modeset (Mejora estabilidad y Wayland)
     if [ -f /etc/default/grub ]; then
         if ! grep -q "nvidia_drm.modeset=1" /etc/default/grub; then
+            log_message "INFO" "Configurando DRM Modeset en GRUB"
             echo -e "${BLUE}[*] Configurando NVIDIA DRM Modeset en GRUB...${NC}"
             sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="nvidia_drm.modeset=1 /' /etc/default/grub
-            echo -e "${YELLOW}[!] Actualizando GRUB...${NC}"
             sudo update-grub
-        else
-            echo -e "${GREEN}[V] DRM Modeset ya está configurado.${NC}"
         fi
     fi
 
     # 3. Optimización de Energía para NVIDIA
     if command -v nvidia-smi > /dev/null; then
-        echo -e "${BLUE}[*] Estableciendo modo de persistencia...${NC}"
+        log_message "INFO" "Activando modo persistencia NVIDIA"
         sudo nvidia-smi -pm 1 || true
     fi
 }
 
 optimize_system() {
+    log_message "INFO" "Iniciando limpieza de sistema"
     echo -e "${GREEN}[*] Limpiando caches y optimizando sistema...${NC}"
     sudo apt update
     sudo apt autoremove -y
@@ -314,8 +358,12 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         exit 1
     fi
 
+    # Requisitos y Logs
+    check_requirements
+    log_message "INFO" "Iniciando sesión de optimización v3.2"
+
     # Menu Interactivo
-    CHOICES=$(whiptail --title "Frutiger Aero Optimizer v3.1 (Master Release)" --checklist \
+    CHOICES=$(whiptail --title "Frutiger Aero Optimizer v3.2 (Professional Edition)" --checklist \
     "Selecciona las acciones a realizar (Espacio para marcar):" 22 75 10 \
     "OPTIMIZE" "Limpieza de sistema y APT" ON \
     "NVIDIA" "Optimización GPU NVIDIA & Gaming Boost" ON \
@@ -349,7 +397,8 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     done
 
     echo -e "${CYAN}---------------------------------------------------${NC}"
-    echo -e "${GREEN}  ¡Operación v3.1 completada con éxito!            ${NC}"
+    echo -e "${GREEN}  ¡Operación v3.2 completada con éxito!            ${NC}"
+    echo -e "${BLUE}  Log guardado en: $LOG_FILE                      ${NC}"
     echo -e "${BLUE}  Por favor, reinicia para ver los cambios totales. ${NC}"
     echo -e "${CYAN}---------------------------------------------------${NC}"
 fi
