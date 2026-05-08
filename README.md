@@ -52,7 +52,9 @@ chmod +x optimize_and_aero.sh
 
 ### 2. Ejecución
 ```bash
-./optimize_and_aero.sh
+./optimize_and_aero.sh           # menú interactivo
+./optimize_and_aero.sh --list    # ver todos los módulos disponibles
+./optimize_and_aero.sh COLORS VISUALS FONTS   # modo no interactivo
 ```
 
 ### 3. Reversión

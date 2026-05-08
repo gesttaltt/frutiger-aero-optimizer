@@ -2,6 +2,20 @@
 
 Todas las novedades y cambios notables de este proyecto serán documentados en este archivo.
 
+## [3.9] - Bugfix & UX Update - 2026-05-08
+### Corregido
+- **Glob roto en limpieza de miniaturas:** `rm -rf "$HOME/.cache/thumbnails/*"` nunca expandía el glob al estar entre comillas — reemplazado por `find -mindepth 1 -delete`.
+- **Menú de wallpapers hardcodeado:** Solo mostraba 3 de los 5 wallpapers disponibles. Ahora se construye dinámicamente desde el array `mapfile`, ajustando las dimensiones de `whiptail` según la cantidad real de archivos.
+- **Sudo sin gestión de errores en GPU (AMD/Intel):** Los `sudo mkdir` y pipes `tee` en `optimize_gpu` no estaban en `try_run`. Ahora usan `try_run` para `mkdir` y `|| log_message WARNING` para el pipe.
+- **Restore gaps (pérdida de configuración en `--restore`):** Añadido `save_setting` antes de sobrescribir en `apply_fonts` (4 claves de fuente), `apply_decorations` (library y theme de kdecoration2), y `apply_glass_effects` (edgehighlightEnabled, RenderingMode, gtk-theme).
+- **`INTERNET_AVAILABLE` sin valor por defecto:** Todas las comprobaciones cambiadas a `${INTERNET_AVAILABLE:-false}` para proteger llamadas directas a funciones fuera del flujo principal.
+- **`apply_bar_and_icons` sin red:** El bloque `else` (sin internet) ahora llama a `save_setting` antes de cambiar el tema de iconos.
+
+### Añadido
+- **Flag `--list` / `-l`:** Lista todos los módulos disponibles con descripción y ejemplo de uso sin lanzar el menú interactivo.
+- **Contador de progreso:** Cada módulo imprime `[N/TOTAL] Ejecutando módulo: X` en el log.
+- **Tiempo transcurrido:** El banner final muestra el total de módulos aplicados y el tiempo en segundos.
+
 ## [3.8] - The Color Scheme Update - 2026-05-08
 ### Añadido
 - **Esquema de Color Aero Blue:** Nuevo módulo `COLORS` que genera e instala `AeroBlue.colors` en `~/.local/share/color-schemes/`. Cubre todos los roles de color de KDE (Window, View, Button, Selection, Tooltip, Complementary) con la paleta auténtica de Windows Vista/7 Aero: fondo de ventanas en azul glass (#D4E1F2), vistas en blanco puro, selección en azul Aero (#3399FF) y contraste 5 para tipografía nítida.

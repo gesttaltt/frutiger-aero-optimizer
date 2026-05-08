@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Frutiger Aero Optimizer & System Cleaner v3.8 (Color Scheme Update) 🫧🐬✨
+# Frutiger Aero Optimizer & System Cleaner v3.9 (Bugfix & UX Update) 🫧🐬✨
 # DESARROLLADO CON IA GENERATIVA (GEMINI)
 # SOLO PARA KUBUNTU 24.04 LTS (NOBLE)
 
@@ -94,10 +94,11 @@ check_requirements() {
 # --- FUNCIONES DE SEGURIDAD ---
 
 show_help() {
-    echo -e "${CYAN}Frutiger Aero Optimizer v3.8 - Guía de Uso${NC}"
+    echo -e "${CYAN}Frutiger Aero Optimizer v3.9 - Guía de Uso${NC}"
     echo -e ""
     echo -e "${BLUE}ARGUMENTOS:${NC}"
     echo -e "  --help, -h     Muestra esta ayuda."
+    echo -e "  --list, -l     Lista todos los módulos disponibles."
     echo -e "  --restore, -r  Revierte los cambios y restaura el estado original."
     echo -e ""
     echo -e "${BLUE}OPCIONES DEL MENÚ:${NC}"
@@ -216,10 +217,14 @@ restore_system() {
 
 apply_fonts() {
     log_message "INFO" "Configurando tipografía Frutiger Aero..."
-    
-    # Instalamos fuentes de Microsoft libres (si están en repo) o alternativas
+    init_state
+    save_setting kdeglobals General font
+    save_setting kdeglobals General fixed
+    save_setting kdeglobals General menuFont
+    save_setting kdeglobals General toolBarFont
+
     try_run "Instalar fuentes básicas" sudo apt install -y fonts-liberation fonts-noto
-    
+
     local font="Noto Sans,10,-1,5,50,0,0,0,0,0"
     try_run "Configurar fuente general" kwriteconfig5 --file kdeglobals --group General --key font "$font"
     try_run "Configurar fuente fixed" kwriteconfig5 --file kdeglobals --group General --key fixed "Monospace,10,-1,5,50,0,0,0,0,0"
@@ -231,12 +236,15 @@ apply_fonts() {
 
 apply_decorations() {
     log_message "INFO" "Configurando decoraciones de ventana..."
-    
+    init_state
+    save_setting kwinrc "org.kde.kdecoration2" library
+    save_setting kwinrc "org.kde.kdecoration2" theme
+
     local decoration_dir="$HOME/.local/share/aurorae/themes"
     mkdir -p "$decoration_dir"
-    
+
     if [ ! -d "$decoration_dir/SevenBlack" ]; then
-        if [ "$INTERNET_AVAILABLE" = false ]; then
+        if [ "${INTERNET_AVAILABLE:-false}" = false ]; then
             log_message "WARNING" "No hay internet para descargar el tema SevenBlack. Se omitirá."
             return 1
         fi
@@ -277,18 +285,26 @@ optimize_gpu() {
         fi
     elif lspci | grep -iE "amd|ati" > /dev/null; then
         log_message "INFO" "GPU AMD detectada. Activando TearFree..."
-        sudo mkdir -p /etc/X11/xorg.conf.d/
-        echo -e 'Section "Device"\n  Identifier "AMD"\n  Driver "amdgpu"\n  Option "TearFree" "true"\nEndSection' | sudo tee /etc/X11/xorg.conf.d/20-amdgpu.conf > /dev/null
+        try_run "Crear directorio xorg.conf.d" sudo mkdir -p /etc/X11/xorg.conf.d/
+        printf 'Section "Device"\n  Identifier "AMD"\n  Driver "amdgpu"\n  Option "TearFree" "true"\nEndSection\n' \
+            | sudo tee /etc/X11/xorg.conf.d/20-amdgpu.conf > /dev/null \
+            || log_message "WARNING" "No se pudo escribir 20-amdgpu.conf"
     elif lspci | grep -i "intel" > /dev/null; then
         log_message "INFO" "GPU Intel detectada. Activando TearFree..."
-        sudo mkdir -p /etc/X11/xorg.conf.d/
-        echo -e 'Section "Device"\n  Identifier "Intel"\n  Driver "intel"\n  Option "TearFree" "true"\nEndSection' | sudo tee /etc/X11/xorg.conf.d/20-intel.conf > /dev/null
+        try_run "Crear directorio xorg.conf.d" sudo mkdir -p /etc/X11/xorg.conf.d/
+        printf 'Section "Device"\n  Identifier "Intel"\n  Driver "intel"\n  Option "TearFree" "true"\nEndSection\n' \
+            | sudo tee /etc/X11/xorg.conf.d/20-intel.conf > /dev/null \
+            || log_message "WARNING" "No se pudo escribir 20-intel.conf"
     fi
 }
 
 apply_glass_effects() {
     log_message "INFO" "Aplicando Glass & Light Tweaks..."
-    
+    init_state
+    save_setting kwinrc Plugins edgehighlightEnabled
+    save_setting kdeglobals General RenderingMode
+    save_setting kdeglobals GTK gtk-theme
+
     # 1. Brillo en bordes de ventana (Edge Highlight)
     try_run "Activar Edge Highlight" kwriteconfig5 --file kwinrc --group Plugins --key edgehighlightEnabled true
     
@@ -308,7 +324,7 @@ optimize_system() {
     try_run "Limpiar paquetes innecesarios" sudo apt autoremove -y
     try_run "Limpiar cache de APT" sudo apt clean
     try_run "Limpiar logs antiguos" sudo journalctl --vacuum-time=3d
-    try_run "Limpiar miniaturas" rm -rf "$HOME/.cache/thumbnails/*"
+    try_run "Limpiar miniaturas" find "$HOME/.cache/thumbnails" -mindepth 1 -delete
     try_run "Activar fstrim" sudo systemctl enable --now fstrim.timer
 }
 
@@ -484,7 +500,7 @@ apply_bar_and_icons() {
     try_run "Configurar Tema de Panel" kwriteconfig5 --file plasmarc --group Theme --key name oxygen
 
     # 2. Instalar Iconos Crystal Remix y Oxylite
-    if [ "$INTERNET_AVAILABLE" = true ]; then
+    if [ "${INTERNET_AVAILABLE:-false}" = true ]; then
         log_message "INFO" "Descargando set de iconos completo..."
         local TEMP_ICONS="/tmp/aero_icons"
         rm -rf "$TEMP_ICONS"
@@ -513,6 +529,7 @@ apply_bar_and_icons() {
         rm -rf "$TEMP_ICONS"
     else
         log_message "WARNING" "No hay internet para descargar iconos. Se usará Oxygen por defecto."
+        save_setting kdeglobals Icons Theme
         try_run "Configurar Iconos Oxygen" kwriteconfig5 --file kdeglobals --group Icons --key Theme oxygen
     fi
 }
@@ -565,7 +582,7 @@ apply_extra_tweaks() {
 apply_startup_shutdown() {
     log_message "INFO" "Aplicando Temas de Inicio y Cierre..."
     
-    if [ "$INTERNET_AVAILABLE" = false ]; then
+    if [ "${INTERNET_AVAILABLE:-false}" = false ]; then
         log_message "WARNING" "No hay internet para descargar temas de arranque. Se omitirá."
         return 1
     fi
@@ -614,11 +631,17 @@ apply_wallpaper() {
         local options=()
         mapfile -t options < <(ls "$ASSETS_DIR")
         if command -v whiptail &> /dev/null; then
-            opt=$(whiptail --title "Selección de Wallpaper" --menu "Elige un fondo:" 15 60 5 \
-                "${options[0]}" "Frutiger Vista 1" \
-                "${options[1]}" "Frutiger Vista 2" \
-                "${options[2]}" "Frutiger Vista 3" \
-                "Omitir" "No cambiar" 3>&1 1>&2 2>&3)
+            local menu_items=()
+            local idx=1
+            for wp in "${options[@]}"; do
+                menu_items+=("$wp" "Frutiger Vista $idx")
+                idx=$((idx + 1))
+            done
+            menu_items+=("Omitir" "No cambiar")
+            local list_h=$(( ${#options[@]} + 1 ))
+            local win_h=$(( list_h + 8 ))
+            opt=$(whiptail --title "Selección de Wallpaper" --menu "Elige un fondo:" \
+                "$win_h" 65 "$list_h" "${menu_items[@]}" 3>&1 1>&2 2>&3)
         else
             opt="Omitir"
         fi
@@ -698,6 +721,29 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         restore_system
     fi
 
+    if [[ "$1" == "--list" ]] || [[ "$1" == "-l" ]]; then
+        echo -e "${CYAN}Módulos disponibles (pasar como argumentos o seleccionar en el menú):${NC}"
+        echo -e "  ${GREEN}OPTIMIZE${NC}    Limpieza de sistema y APT"
+        echo -e "  ${GREEN}GPU${NC}         Detección de hardware y optimización de video"
+        echo -e "  ${GREEN}GLASS${NC}       Edge Glow, blur dinámico y soporte GTK"
+        echo -e "  ${GREEN}DEPS${NC}        Dependencias estéticas (Kvantum, Oxygen, gamemode)"
+        echo -e "  ${GREEN}FONTS${NC}       Fuentes clásicas estilo Segoe/Tahoma"
+        echo -e "  ${GREEN}DECOR${NC}       Bordes de ventana Aurorae SevenBlack"
+        echo -e "  ${GREEN}VISUALS${NC}     Kvantum AeroGlass, Magic Lamp, Wobbly Windows"
+        echo -e "  ${GREEN}COLORS${NC}      Esquema de color Aero Blue"
+        echo -e "  ${GREEN}BAR_ICONS${NC}   Panel Oxygen e iconos Crystal Remix/Oxylite"
+        echo -e "  ${GREEN}FOLDERS${NC}     Escritorio Folder View y ajustes de Dolphin"
+        echo -e "  ${GREEN}TWEAKS${NC}      Altura de paneles y ajustes de UI"
+        echo -e "  ${GREEN}SOUNDS${NC}      Esquema de sonidos Oxygen"
+        echo -e "  ${GREEN}BOOT_LOGIN${NC}  Temas SDDM y Plymouth estilo Vista/7"
+        echo -e "  ${GREEN}WALLPAPER${NC}   Selección de fondo de pantalla"
+        echo -e "  ${GREEN}CHROME${NC}      Bordes y tema para Google Chrome"
+        echo -e "  ${GREEN}SERVICES${NC}    Deshabilitar CUPS/Bluetooth/Baloo"
+        echo -e ""
+        echo -e "${YELLOW}Ejemplo:${NC} $0 COLORS VISUALS FONTS"
+        exit 0
+    fi
+
     # Comprobación de sistema
     if [ -f /etc/os-release ]; then
         OS_VER=$(grep "VERSION_ID" /etc/os-release | cut -d'"' -f2)
@@ -727,7 +773,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
             exit 1
         fi
 
-        CHOICES=$(whiptail --title "Frutiger Aero Optimizer v3.8 (Color Scheme Update)" --checklist \
+        CHOICES=$(whiptail --title "Frutiger Aero Optimizer v3.9 (Bugfix & UX Update)" --checklist \
         "Selecciona las acciones a realizar (Espacio para marcar):" 24 78 15 \
         "OPTIMIZE" "Limpieza de sistema y APT" ON \
         "GPU" "Detección de Hardware & Video Boost (Universal)" ON \
@@ -752,9 +798,15 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         exit 0
     fi
 
+    START_TIME=$(date +%s)
+    STEP=0
+    TOTAL=$(echo "$CHOICES" | wc -w)
+
     for choice in $CHOICES; do
         # Eliminar comillas si whiptail las añade
         choice=$(echo "$choice" | sed 's/"//g')
+        STEP=$((STEP + 1))
+        log_message "INFO" "[$STEP/$TOTAL] Ejecutando módulo: $choice"
         case $choice in
             "OPTIMIZE")   optimize_system ;;
             "GPU")        optimize_gpu ;;
@@ -775,9 +827,11 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         esac
     done
 
-    log_message "SUCCESS" "Optimización finalizada exitosamente."
+    ELAPSED=$(( $(date +%s) - START_TIME ))
+    log_message "SUCCESS" "Optimización finalizada en ${ELAPSED}s ($TOTAL módulos)."
     echo -e "${CYAN}---------------------------------------------------${NC}"
-    echo -e "${GREEN}  ¡Operación v3.8 completada con éxito!            ${NC}"
+    echo -e "${GREEN}  ¡Operación v3.9 completada con éxito!            ${NC}"
+    echo -e "${BLUE}  Módulos: $TOTAL  |  Tiempo total: ${ELAPSED}s    ${NC}"
     echo -e "${BLUE}  Log guardado en: $LOG_FILE                      ${NC}"
     echo -e "${BLUE}  Por favor, reinicia para ver los cambios totales. ${NC}"
     echo -e "${CYAN}---------------------------------------------------${NC}"
