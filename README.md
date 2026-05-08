@@ -1,4 +1,4 @@
-# Frutiger Aero Optimizer & KDE Customizer v3.2 🫧🐬✨
+# Frutiger Aero Optimizer & KDE Customizer v3.3 🫧🐬✨
 
 Este script transforma tu instalación de **Kubuntu 24.04 LTS** en una cápsula del tiempo de la estética **Frutiger Aero** (circa 2004-2013), combinando optimización de rendimiento moderno con la nostalgia visual del brillo, el agua y la transparencia.
 
@@ -7,7 +7,9 @@ Este script transforma tu instalación de **Kubuntu 24.04 LTS** en una cápsula 
 
 ---
 
-## ✨ Novedades de la v3.2 (Professional Update)
+## ✨ Novedades de la v3.3 (Aero Typography Edition)
+- **🪟 Bordes de Ventana Aero Glass:** Instalación y configuración automática del tema **SevenBlack** (Aurorae) para botones de ventana brillantes y transparentes.
+- **🔡 Tipografía Frutiger:** Ajuste automático de las fuentes del sistema al estilo clásico de la era (Segoe UI / Tahoma style).
 - **📋 Sistema de Logs:** Registro detallado de cada acción en `~/.frutiger_aero.log`.
 - **🛠️ Verificación de Requisitos:** El script ahora autoinstala las herramientas necesarias (`jq`, `git`, `whiptail`, etc.) antes de empezar.
 - **🚀 NVIDIA Gaming Boost:** Optimización específica para GPUs NVIDIA. Activa `ForceFullCompositionPipeline` para eliminar el tearing y habilita `DRM Modeset` para mayor estabilidad.

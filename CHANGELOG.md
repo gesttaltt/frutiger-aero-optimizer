@@ -2,6 +2,12 @@
 
 Todas las novedades y cambios notables de este proyecto serán documentados en este archivo.
 
+## [3.3] - Aero Typography Edition - 2026-05-07
+### Añadido
+- **Aero Decoration:** Instalación automática del tema Aurorae "SevenBlack" para bordes de ventana de cristal.
+- **Typography:** Configuración de fuentes del sistema (estilo Segoe UI / Tahoma) para mejorar la fidelidad estética.
+- **UI:** Menú interactivo ampliado con opciones de tipografía y decoración.
+
 ## [3.2] - Professional Update - 2026-05-07
 ### Añadido
 - **Logging System:** Implementación de un sistema de registros en `~/.frutiger_aero.log` para trazabilidad.

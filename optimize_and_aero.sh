@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Frutiger Aero Optimizer & System Cleaner v3.2 (Professional Edition) 🫧🐬✨
+# Frutiger Aero Optimizer & System Cleaner v3.3 (Aero Typography Edition) 🫧🐬✨
 # DESARROLLADO CON IA GENERATIVA (GEMINI)
 # SOLO PARA KUBUNTU 24.04 LTS (NOBLE)
 
@@ -148,6 +148,51 @@ restore_system() {
 }
 
 # --- FUNCIONES DE ACCIÓN ---
+
+apply_fonts() {
+    log_message "INFO" "Configurando tipografía Frutiger Aero..."
+    echo -e "${GREEN}[*] Instalando fuentes clásicas (Segoe UI / Tahoma style)...${NC}"
+    
+    # Instalamos fuentes de Microsoft libres (si están en repo) o alternativas
+    sudo apt install -y fonts-liberation fonts-noto || true
+    
+    # Intentamos configurar fuentes vía kwriteconfig5
+    # Segoe UI es la fuente por defecto de Vista/7. Si no está, usamos Noto Sans
+    local font="Noto Sans,10,-1,5,50,0,0,0,0,0"
+    kwriteconfig5 --file kdeglobals --group General --key font "$font"
+    kwriteconfig5 --file kdeglobals --group General --key fixed "Monospace,10,-1,5,50,0,0,0,0,0"
+    kwriteconfig5 --file kdeglobals --group General --key menuFont "$font"
+    kwriteconfig5 --file kdeglobals --group General --key toolBarFont "$font"
+    log_message "INFO" "Fuentes configuradas."
+}
+
+apply_decorations() {
+    log_message "INFO" "Configurando decoraciones de ventana..."
+    echo -e "${GREEN}[*] Aplicando bordes de ventana estilo Aero Glass...${NC}"
+    
+    # 1. Descargar tema de decoración Aurorae (SevenBlack es muy fiel)
+    local decoration_dir="$HOME/.local/share/aurorae/themes"
+    mkdir -p "$decoration_dir"
+    
+    if [ ! -d "$decoration_dir/SevenBlack" ]; then
+        log_message "INFO" "Descargando tema Aurorae SevenBlack..."
+        TEMP_DEC="/tmp/aero_dec"
+        rm -rf "$TEMP_DEC"
+        # Usamos un repositorio conocido que contenga temas Aero Aurorae
+        git clone --depth 1 https://github.com/Gomogura/SevenBlack.git "$TEMP_DEC" || true
+        if [ -d "$TEMP_DEC" ]; then
+            cp -r "$TEMP_DEC" "$decoration_dir/SevenBlack"
+        fi
+    fi
+
+    # 2. Activar la decoración en KWin
+    kwriteconfig5 --file kwinrc --group org.kde.kdecoration2 --key library org.kde.kwin.aurorae
+    kwriteconfig5 --file kwinrc --group org.kde.kdecoration2 --key theme "__aurorae__svg__SevenBlack"
+    
+    # Forzar recarga de KWin
+    qdbus org.kde.KWin /KWin reconfigure || true
+    log_message "INFO" "Decoración SevenBlack aplicada."
+}
 
 optimize_nvidia() {
     log_message "INFO" "Iniciando optimización NVIDIA..."
@@ -360,14 +405,16 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 
     # Requisitos y Logs
     check_requirements
-    log_message "INFO" "Iniciando sesión de optimización v3.2"
+    log_message "INFO" "Iniciando sesión de optimización v3.3"
 
     # Menu Interactivo
-    CHOICES=$(whiptail --title "Frutiger Aero Optimizer v3.2 (Professional Edition)" --checklist \
-    "Selecciona las acciones a realizar (Espacio para marcar):" 22 75 10 \
+    CHOICES=$(whiptail --title "Frutiger Aero Optimizer v3.3 (Typography Edition)" --checklist \
+    "Selecciona las acciones a realizar (Espacio para marcar):" 22 75 11 \
     "OPTIMIZE" "Limpieza de sistema y APT" ON \
     "NVIDIA" "Optimización GPU NVIDIA & Gaming Boost" ON \
     "DEPS" "Instalar temas y dependencias" ON \
+    "FONTS" "Fuentes clásicas (Segoe/Tahoma Style)" ON \
+    "DECOR" "Bordes de ventana Aero Glass" ON \
     "VISUALS" "Kvantum AeroGlass y efectos KDE" ON \
     "BAR_ICONS" "Estilo Oxygen para Panel e Iconos Crystal" ON \
     "SOUNDS" "Esquema de sonidos Oxygen" ON \
@@ -386,6 +433,8 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
             "\"OPTIMIZE\"") optimize_system ;;
             "\"NVIDIA\"") optimize_nvidia ;;
             "\"DEPS\"") install_dependencies ;;
+            "\"FONTS\"") apply_fonts ;;
+            "\"DECOR\"") apply_decorations ;;
             "\"VISUALS\"") apply_visuals ;;
             "\"BAR_ICONS\"") apply_bar_and_icons ;;
             "\"SOUNDS\"") apply_sounds ;;
@@ -397,7 +446,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     done
 
     echo -e "${CYAN}---------------------------------------------------${NC}"
-    echo -e "${GREEN}  ¡Operación v3.2 completada con éxito!            ${NC}"
+    echo -e "${GREEN}  ¡Operación v3.3 completada con éxito!            ${NC}"
     echo -e "${BLUE}  Log guardado en: $LOG_FILE                      ${NC}"
     echo -e "${BLUE}  Por favor, reinicia para ver los cambios totales. ${NC}"
     echo -e "${CYAN}---------------------------------------------------${NC}"
