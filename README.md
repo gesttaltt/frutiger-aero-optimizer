@@ -34,7 +34,8 @@ Este proyecto transforma tu **Kubuntu 24.04 LTS** en una cápsula del tiempo vis
 
 ### 🫧 Inmersión Estética (Total Look)
 - **Aero Glass:** Transparencia real con **Kvantum** y bordes de ventana **SevenBlack**.
-- **Iconografía Crystal:** El set icónico **Crystal Remix** configurado automáticamente.
+- **Paleta de Color Aero Blue:** Esquema KDE completo con la paleta auténtica de Vista/7 — fondo glass azulado, selección en azul eléctrico y vistas en blanco puro.
+- **Iconografía Crystal:** El set icónico **Crystal Remix** + **Oxylite** configurado automáticamente.
 - **Sonidos Oxygen:** Vuelve a escuchar los clics de agua y burbujas clásicos.
 - **Boot & Login:** Pantalla de carga (Plymouth) y Login (SDDM) estilo Vista/7.
 
@@ -74,10 +75,13 @@ chmod +x optimize_and_aero.sh
 ├── optimize_and_aero.sh  # Script modular principal
 ├── assets/               # Recursos visuales y sonoros
 │   ├── wallpapers/       # Galería de paisajes Aero
-│   └── sounds/           # Esquemas de sonido Oxygen
+│   ├── sounds/           # Esquemas de sonido Oxygen
+│   └── kvantum/          # Tema Kvantum AeroGlass (SVG + config)
 ├── CHANGELOG.md          # Historial de versiones
 └── README.md             # Esta guía visual
 ```
+
+> **Nota:** El esquema de color `AeroBlue.colors` se genera dinámicamente en `~/.local/share/color-schemes/` al ejecutar la opción `COLORS`. No requiere assets externos.
 
 ## 🤝 Créditos
 Gratitud infinita a los artistas de la comunidad:

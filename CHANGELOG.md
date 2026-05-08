@@ -2,6 +2,22 @@
 
 Todas las novedades y cambios notables de este proyecto serán documentados en este archivo.
 
+## [3.8] - The Color Scheme Update - 2026-05-08
+### Añadido
+- **Esquema de Color Aero Blue:** Nuevo módulo `COLORS` que genera e instala `AeroBlue.colors` en `~/.local/share/color-schemes/`. Cubre todos los roles de color de KDE (Window, View, Button, Selection, Tooltip, Complementary) con la paleta auténtica de Windows Vista/7 Aero: fondo de ventanas en azul glass (#D4E1F2), vistas en blanco puro, selección en azul Aero (#3399FF) y contraste 5 para tipografía nítida.
+- **Opción COLORS en el menú:** Integrada en el menú `whiptail` y el dispatcher `case`, activada por defecto (`ON`).
+- **Soporte de restauración:** `restore_system` ahora revierte el `ColorScheme` original y elimina `AeroBlue.colors`.
+- **Corrección de versiones:** Solucionadas las cadenas de versión obsoletas (`v3.6`/`v3.5`) en el banner del script, el título de `whiptail` y el mensaje de éxito final.
+- **Ayuda ampliada:** `--help` ahora documenta todas las opciones del menú incluyendo `GPU`, `GLASS`, `COLORS` y `SERVICES`.
+
+## [3.7] - The Icons & Folders Update - 2026-05-08
+### Añadido
+- **Escritorio Folder View:** Implementación de script D-Bus para cambiar automáticamente el layout del escritorio al modo de carpetas clásico.
+- **Set de Iconos Extendido:** Integración de los iconos **Oxylite** junto a Crystal Remix para una cobertura más completa de aplicaciones modernas.
+- **Dolphin Optimization:** Configuración automática de previsualizaciones y tamaños de icono optimizados para la estética Aero.
+- **Ajuste de Paneles:** Automatización del redimensionado de paneles a 44px para mayor fidelidad visual con Windows 7/Vista.
+- **Nuevas Opciones de Menú:** Añadidas las categorías `FOLDERS` y `TWEAKS` al menú interactivo.
+
 ## [3.6] - Robustness & Error Handling Update - 2026-05-08
 ### Añadido
 - **Sistema Safe-Run:** Implementación de envoltorios para comandos críticos que abortan el script de forma segura en caso de fallo catastrófico.

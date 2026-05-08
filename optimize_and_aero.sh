@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Frutiger Aero Optimizer & System Cleaner v3.6 (Robustness Update) 🫧🐬✨
+# Frutiger Aero Optimizer & System Cleaner v3.8 (Color Scheme Update) 🫧🐬✨
 # DESARROLLADO CON IA GENERATIVA (GEMINI)
 # SOLO PARA KUBUNTU 24.04 LTS (NOBLE)
 
@@ -94,7 +94,7 @@ check_requirements() {
 # --- FUNCIONES DE SEGURIDAD ---
 
 show_help() {
-    echo -e "${CYAN}Frutiger Aero Optimizer v3.6 - Guía de Uso${NC}"
+    echo -e "${CYAN}Frutiger Aero Optimizer v3.8 - Guía de Uso${NC}"
     echo -e ""
     echo -e "${BLUE}ARGUMENTOS:${NC}"
     echo -e "  --help, -h     Muestra esta ayuda."
@@ -102,11 +102,14 @@ show_help() {
     echo -e ""
     echo -e "${BLUE}OPCIONES DEL MENÚ:${NC}"
     echo -e "  ${GREEN}OPTIMIZE${NC}   Limpia caches de APT, logs y miniaturas para liberar espacio."
-    echo -e "  ${GREEN}NVIDIA${NC}     Mejora la fluidez en GPUs NVIDIA (Tearing fix & DRM Modeset)."
+    echo -e "  ${GREEN}GPU${NC}        Detección de hardware y mejoras de video (NVIDIA/AMD/Intel)."
+    echo -e "  ${GREEN}GLASS${NC}      Activa brillo en bordes (Edge Glow) y blur de calidad."
     echo -e "  ${GREEN}FONTS${NC}      Instala fuentes clásicas (Segoe/Tahoma Style) de la era Aero."
     echo -e "  ${GREEN}DECOR${NC}      Aplica bordes de ventana transparentes 'SevenBlack' (Aurorae)."
     echo -e "  ${GREEN}VISUALS${NC}    Activa Kvantum Glass, Lámpara Mágica y Ventanas Gelatinosas."
+    echo -e "  ${GREEN}COLORS${NC}     Aplica el esquema de color Aero Blue (paleta glass auténtica)."
     echo -e "  ${GREEN}SOUNDS${NC}     Activa el esquema de sonidos Oxygen (clics de agua y burbujas)."
+    echo -e "  ${GREEN}SERVICES${NC}   Deshabilita servicios innecesarios (CUPS/BT/Baloo)."
     echo -e ""
     echo -e "${YELLOW}NOTA:${NC} Se recomienda cerrar sesión después de aplicar cambios estéticos."
     exit 0
@@ -174,6 +177,7 @@ restore_system() {
     # shellcheck source=/dev/null
     source "$STATE_FILE"
     restore_setting kdeglobals General widgetStyle
+    restore_setting kdeglobals General ColorScheme
     restore_setting kdeglobals Icons Theme
     restore_setting kcminputrc Mouse cursorTheme
     restore_setting kwinrc Plugins magiclampEnabled
@@ -190,6 +194,7 @@ restore_system() {
     rm -rf ~/.config/Kvantum/AeroGlass
     rm -rf ~/.local/share/sounds/frutiger-aero
     rm -rf ~/.local/share/icons/crystal-remix-icon-theme-diinki-version
+    rm -f ~/.local/share/color-schemes/AeroBlue.colors
 
     for svc in cups bluetooth ModemManager; do
         var="SVC_$svc"
@@ -343,6 +348,133 @@ apply_visuals() {
     try_run "Ajustar velocidad de animación" kwriteconfig5 --file kdeglobals --group KDE --key AnimationDurationFactor 1.2
 }
 
+apply_color_scheme() {
+    log_message "INFO" "Aplicando esquema de colores Aero Blue..."
+    init_state
+    save_setting kdeglobals General ColorScheme
+
+    local SCHEME_DIR="$HOME/.local/share/color-schemes"
+    mkdir -p "$SCHEME_DIR"
+
+    cat > "$SCHEME_DIR/AeroBlue.colors" << 'COLOREOF'
+[ColorEffects:Disabled]
+Color=56,56,56
+ColorAmount=0
+ColorEffect=0
+ContrastAmount=0.65
+ContrastEffect=1
+IntensityAmount=0.1
+IntensityEffect=2
+
+[ColorEffects:Inactive]
+ChangeSelectionColor=true
+Color=112,111,110
+ColorAmount=0.025
+ColorEffect=2
+ContrastAmount=0.1
+ContrastEffect=2
+Enable=false
+IntensityAmount=0
+IntensityEffect=0
+
+[Colors:Button]
+BackgroundAlternate=200,218,238
+BackgroundNormal=216,230,246
+DecorationFocus=51,153,255
+DecorationHover=100,180,255
+ForegroundActive=0,70,170
+ForegroundInactive=90,115,155
+ForegroundLink=0,100,200
+ForegroundNegative=180,0,0
+ForegroundNeutral=170,100,0
+ForegroundNormal=15,15,15
+ForegroundPositive=0,130,50
+ForegroundVisited=110,60,160
+
+[Colors:Complementary]
+BackgroundAlternate=22,50,90
+BackgroundNormal=15,40,75
+DecorationFocus=51,153,255
+DecorationHover=100,180,255
+ForegroundActive=255,255,255
+ForegroundInactive=161,200,245
+ForegroundLink=100,174,243
+ForegroundNegative=218,68,83
+ForegroundNeutral=246,116,0
+ForegroundNormal=255,255,255
+ForegroundPositive=39,174,96
+ForegroundVisited=155,89,182
+
+[Colors:Selection]
+BackgroundAlternate=30,120,220
+BackgroundNormal=51,153,255
+DecorationFocus=255,255,255
+DecorationHover=200,235,255
+ForegroundActive=255,255,255
+ForegroundInactive=200,225,255
+ForegroundLink=255,255,255
+ForegroundNegative=255,180,180
+ForegroundNeutral=255,230,180
+ForegroundNormal=255,255,255
+ForegroundPositive=180,255,200
+ForegroundVisited=230,200,255
+
+[Colors:Tooltip]
+BackgroundAlternate=220,235,252
+BackgroundNormal=240,247,255
+DecorationFocus=51,153,255
+DecorationHover=100,180,255
+ForegroundActive=0,70,170
+ForegroundInactive=90,115,155
+ForegroundLink=0,100,200
+ForegroundNegative=180,0,0
+ForegroundNeutral=170,100,0
+ForegroundNormal=15,15,15
+ForegroundPositive=0,130,50
+ForegroundVisited=110,60,160
+
+[Colors:View]
+BackgroundAlternate=234,243,254
+BackgroundNormal=255,255,255
+DecorationFocus=51,153,255
+DecorationHover=100,180,255
+ForegroundActive=0,70,170
+ForegroundInactive=90,115,155
+ForegroundLink=0,100,200
+ForegroundNegative=180,0,0
+ForegroundNeutral=170,100,0
+ForegroundNormal=15,15,15
+ForegroundPositive=0,130,50
+ForegroundVisited=110,60,160
+
+[Colors:Window]
+BackgroundAlternate=194,212,234
+BackgroundNormal=212,225,242
+DecorationFocus=51,153,255
+DecorationHover=100,180,255
+ForegroundActive=0,70,170
+ForegroundInactive=90,115,155
+ForegroundLink=0,100,200
+ForegroundNegative=180,0,0
+ForegroundNeutral=170,100,0
+ForegroundNormal=15,15,15
+ForegroundPositive=0,130,50
+ForegroundVisited=110,60,160
+
+[General]
+ColorScheme=AeroBlue
+Name=Aero Blue
+shadeSortColumn=true
+
+[KDE]
+contrast=5
+COLOREOF
+
+    try_run "Aplicar esquema de colores" kwriteconfig5 --file kdeglobals --group General --key ColorScheme AeroBlue
+    try_run "Recargar KWin (colores)" qdbus org.kde.KWin /KWin reconfigure
+    log_message "SUCCESS" "Esquema de colores Aero Blue instalado en $SCHEME_DIR/AeroBlue.colors"
+}
+
 apply_bar_and_icons() {
     log_message "INFO" "Mejorando Barra de Tareas e Iconos..."
     init_state
@@ -351,23 +483,83 @@ apply_bar_and_icons() {
     save_setting plasmarc Theme name
     try_run "Configurar Tema de Panel" kwriteconfig5 --file plasmarc --group Theme --key name oxygen
 
-    # 2. Instalar Iconos Crystal Remix (Frutiger Aero Style)
+    # 2. Instalar Iconos Crystal Remix y Oxylite
     if [ "$INTERNET_AVAILABLE" = true ]; then
-        log_message "INFO" "Descargando iconos Crystal Remix..."
+        log_message "INFO" "Descargando set de iconos completo..."
         local TEMP_ICONS="/tmp/aero_icons"
         rm -rf "$TEMP_ICONS"
-        if try_run "Clonar iconos Crystal" git clone --depth 1 https://github.com/diinki/diinki-aero.git "$TEMP_ICONS"; then
+        mkdir -p "$TEMP_ICONS"
+        
+        # Crystal Remix
+        if try_run "Clonar iconos Crystal" git clone --depth 1 https://github.com/diinki/diinki-aero.git "$TEMP_ICONS/crystal"; then
             mkdir -p "$HOME/.local/share/icons"
-            cp -r "$TEMP_ICONS/IconTheme/crystal-remix-icon-theme-diinki-version" "$HOME/.local/share/icons/"
-            
-            save_setting kdeglobals Icons Theme
-            try_run "Configurar Iconos" kwriteconfig5 --file kdeglobals --group Icons --key Theme crystal-remix-icon-theme-diinki-version
+            cp -r "$TEMP_ICONS/crystal/IconTheme/crystal-remix-icon-theme-diinki-version" "$HOME/.local/share/icons/"
+        fi
+
+        # Oxylite (Modern Frutiger Aero)
+        if try_run "Clonar iconos Oxylite" git clone --depth 1 https://github.com/mx-2/oxylite-icon-theme.git "$TEMP_ICONS/oxylite"; then
+            mkdir -p "$HOME/.local/share/icons/Oxylite"
+            cp -r "$TEMP_ICONS/oxylite/"* "$HOME/.local/share/icons/Oxylite/"
+        fi
+        
+        save_setting kdeglobals Icons Theme
+        # Preferimos Oxylite por ser más completo, pero Crystal Remix es muy icónico.
+        # Dejaremos Oxylite como principal si se descargó con éxito.
+        if [ -d "$HOME/.local/share/icons/Oxylite" ]; then
+            try_run "Configurar Iconos Oxylite" kwriteconfig5 --file kdeglobals --group Icons --key Theme Oxylite
+        else
+            try_run "Configurar Iconos Crystal" kwriteconfig5 --file kdeglobals --group Icons --key Theme crystal-remix-icon-theme-diinki-version
         fi
         rm -rf "$TEMP_ICONS"
     else
         log_message "WARNING" "No hay internet para descargar iconos. Se usará Oxygen por defecto."
         try_run "Configurar Iconos Oxygen" kwriteconfig5 --file kdeglobals --group Icons --key Theme oxygen
     fi
+}
+
+apply_folders_and_desktop() {
+    log_message "INFO" "Configurando Escritorio y Carpetas..."
+    init_state
+    
+    # 1. Escritorio 'Folder View' (Layout de Carpetas clásico)
+    if command -v qdbus &> /dev/null; then
+        log_message "INFO" "Cambiando layout de escritorio a Folder View..."
+        try_run "Activar Folder View" qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "
+            var allDesktops = desktops();
+            for (var i = 0; i < allDesktops.length; i++) {
+                allDesktops[i].plugin = 'org.kde.plasma.folder';
+            }
+        "
+    fi
+
+    # 2. Ajustes de Dolphin (Vistas y Previsualizaciones)
+    local DOLPHIN_CONFIG="dolphinrc"
+    save_setting "$DOLPHIN_CONFIG" General ShowPreview
+    save_setting "$DOLPHIN_CONFIG" IconsMode IconSize
+    
+    try_run "Dolphin: Activar Previsualizaciones" kwriteconfig5 --file "$DOLPHIN_CONFIG" --group General --key ShowPreview true
+    try_run "Dolphin: Aumentar tamaño de iconos" kwriteconfig5 --file "$DOLPHIN_CONFIG" --group IconsMode --key IconSize 64
+    try_run "Dolphin: Tamaño de miniaturas" kwriteconfig5 --file "$DOLPHIN_CONFIG" --group IconsMode --key PreviewSize 128
+    
+    log_message "SUCCESS" "Configuración de carpetas aplicada."
+}
+
+apply_extra_tweaks() {
+    log_message "INFO" "Aplicando ajustes finos de UI..."
+    
+    # 1. Ajustar altura del panel (Aero Style - aprox 44px)
+    if command -v qdbus &> /dev/null; then
+        try_run "Ajustar altura de paneles" qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "
+            for (var i = 0; i < panels().length; i++) {
+                panels()[i].height = 44;
+            }
+        "
+    fi
+
+    # 2. Configuración de efectos de transparencia en Panel
+    # (Esto se hereda principalmente del tema de Plasma 'oxygen' aplicado antes)
+    
+    log_message "SUCCESS" "Ajustes de UI completados."
 }
 
 apply_startup_shutdown() {
@@ -524,27 +716,36 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     check_requirements
     log_message "INFO" "Sesión de optimización iniciada. Usuario: $USER"
 
-    # Menu Interactivo
-    if ! command -v whiptail &> /dev/null; then
-        log_message "ERROR" "whiptail no está instalado. No se puede mostrar el menú."
-        exit 1
-    fi
+    # Si se pasan argumentos, usarlos como CHOICES
+    if [ $# -gt 0 ]; then
+        CHOICES="$*"
+        log_message "INFO" "Ejecutando componentes seleccionados por argumentos: $CHOICES"
+    else
+        # Menu Interactivo
+        if ! command -v whiptail &> /dev/null; then
+            log_message "ERROR" "whiptail no está instalado. No se puede mostrar el menú."
+            exit 1
+        fi
 
-    CHOICES=$(whiptail --title "Frutiger Aero Optimizer v3.6 (Robustness Update)" --checklist \
-    "Selecciona las acciones a realizar (Espacio para marcar):" 22 75 12 \
-    "OPTIMIZE" "Limpieza de sistema y APT" ON \
-    "GPU" "Detección de Hardware & Video Boost (Universal)" ON \
-    "GLASS" "Efectos de Luz (Edge Glow) y Blur dinámico" ON \
-    "DEPS" "Instalar temas y dependencias" ON \
-    "FONTS" "Fuentes clásicas (Segoe/Tahoma Style)" ON \
-    "DECOR" "Bordes de ventana Aero Glass" ON \
-    "VISUALS" "Kvantum AeroGlass y efectos KDE" ON \
-    "BAR_ICONS" "Estilo Oxygen para Panel e Iconos Crystal" ON \
-    "SOUNDS" "Esquema de sonidos Oxygen" ON \
-    "BOOT_LOGIN" "Temas Aero para SDDM y Plymouth" ON \
-    "WALLPAPER" "Elegir fondo de pantalla" ON \
-    "CHROME" "Bordes Aero y Tema para Chrome" ON \
-    "SERVICES" "Deshabilitar Impresoras/BT/Baloo" OFF 3>&1 1>&2 2>&3)
+        CHOICES=$(whiptail --title "Frutiger Aero Optimizer v3.8 (Color Scheme Update)" --checklist \
+        "Selecciona las acciones a realizar (Espacio para marcar):" 24 78 15 \
+        "OPTIMIZE" "Limpieza de sistema y APT" ON \
+        "GPU" "Detección de Hardware & Video Boost (Universal)" ON \
+        "GLASS" "Efectos de Luz (Edge Glow) y Blur dinámico" ON \
+        "DEPS" "Instalar temas y dependencias" ON \
+        "FONTS" "Fuentes clásicas (Segoe/Tahoma Style)" ON \
+        "DECOR" "Bordes de ventana Aero Glass" ON \
+        "VISUALS" "Kvantum AeroGlass y efectos KDE" ON \
+        "COLORS" "Esquema de color Aero Blue (paleta glass auténtica)" ON \
+        "BAR_ICONS" "Estilo Oxygen para Panel e Iconos Crystal" ON \
+        "FOLDERS" "Escritorio 'Folder View' y ajustes de Dolphin" ON \
+        "TWEAKS" "Ajustes de Panel y UI (Aero Style)" ON \
+        "SOUNDS" "Esquema de sonidos Oxygen" ON \
+        "BOOT_LOGIN" "Temas Aero para SDDM y Plymouth" ON \
+        "WALLPAPER" "Elegir fondo de pantalla" ON \
+        "CHROME" "Bordes Aero y Tema para Chrome" ON \
+        "SERVICES" "Deshabilitar Impresoras/BT/Baloo" OFF 3>&1 1>&2 2>&3)
+    fi
 
     if [ -z "$CHOICES" ]; then
         echo "Operación cancelada."
@@ -562,7 +763,10 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
             "FONTS")      apply_fonts ;;
             "DECOR")      apply_decorations ;;
             "VISUALS")    apply_visuals ;;
+            "COLORS")     apply_color_scheme ;;
             "BAR_ICONS")  apply_bar_and_icons ;;
+            "FOLDERS")    apply_folders_and_desktop ;;
+            "TWEAKS")     apply_extra_tweaks ;;
             "SOUNDS")     apply_sounds ;;
             "BOOT_LOGIN") apply_startup_shutdown ;;
             "WALLPAPER")  apply_wallpaper ;;
@@ -573,7 +777,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 
     log_message "SUCCESS" "Optimización finalizada exitosamente."
     echo -e "${CYAN}---------------------------------------------------${NC}"
-    echo -e "${GREEN}  ¡Operación v3.5 completada con éxito!            ${NC}"
+    echo -e "${GREEN}  ¡Operación v3.8 completada con éxito!            ${NC}"
     echo -e "${BLUE}  Log guardado en: $LOG_FILE                      ${NC}"
     echo -e "${BLUE}  Por favor, reinicia para ver los cambios totales. ${NC}"
     echo -e "${CYAN}---------------------------------------------------${NC}"
