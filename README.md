@@ -59,10 +59,15 @@ Este script transforma tu instalación de **Kubuntu 24.04 LTS** en una cápsula 
    ./optimize_and_aero.sh --restore
    ```
 
+## 🕹️ Consejos de Uso (Pruébalo ahora)
+- **Inmersión Total:** Para obtener el mejor resultado, ejecuta el script y selecciona todas las opciones. Una vez terminado, **reinicia tu PC**. Al volver a entrar, el sistema de sonidos, las fuentes y los bordes de ventana estarán sincronizados.
+- **Gaming:** Si tienes NVIDIA, notarás que los juegos se sienten más fluidos gracias al *Tearing Fix*.
+- **Personalización de Chrome:** No olvides instalar el tema recomendado en el script para que el navegador combine perfectamente con tus nuevas ventanas transparentes.
+
 ---
 
 ## 📂 Estructura del Proyecto
-- `optimize_and_aero.sh`: Script principal modular.
+- `optimize_and_aero.sh`: Script principal modular con soporte para `--help`.
 - `assets/kvantum/`: Tema AeroGlass personalizado.
 - `assets/wallpapers/`: Colección curada de fondos 4K.
 - `assets/sounds/`: Recursos sonoros adicionales.
@@ -76,6 +81,7 @@ Este script transforma tu instalación de **Kubuntu 24.04 LTS** en una cápsula 
 Este proyecto integra el trabajo de talentosos artistas de la comunidad:
 - **Iconos Crystal Remix:** Por [diinki](https://github.com/diinki/diinki-aero).
 - **Temas SDDM/Plasma:** Inspirados en el trabajo de [AeroThemePlasma](https://github.com/aeroshell-desktop/aerothemeplasma).
+- **Tema de Ventanas SevenBlack:** Por [Gomogura](https://github.com/Gomogura/SevenBlack).
 - **Plymouth Vista:** Por [furkrn](https://github.com/furkrn/PlymouthVista).
 - **Wallpaper Assets:** Colección curada de diversas fuentes de la comunidad Frutiger Aero.
 

@@ -61,6 +61,25 @@ check_requirements() {
 
 # --- FUNCIONES DE SEGURIDAD ---
 
+show_help() {
+    echo -e "${CYAN}Frutiger Aero Optimizer v3.3 - Guía de Uso${NC}"
+    echo -e ""
+    echo -e "${BLUE}ARGUMENTOS:${NC}"
+    echo -e "  --help, -h     Muestra esta ayuda."
+    echo -e "  --restore, -r  Revierte los cambios y restaura el estado original."
+    echo -e ""
+    echo -e "${BLUE}OPCIONES DEL MENÚ:${NC}"
+    echo -e "  ${GREEN}OPTIMIZE${NC}   Limpia caches de APT, logs y miniaturas para liberar espacio."
+    echo -e "  ${GREEN}NVIDIA${NC}     Mejora la fluidez en GPUs NVIDIA (Tearing fix & DRM Modeset)."
+    echo -e "  ${GREEN}FONTS${NC}      Instala fuentes clásicas (Segoe/Tahoma Style) de la era Aero."
+    echo -e "  ${GREEN}DECOR${NC}      Aplica bordes de ventana transparentes 'SevenBlack' (Aurorae)."
+    echo -e "  ${GREEN}VISUALS${NC}    Activa Kvantum Glass, Lámpara Mágica y Ventanas Gelatinosas."
+    echo -e "  ${GREEN}SOUNDS${NC}     Activa el esquema de sonidos Oxygen (clics de agua y burbujas)."
+    echo -e ""
+    echo -e "${YELLOW}NOTA:${NC} Se recomienda cerrar sesión después de aplicar cambios estéticos."
+    exit 0
+}
+
 save_setting() {
     local file=$1
     local group=$2
@@ -390,6 +409,10 @@ disable_services() {
 # --- LÓGICA PRINCIPAL ---
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
+        show_help
+    fi
+
     if [[ "$1" == "--restore" ]] || [[ "$1" == "-r" ]]; then
         restore_system
     fi
