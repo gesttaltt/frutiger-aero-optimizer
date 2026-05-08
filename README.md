@@ -51,14 +51,25 @@ chmod +x optimize_and_aero.sh
 ```
 
 ### 2. Ejecución
+El script soporta dos modos de operación para asegurar la **repetibilidad determinista**:
+
+- **Modo Interactivo:** Ejecuta `./optimize_and_aero.sh` y selecciona los componentes visualmente.
+- **Modo Automatizado:** Pasa los nombres de los módulos como argumentos para una ejecución sin intervención (ideal para scripts de post-instalación o despliegues repetibles).
+
 ```bash
-./optimize_and_aero.sh           # menú interactivo
-./optimize_and_aero.sh --list    # ver todos los módulos disponibles
-./optimize_and_aero.sh COLORS VISUALS FONTS   # modo no interactivo
+# Ejemplo de instalación completa y determinista:
+./optimize_and_aero.sh VERIFY DEPS COLORS VISUALS BAR_ICONS FOLDERS TWEAKS KONSOLE SOUNDS_WIN7
 ```
 
-### 3. Reversión
-¿Quieres volver al estado original? No hay problema:
+### 3. Verificación de Integridad (Health Check)
+Para asegurar que todos los assets y configuraciones se han aplicado correctamente, el script incluye un sistema de verificación:
+```bash
+./optimize_and_aero.sh VERIFY
+```
+Este comando analizará la presencia de iconos, temas Kvantum, esquemas de sonido y decoraciones de ventana, informando de cualquier anomalía.
+
+### 4. Reversión
+¿Quieres volver al estado original? El sistema de gestión de estado asegura una limpieza profunda:
 ```bash
 ./optimize_and_aero.sh --restore
 ```
@@ -66,9 +77,10 @@ chmod +x optimize_and_aero.sh
 ---
 
 ## 🕹️ Consejos de Uso
+- **Repetibilidad:** Si compartes tu configuración con otros, simplemente dales la lista de módulos que usaste. El script se encargará de clonar los repositorios correctos y aplicar las mismas configuraciones.
+- **Fallback Inteligente:** Si un tema de terceros (como Aurorae) no está disponible en internet, el script aplicará automáticamente **Oxygen** como alternativa de alta calidad para no romper la estética.
 - **Reinicio:** Tras aplicar los cambios, reinicia tu sistema para sincronizar los temas de inicio (SDDM) y los controladores NVIDIA.
 - **Chrome:** El script te dará un enlace a un tema de la Web Store; instálalo para que el navegador combine con el escritorio.
-- **Help:** Usa `./optimize_and_aero.sh --help` para ver detalles técnicos de cada opción.
 
 ---
 

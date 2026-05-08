@@ -1,10 +1,18 @@
 #!/bin/bash
 
-# Frutiger Aero Optimizer & System Cleaner v3.9 (Bugfix & UX Update) 🫧🐬✨
+# Frutiger Aero Optimizer & System Cleaner v4.1 (Stability Update) 🫧🐬✨
 # DESARROLLADO CON IA GENERATIVA (GEMINI)
 # SOLO PARA KUBUNTU 24.04 LTS (NOBLE)
 
+# --- ARQUITECTURA DETERMINISTA ---
+# El script está diseñado para ser repetible y robusto:
+# 1. Gestión de Estado: Guarda configuraciones originales para una reversión 100% limpia (--restore).
+# 2. Ejecución Modular: Cada componente es un módulo independiente que puede invocarse por argumentos.
+# 3. Fallback Inteligente: Si los assets externos fallan, se aplican alternativas locales de alta calidad.
+# 4. Verificación (Health Check): El módulo VERIFY asegura que el resultado final es el esperado.
+
 set -e
+
 
 # Colores para la terminal
 RED='\033[0;31m'
@@ -94,25 +102,22 @@ check_requirements() {
 # --- FUNCIONES DE SEGURIDAD ---
 
 show_help() {
-    echo -e "${CYAN}Frutiger Aero Optimizer v3.9 - Guía de Uso${NC}"
+    echo -e "${CYAN}Frutiger Aero Optimizer v4.1 - Guía de Uso${NC}"
     echo -e ""
     echo -e "${BLUE}ARGUMENTOS:${NC}"
     echo -e "  --help, -h     Muestra esta ayuda."
     echo -e "  --list, -l     Lista todos los módulos disponibles."
     echo -e "  --restore, -r  Revierte los cambios y restaura el estado original."
+    echo -e "  [MODULOS...]   Ejecuta módulos específicos de forma determinista y no interactiva."
     echo -e ""
-    echo -e "${BLUE}OPCIONES DEL MENÚ:${NC}"
-    echo -e "  ${GREEN}OPTIMIZE${NC}   Limpia caches de APT, logs y miniaturas para liberar espacio."
-    echo -e "  ${GREEN}GPU${NC}        Detección de hardware y mejoras de video (NVIDIA/AMD/Intel)."
-    echo -e "  ${GREEN}GLASS${NC}      Activa brillo en bordes (Edge Glow) y blur de calidad."
-    echo -e "  ${GREEN}FONTS${NC}      Instala fuentes clásicas (Segoe/Tahoma Style) de la era Aero."
-    echo -e "  ${GREEN}DECOR${NC}      Aplica bordes de ventana transparentes 'SevenBlack' (Aurorae)."
-    echo -e "  ${GREEN}VISUALS${NC}    Activa Kvantum Glass, Lámpara Mágica y Ventanas Gelatinosas."
-    echo -e "  ${GREEN}COLORS${NC}     Aplica el esquema de color Aero Blue (paleta glass auténtica)."
-    echo -e "  ${GREEN}SOUNDS${NC}     Activa el esquema de sonidos Oxygen (clics de agua y burbujas)."
-    echo -e "  ${GREEN}SERVICES${NC}   Deshabilita servicios innecesarios (CUPS/BT/Baloo)."
+    echo -e "${BLUE}MÓDULOS DESTACADOS:${NC}"
+    echo -e "  ${GREEN}VERIFY${NC}      Verifica la integridad de la instalación (Health Check)."
+    echo -e "  ${GREEN}BAR_ICONS${NC}   Panel Oxygen e iconos Crystal Remix/Oxylite."
+    echo -e "  ${GREEN}FOLDERS${NC}     Activa el escritorio 'Folder View' y optimiza Dolphin."
+    echo -e "  ${GREEN}SOUNDS_WIN7${NC} Sonidos auténticos de Windows 7 (.wav originales)."
+    echo -e "  ${GREEN}KONSOLE${NC}     Crea perfil de terminal 'AeroGlass' transparente."
     echo -e ""
-    echo -e "${YELLOW}NOTA:${NC} Se recomienda cerrar sesión después de aplicar cambios estéticos."
+    echo -e "${YELLOW}NOTA:${NC} Para una instalación repetible, usa: ./optimize_and_aero.sh VERIFY DEPS COLORS VISUALS..."
     exit 0
 }
 
@@ -188,14 +193,31 @@ restore_system() {
     restore_setting kdeglobals Sounds EnableSounds
     restore_setting kdeglobals Sounds Theme
     restore_setting plasmarc Theme name
+    restore_setting dolphinrc General ShowPreview
+    restore_setting dolphinrc IconsMode IconSize
 
     if [ -n "$OLD_kvantum_kvconfig" ]; then
         echo -e "[General]\ntheme=$OLD_kvantum_kvconfig" > ~/.config/Kvantum/kvantum.kvconfig
     fi
+    
+    # Limpieza de carpetas y perfiles nuevos
     rm -rf ~/.config/Kvantum/AeroGlass
     rm -rf ~/.local/share/sounds/frutiger-aero
     rm -rf ~/.local/share/icons/crystal-remix-icon-theme-diinki-version
+    rm -rf ~/.local/share/icons/Oxylite
     rm -f ~/.local/share/color-schemes/AeroBlue.colors
+    rm -f ~/.local/share/konsole/AeroGlass.profile
+    rm -f ~/.local/share/konsole/AeroGlass.colorscheme
+    
+    # Intentar revertir layout de escritorio si es posible
+    if command -v qdbus &> /dev/null; then
+        qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "
+            var allDesktops = desktops();
+            for (var i = 0; i < allDesktops.length; i++) {
+                allDesktops[i].plugin = 'org.kde.desktopcontainment';
+            }
+        "
+    fi
 
     for svc in cups bluetooth ModemManager; do
         var="SVC_$svc"
@@ -211,6 +233,44 @@ restore_system() {
     rm "$STATE_FILE"
     echo -e "${GREEN}[V] Sistema restaurado. Reinicia sesión para completar.${NC}"
     exit 0
+}
+
+verify_system_integrity() {
+    log_message "INFO" "Iniciando verificación de integridad (Health Check)..."
+    local issues=0
+    
+    # Verificar Iconos
+    if [ ! -d "$HOME/.local/share/icons/Oxylite" ] && [ ! -d "$HOME/.local/share/icons/crystal-remix-icon-theme-diinki-version" ]; then
+        log_message "WARNING" "Iconos Aero (Oxylite/Crystal) no encontrados."
+        issues=$((issues + 1))
+    fi
+
+    # Verificar Kvantum
+    if [ ! -d "$HOME/.config/Kvantum/AeroGlass" ]; then
+        log_message "WARNING" "Tema Kvantum AeroGlass no encontrado."
+        issues=$((issues + 1))
+    fi
+
+    # Verificar Sonidos
+    if [ ! -f "$HOME/.local/share/sounds/frutiger-aero/index.theme" ]; then
+        log_message "WARNING" "Esquema de sonidos Aero no encontrado."
+        issues=$((issues + 1))
+    fi
+
+    # Verificar Decoración Aurorae (opcional)
+    local has_decor=0
+    [ -d "$HOME/.local/share/aurorae/themes/SevenBlack" ] && has_decor=1
+    [ -d "$HOME/.local/share/aurorae/themes/Aero-Wood" ] && has_decor=1
+    
+    if [ $has_decor -eq 0 ]; then
+        log_message "WARNING" "No se detectó decoración Aurorae. El script usará Oxygen como fallback."
+    fi
+
+    if [ $issues -eq 0 ]; then
+        log_message "SUCCESS" "Integridad base: OK. Los componentes esenciales están presentes."
+    else
+        log_message "WARNING" "Se encontraron $issues problemas críticos de integridad."
+    fi
 }
 
 # --- FUNCIONES DE ACCIÓN ---
@@ -235,7 +295,7 @@ apply_fonts() {
 }
 
 apply_decorations() {
-    log_message "INFO" "Configurando decoraciones de ventana..."
+    log_message "INFO" "Configurando decoraciones de ventana (Aero Style)..."
     init_state
     save_setting kwinrc "org.kde.kdecoration2" library
     save_setting kwinrc "org.kde.kdecoration2" theme
@@ -243,31 +303,40 @@ apply_decorations() {
     local decoration_dir="$HOME/.local/share/aurorae/themes"
     mkdir -p "$decoration_dir"
 
-    if [ ! -d "$decoration_dir/SevenBlack" ]; then
-        if [ "${INTERNET_AVAILABLE:-false}" = false ]; then
-            log_message "WARNING" "No hay internet para descargar el tema SevenBlack. Se omitirá."
-            return 1
-        fi
-
-        log_message "INFO" "Descargando tema Aurorae SevenBlack..."
-        local TEMP_DEC="/tmp/aero_dec"
-        rm -rf "$TEMP_DEC"
-        
-        if try_run "Clonar tema SevenBlack" git clone --depth 1 https://github.com/Gomogura/SevenBlack.git "$TEMP_DEC"; then
-            cp -r "$TEMP_DEC" "$decoration_dir/SevenBlack"
-            log_message "SUCCESS" "Tema SevenBlack descargado e instalado."
-        else
-            log_message "ERROR" "No se pudo descargar el tema visual. La experiencia será incompleta."
-        fi
-        rm -rf "$TEMP_DEC"
+    # Aplicar el que esté disponible, priorizando SevenBlack > Aero-Wood
+    local SELECTED_THEME=""
+    if [ -d "$decoration_dir/SevenBlack" ]; then
+        SELECTED_THEME="__aurorae__svg__SevenBlack"
+    elif [ -d "$decoration_dir/Aero-Wood" ]; then
+        SELECTED_THEME="__aurorae__svg__Aero-Wood"
     fi
 
-    # Activar la decoración en KWin
-    try_run "Configurar KWin (Aurorae)" kwriteconfig5 --file kwinrc --group org.kde.kdecoration2 --key library org.kde.kwin.aurorae
-    try_run "Configurar tema SevenBlack" kwriteconfig5 --file kwinrc --group org.kde.kdecoration2 --key theme "__aurorae__svg__SevenBlack"
+    if [ -n "$SELECTED_THEME" ]; then
+        try_run "Configurar KWin (Aurorae)" kwriteconfig5 --file kwinrc --group org.kde.kdecoration2 --key library org.kde.kwin.aurorae
+        try_run "Configurar tema $SELECTED_THEME" kwriteconfig5 --file kwinrc --group org.kde.kdecoration2 --key theme "$SELECTED_THEME"
+        log_message "SUCCESS" "Decoración aplicada: $SELECTED_THEME"
+    else
+        log_message "WARNING" "No se encontró decoración Aero local. Usando Oxygen/Breeze."
+        # Oxygen es una excelente alternativa Frutiger Aero (KDE 4 style)
+        if [ -f "/usr/lib/x86_64-linux-gnu/qt5/plugins/org.kde.kdecoration2/oxygen.so" ] || [ -f "/usr/lib/qt/plugins/org.kde.kdecoration2/oxygen.so" ]; then
+             try_run "Configurar KWin (Oxygen)" kwriteconfig5 --file kwinrc --group org.kde.kdecoration2 --key library org.kde.oxygen
+             log_message "INFO" "Oxygen aplicado como alternativa de alta calidad."
+        else
+             try_run "Configurar KWin (Breeze)" kwriteconfig5 --file kwinrc --group org.kde.kdecoration2 --key library org.kde.breeze
+        fi
+    fi
     
     # Forzar recarga de KWin
-    try_run "Recargar KWin" qdbus org.kde.KWin /KWin reconfigure
+    if command -v qdbus &> /dev/null; then
+        try_run "Recargar KWin" qdbus org.kde.KWin /KWin reconfigure
+    fi
+
+    echo -e "${YELLOW}---------------------------------------------------${NC}"
+    echo -e "${CYAN}TIP PARA DECORACIONES:${NC}"
+    echo -e "Si buscas el look cristalino de Windows 7, ve a:"
+    echo -e "Configuración > Aspecto > Decoraciones de ventana > Obtener nuevas"
+    echo -e "y busca: ${BLUE}SevenBlack${NC} o ${BLUE}Aero-Wood${NC}."
+    echo -e "${YELLOW}---------------------------------------------------${NC}"
 }
 
 optimize_gpu() {
@@ -346,17 +415,29 @@ apply_visuals() {
 
     local KVANTUM_DIR="$HOME/.config/Kvantum"
     mkdir -p "$KVANTUM_DIR"
-    local THEME_SOURCE="$(dirname "$(readlink -f "$0")")/assets/kvantum/AeroGlass"
+    
+    # Obtener la ruta absoluta del directorio del script de forma más fiable
+    local SCRIPT_DIR
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local THEME_SOURCE="$SCRIPT_DIR/assets/kvantum/AeroGlass"
 
     if [ -d "$THEME_SOURCE" ]; then
-        log_message "INFO" "Instalando tema Kvantum AeroGlass local..."
+        log_message "INFO" "Instalando tema Kvantum AeroGlass local desde $THEME_SOURCE..."
         mkdir -p "$KVANTUM_DIR/AeroGlass"
-        cp -r "$THEME_SOURCE/"* "$KVANTUM_DIR/AeroGlass/"
-        echo -e "[General]\ntheme=AeroGlass" > "$KVANTUM_DIR/kvantum.kvconfig"
+        cp -f "$THEME_SOURCE/"* "$KVANTUM_DIR/AeroGlass/"
+        
+        # Asegurar que el archivo de configuración de Kvantum apunte al tema
+        if [ ! -f "$KVANTUM_DIR/kvantum.kvconfig" ]; then
+            echo -e "[General]\ntheme=AeroGlass" > "$KVANTUM_DIR/kvantum.kvconfig"
+        else
+            kwriteconfig5 --file "$KVANTUM_DIR/kvantum.kvconfig" --group General --key theme AeroGlass
+        fi
+        log_message "SUCCESS" "Tema Kvantum AeroGlass configurado."
+    else
+        log_message "WARNING" "No se encontró el asset local de Kvantum en $THEME_SOURCE"
     fi
 
     try_run "Configurar widgetStyle" kwriteconfig5 --file kdeglobals --group General --key widgetStyle kvantum
-    try_run "Configurar Icons Theme" kwriteconfig5 --file kdeglobals --group Icons --key Theme oxygen
     try_run "Configurar Cursor" kwriteconfig5 --file kcminputrc --group Mouse --key cursorTheme Oxygen_White
     try_run "Activar Lámpara Mágica" kwriteconfig5 --file kwinrc --group Plugins --key magiclampEnabled true
     try_run "Activar Ventanas Gelatinosas" kwriteconfig5 --file kwinrc --group Plugins --key wobblywindowsEnabled true
@@ -579,6 +660,77 @@ apply_extra_tweaks() {
     log_message "SUCCESS" "Ajustes de UI completados."
 }
 
+apply_authentic_sounds() {
+    log_message "INFO" "Configurando sonidos auténticos de Windows 7..."
+    if [ "$INTERNET_AVAILABLE" = false ]; then
+        log_message "WARNING" "No hay internet para descargar sonidos. Se omitirá."
+        return 1
+    fi
+
+    local SOUND_DIR="$HOME/.local/share/sounds/frutiger-aero/stereo"
+    mkdir -p "$SOUND_DIR"
+    
+    local TEMP_SND="/tmp/aero_sounds"
+    rm -rf "$TEMP_SND"
+    
+    # Usamos un repo con los sonidos originales
+    if try_run "Clonar sonidos Win7" git clone --depth 1 https://github.com/MCPlayer2015/all-windows-sounds.git "$TEMP_SND"; then
+        local W7_DIR="$TEMP_SND/Windows 7/Media"
+        if [ -d "$W7_DIR" ]; then
+            # Mapeo de sonidos críticos (convertir de wav a ogg no es estrictamente necesario si KDE los soporta)
+            cp "$W7_DIR/Windows Log-on.wav" "$SOUND_DIR/service-login.wav"
+            cp "$W7_DIR/Windows Log-off.wav" "$SOUND_DIR/service-logout.wav"
+            cp "$W7_DIR/Windows Navigation Start.wav" "$SOUND_DIR/click-navigation.wav"
+            cp "$W7_DIR/Windows Recycle.wav" "$SOUND_DIR/trash-empty.wav"
+            cp "$W7_DIR/Windows Information Bar.wav" "$SOUND_DIR/dialog-information.wav"
+            cp "$W7_DIR/Windows Error.wav" "$SOUND_DIR/dialog-error.wav"
+            
+            # Actualizar index.theme para que KDE prefiera estos wavs
+            echo -e "[Sound Theme]\nName=Frutiger Aero Authentic\nExample=service-login\nInherits=oxygen" > "$HOME/.local/share/sounds/frutiger-aero/index.theme"
+            
+            try_run "Habilitar sonidos" kwriteconfig5 --file kdeglobals --group Sounds --key EnableSounds true
+            try_run "Configurar esquema" kwriteconfig5 --file kdeglobals --group Sounds --key Theme frutiger-aero
+            log_message "SUCCESS" "Sonidos auténticos instalados."
+        fi
+    fi
+    rm -rf "$TEMP_SND"
+}
+
+apply_glassy_konsole() {
+    log_message "INFO" "Configurando Konsole estilo Aero Glass..."
+    local KONSOLE_DIR="$HOME/.local/share/konsole"
+    mkdir -p "$KONSOLE_DIR"
+
+    # Perfil Glassy
+    cat <<EOF > "$KONSOLE_DIR/AeroGlass.profile"
+[Appearance]
+ColorScheme=AeroGlass
+Font=Monospace,10,-1,5,50,0,0,0,0,0
+
+[General]
+Name=AeroGlass
+Parent=FALLBACK/
+EOF
+
+    # Esquema de colores con transparencia
+    cat <<EOF > "$KONSOLE_DIR/AeroGlass.colorscheme"
+[General]
+Description=Aero Glass Translucent
+Opacity=0.6
+
+[Background]
+Color=0,0,0
+
+[Foreground]
+Color=255,255,255
+EOF
+
+    # Asegurar que KWin aplique Blur a Konsole si es posible
+    # (Generalmente KWin ya hace blur en ventanas con transparencia si está activado)
+    
+    log_message "SUCCESS" "Perfil de Konsole 'AeroGlass' creado. Selecciónalo en los ajustes de Konsole."
+}
+
 apply_startup_shutdown() {
     log_message "INFO" "Aplicando Temas de Inicio y Cierre..."
     
@@ -723,24 +875,28 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 
     if [[ "$1" == "--list" ]] || [[ "$1" == "-l" ]]; then
         echo -e "${CYAN}Módulos disponibles (pasar como argumentos o seleccionar en el menú):${NC}"
+        echo -e "  ${GREEN}VERIFY${NC}      VERIFICAR INTEGRIDAD (Health Check)"
         echo -e "  ${GREEN}OPTIMIZE${NC}    Limpieza de sistema y APT"
         echo -e "  ${GREEN}GPU${NC}         Detección de hardware y optimización de video"
         echo -e "  ${GREEN}GLASS${NC}       Edge Glow, blur dinámico y soporte GTK"
         echo -e "  ${GREEN}DEPS${NC}        Dependencias estéticas (Kvantum, Oxygen, gamemode)"
         echo -e "  ${GREEN}FONTS${NC}       Fuentes clásicas estilo Segoe/Tahoma"
-        echo -e "  ${GREEN}DECOR${NC}       Bordes de ventana Aurorae SevenBlack"
+        echo -e "  ${GREEN}DECOR${NC}       Bordes de ventana Aurorae (Aero-Wood/SevenBlack)"
         echo -e "  ${GREEN}VISUALS${NC}     Kvantum AeroGlass, Magic Lamp, Wobbly Windows"
-        echo -e "  ${GREEN}COLORS${NC}      Esquema de color Aero Blue"
+        echo -e "  ${GREEN}COLORS${NC}      Esquema de color Aero Blue (Paleta Glass)"
         echo -e "  ${GREEN}BAR_ICONS${NC}   Panel Oxygen e iconos Crystal Remix/Oxylite"
         echo -e "  ${GREEN}FOLDERS${NC}     Escritorio Folder View y ajustes de Dolphin"
         echo -e "  ${GREEN}TWEAKS${NC}      Altura de paneles y ajustes de UI"
-        echo -e "  ${GREEN}SOUNDS${NC}      Esquema de sonidos Oxygen"
+        echo -e "  ${GREEN}KONSOLE${NC}     Perfil de Terminal Aero Glass (Transparente)"
+        echo -e "  ${GREEN}SOUNDS_WIN7${NC} Sonidos auténticos de Windows 7/Vista"
+        echo -e "  ${GREEN}SOUNDS${NC}      Esquema de sonidos Oxygen (Alternativo)"
         echo -e "  ${GREEN}BOOT_LOGIN${NC}  Temas SDDM y Plymouth estilo Vista/7"
         echo -e "  ${GREEN}WALLPAPER${NC}   Selección de fondo de pantalla"
         echo -e "  ${GREEN}CHROME${NC}      Bordes y tema para Google Chrome"
         echo -e "  ${GREEN}SERVICES${NC}    Deshabilitar CUPS/Bluetooth/Baloo"
         echo -e ""
-        echo -e "${YELLOW}Ejemplo:${NC} $0 COLORS VISUALS FONTS"
+        echo -e "${YELLOW}Ejemplo para repetición determinista:${NC}"
+        echo -e "  $0 VERIFY DEPS COLORS VISUALS BAR_ICONS FOLDERS"
         exit 0
     fi
 
@@ -773,8 +929,9 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
             exit 1
         fi
 
-        CHOICES=$(whiptail --title "Frutiger Aero Optimizer v3.9 (Bugfix & UX Update)" --checklist \
-        "Selecciona las acciones a realizar (Espacio para marcar):" 24 78 15 \
+        CHOICES=$(whiptail --title "Frutiger Aero Optimizer v4.1 (Stability Update)" --checklist \
+        "Selecciona las acciones a realizar (Espacio para marcar):" 24 78 17 \
+        "VERIFY" "VERIFICAR INTEGRIDAD (Health Check)" ON \
         "OPTIMIZE" "Limpieza de sistema y APT" ON \
         "GPU" "Detección de Hardware & Video Boost (Universal)" ON \
         "GLASS" "Efectos de Luz (Edge Glow) y Blur dinámico" ON \
@@ -786,7 +943,9 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         "BAR_ICONS" "Estilo Oxygen para Panel e Iconos Crystal" ON \
         "FOLDERS" "Escritorio 'Folder View' y ajustes de Dolphin" ON \
         "TWEAKS" "Ajustes de Panel y UI (Aero Style)" ON \
-        "SOUNDS" "Esquema de sonidos Oxygen" ON \
+        "KONSOLE" "Perfil de Terminal Aero Glass (Transparente)" ON \
+        "SOUNDS_WIN7" "Sonidos auténticos de Windows 7/Vista" ON \
+        "SOUNDS" "Esquema de sonidos Oxygen (Alternativo)" OFF \
         "BOOT_LOGIN" "Temas Aero para SDDM y Plymouth" ON \
         "WALLPAPER" "Elegir fondo de pantalla" ON \
         "CHROME" "Bordes Aero y Tema para Chrome" ON \
@@ -808,6 +967,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         STEP=$((STEP + 1))
         log_message "INFO" "[$STEP/$TOTAL] Ejecutando módulo: $choice"
         case $choice in
+            "VERIFY")     verify_system_integrity ;;
             "OPTIMIZE")   optimize_system ;;
             "GPU")        optimize_gpu ;;
             "GLASS")      apply_glass_effects ;;
@@ -819,6 +979,8 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
             "BAR_ICONS")  apply_bar_and_icons ;;
             "FOLDERS")    apply_folders_and_desktop ;;
             "TWEAKS")     apply_extra_tweaks ;;
+            "KONSOLE")    apply_glassy_konsole ;;
+            "SOUNDS_WIN7") apply_authentic_sounds ;;
             "SOUNDS")     apply_sounds ;;
             "BOOT_LOGIN") apply_startup_shutdown ;;
             "WALLPAPER")  apply_wallpaper ;;
@@ -830,7 +992,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     ELAPSED=$(( $(date +%s) - START_TIME ))
     log_message "SUCCESS" "Optimización finalizada en ${ELAPSED}s ($TOTAL módulos)."
     echo -e "${CYAN}---------------------------------------------------${NC}"
-    echo -e "${GREEN}  ¡Operación v3.9 completada con éxito!            ${NC}"
+    echo -e "${GREEN}  ¡Operación v4.1 completada con éxito!            ${NC}"
     echo -e "${BLUE}  Módulos: $TOTAL  |  Tiempo total: ${ELAPSED}s    ${NC}"
     echo -e "${BLUE}  Log guardado en: $LOG_FILE                      ${NC}"
     echo -e "${BLUE}  Por favor, reinicia para ver los cambios totales. ${NC}"

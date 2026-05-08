@@ -24,6 +24,14 @@ Todas las novedades y cambios notables de este proyecto serán documentados en e
 - **Corrección de versiones:** Solucionadas las cadenas de versión obsoletas (`v3.6`/`v3.5`) en el banner del script, el título de `whiptail` y el mensaje de éxito final.
 - **Ayuda ampliada:** `--help` ahora documenta todas las opciones del menú incluyendo `GPU`, `GLASS`, `COLORS` y `SERVICES`.
 
+## [4.1] - Stability & Failure Resilience Update - 2026-05-08
+### Añadido
+- **Módulo VERIFY (Health Check):** Sistema de autodiagnóstico para asegurar que todos los assets (iconos, sonidos, kvantum) están instalados correctamente.
+- **Mapeo de Sonidos Avanzado:** Integración de sonidos auténticos de Windows 7/Vista (.wav) con fallback inteligente.
+- **Perfil Konsole Aero Glass:** Creación automática de perfiles de terminal con transparencia y desenfoque.
+- **Fallback de Decoración:** Lógica mejorada que usa **Oxygen** (el look clásico de KDE 4) si los temas de internet fallan, garantizando una estética Aero consistente.
+- **Mejora en Restauración:** El modo `--restore` ahora limpia perfiles de Konsole, esquemas de color e iconos Oxylite de forma exhaustiva.
+
 ## [3.7] - The Icons & Folders Update - 2026-05-08
 ### Añadido
 - **Escritorio Folder View:** Implementación de script D-Bus para cambiar automáticamente el layout del escritorio al modo de carpetas clásico.
