@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Frutiger Aero Optimizer & System Cleaner v3.3 (Aero Typography Edition) 🫧🐬✨
+# Frutiger Aero Optimizer & System Cleaner v3.5 (The Glass & Light Update) 🫧🐬✨
 # DESARROLLADO CON IA GENERATIVA (GEMINI)
 # SOLO PARA KUBUNTU 24.04 LTS (NOBLE)
 
@@ -213,32 +213,46 @@ apply_decorations() {
     log_message "INFO" "Decoración SevenBlack aplicada."
 }
 
-optimize_nvidia() {
-    log_message "INFO" "Iniciando optimización NVIDIA..."
-    echo -e "${GREEN}[*] Optimizando GPU NVIDIA para Gaming y Fluidez...${NC}"
+optimize_gpu() {
+    log_message "INFO" "Detectando Hardware de Video..."
+    echo -e "${GREEN}[*] Detectando GPU y aplicando optimizaciones de fluidez...${NC}"
     
-    # 1. Forzar Full Composition Pipeline (Evita tearing en X11)
-    if command -v nvidia-settings > /dev/null; then
-        log_message "INFO" "Activando ForceFullCompositionPipeline"
-        echo -e "${BLUE}[*] Activando ForceFullCompositionPipeline...${NC}"
-        nvidia-settings --assign CurrentMetaMode="nvidia-auto-select +0+0 {ForceFullCompositionPipeline=On}" || log_message "WARNING" "Fallo al asignar MetaMode NVIDIA"
-    fi
-
-    # 2. Habilitar DRM Modeset (Mejora estabilidad y Wayland)
-    if [ -f /etc/default/grub ]; then
-        if ! grep -q "nvidia_drm.modeset=1" /etc/default/grub; then
-            log_message "INFO" "Configurando DRM Modeset en GRUB"
-            echo -e "${BLUE}[*] Configurando NVIDIA DRM Modeset en GRUB...${NC}"
+    if lspci | grep -i "nvidia" > /dev/null; then
+        log_message "INFO" "GPU NVIDIA detectada. Aplicando mejoras..."
+        if command -v nvidia-settings > /dev/null; then
+            nvidia-settings --assign CurrentMetaMode="nvidia-auto-select +0+0 {ForceFullCompositionPipeline=On}" || true
+        fi
+        sudo nvidia-smi -pm 1 || true
+        if [ -f /etc/default/grub ] && ! grep -q "nvidia_drm.modeset=1" /etc/default/grub; then
             sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="nvidia_drm.modeset=1 /' /etc/default/grub
             sudo update-grub
         fi
+    elif lspci | grep -iE "amd|ati" > /dev/null; then
+        log_message "INFO" "GPU AMD detectada. Activando TearFree..."
+        sudo mkdir -p /etc/X11/xorg.conf.d/
+        echo -e 'Section "Device"\n  Identifier "AMD"\n  Driver "amdgpu"\n  Option "TearFree" "true"\nEndSection' | sudo tee /etc/X11/xorg.conf.d/20-amdgpu.conf > /dev/null
+    elif lspci | grep -i "intel" > /dev/null; then
+        log_message "INFO" "GPU Intel detectada. Activando TearFree..."
+        sudo mkdir -p /etc/X11/xorg.conf.d/
+        echo -e 'Section "Device"\n  Identifier "Intel"\n  Driver "intel"\n  Option "TearFree" "true"\nEndSection' | sudo tee /etc/X11/xorg.conf.d/20-intel.conf > /dev/null
     fi
+}
 
-    # 3. Optimización de Energía para NVIDIA
-    if command -v nvidia-smi > /dev/null; then
-        log_message "INFO" "Activando modo persistencia NVIDIA"
-        sudo nvidia-smi -pm 1 || true
-    fi
+apply_glass_effects() {
+    log_message "INFO" "Aplicando Glass & Light Tweaks..."
+    echo -e "${GREEN}[*] Mejorando efectos de cristal y luz (Blur & Glow)...${NC}"
+    
+    # 1. Brillo en bordes de ventana (Edge Highlight)
+    kwriteconfig5 --file kwinrc --group Plugins --key edgehighlightEnabled true
+    
+    # 2. Forzar Renderizado de Calidad para Blur
+    kwriteconfig5 --file kdeglobals --group General --key RenderingMode "Quality"
+    
+    # 3. Soporte GTK (Aero style para apps no-KDE)
+    sudo apt install -y kde-config-gtk-style adwaita-icon-theme-full || true
+    kwriteconfig5 --file kdeglobals --group GTK --key gtk-theme "Breeze"
+    
+    qdbus org.kde.KWin /KWin reconfigure || true
 }
 
 optimize_system() {
@@ -428,13 +442,14 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 
     # Requisitos y Logs
     check_requirements
-    log_message "INFO" "Iniciando sesión de optimización v3.3"
+    log_message "INFO" "Iniciando sesión de optimización v3.5"
 
     # Menu Interactivo
-    CHOICES=$(whiptail --title "Frutiger Aero Optimizer v3.3 (Typography Edition)" --checklist \
-    "Selecciona las acciones a realizar (Espacio para marcar):" 22 75 11 \
+    CHOICES=$(whiptail --title "Frutiger Aero Optimizer v3.5 (The Glass & Light Update)" --checklist \
+    "Selecciona las acciones a realizar (Espacio para marcar):" 22 75 12 \
     "OPTIMIZE" "Limpieza de sistema y APT" ON \
-    "NVIDIA" "Optimización GPU NVIDIA & Gaming Boost" ON \
+    "GPU" "Detección de Hardware & Video Boost (Universal)" ON \
+    "GLASS" "Efectos de Luz (Edge Glow) y Blur dinámico" ON \
     "DEPS" "Instalar temas y dependencias" ON \
     "FONTS" "Fuentes clásicas (Segoe/Tahoma Style)" ON \
     "DECOR" "Bordes de ventana Aero Glass" ON \
@@ -454,7 +469,8 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     for choice in $CHOICES; do
         case $choice in
             "\"OPTIMIZE\"") optimize_system ;;
-            "\"NVIDIA\"") optimize_nvidia ;;
+            "\"GPU\"") optimize_gpu ;;
+            "\"GLASS\"") apply_glass_effects ;;
             "\"DEPS\"") install_dependencies ;;
             "\"FONTS\"") apply_fonts ;;
             "\"DECOR\"") apply_decorations ;;
@@ -469,7 +485,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     done
 
     echo -e "${CYAN}---------------------------------------------------${NC}"
-    echo -e "${GREEN}  ¡Operación v3.3 completada con éxito!            ${NC}"
+    echo -e "${GREEN}  ¡Operación v3.5 completada con éxito!            ${NC}"
     echo -e "${BLUE}  Log guardado en: $LOG_FILE                      ${NC}"
     echo -e "${BLUE}  Por favor, reinicia para ver los cambios totales. ${NC}"
     echo -e "${CYAN}---------------------------------------------------${NC}"

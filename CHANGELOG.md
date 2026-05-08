@@ -2,6 +2,13 @@
 
 Todas las novedades y cambios notables de este proyecto serán documentados en este archivo.
 
+## [3.5] - The Glass & Light Update - 2026-05-07
+### Añadido
+- **Hardware Auto-Detection:** El script ahora detecta si usas NVIDIA, AMD o Intel y aplica optimizaciones de vídeo específicas (TearFree / Composition Pipeline).
+- **Edge Highlight:** Activación del efecto de brillo en los bordes de las ventanas para mayor realismo Aero.
+- **GTK Aero Support:** Configuración automática para que aplicaciones GTK hereden el estilo Breeze/Aero.
+- **Quality Rendering:** Forzado de modo de renderizado de alta calidad para desenfoques (Blur) más suaves.
+
 ## [3.3] - Aero Typography Edition - 2026-05-07
 ### Añadido
 - **Aero Decoration:** Instalación automática del tema Aurorae "SevenBlack" para bordes de ventana de cristal.
