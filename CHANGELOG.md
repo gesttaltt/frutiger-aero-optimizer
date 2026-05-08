@@ -2,16 +2,16 @@
 
 Todas las novedades y cambios notables de este proyecto serán documentados en este archivo.
 
-## [3.0] - Master Release - 2026-05-07
+## [3.1] - Visual Polish - 2026-05-07
 ### Añadido
-- **Inmersión Total:** Integración de temas para SDDM (Login) y Plymouth (Arranque).
-- **Iconografía Crystal:** Instalación automática del set de iconos Crystal Remix via GitHub.
-- **Panel Oxygen:** Cambio automático al estilo de plasma Oxygen para el panel.
-- **Modularidad:** El script ahora permite ser "sourceado" para ejecutar funciones específicas.
-- **QA:** Integración de GitHub Actions para linting de código y verificación de assets.
+- **Cursores Aero:** Integración de cursores auténticos de Windows 7/Vista.
+- **Splash Screen:** Añadido el Splash Screen "Aero AuthUI" para la transición post-login.
+- **Tipografía:** Ajustes automáticos de fuentes para simular el look de Segoe UI.
+- **Seguridad:** El sistema de restauración ahora maneja los cursores y el splash screen.
 
-## [2.7] - Chrome & UX Update - 2026-05-07
-### Añadido
+## [3.0] - Master Release - 2026-05-07
+...
+
 - **Soporte para Google Chrome:** Activación de bordes de ventana del sistema y recomendaciones de temas.
 - **Menú Interactivo:** Implementación de interfaz `whiptail` para selección de componentes.
 - **Dependencias:** Integración de `jq` para manejo seguro de JSON.

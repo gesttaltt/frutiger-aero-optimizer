@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Frutiger Aero Optimizer & System Cleaner v3.0 (Master Release) 🫧🐬✨
+# Frutiger Aero Optimizer & System Cleaner v3.1 (Visual Polish) 🫧🐬✨
 # DESARROLLADO CON IA GENERATIVA (GEMINI)
 # SOLO PARA KUBUNTU 24.04 LTS (NOBLE)
 
@@ -80,6 +80,7 @@ restore_system() {
     restore_setting kdeglobals Sounds EnableSounds
     restore_setting kdeglobals Sounds Theme
     restore_setting plasmarc Theme name
+    restore_setting ksplashrc SecondShell Theme
 
     if [ -n "$OLD_kvantum_kvconfig" ]; then
         echo -e "[General]\ntheme=$OLD_kvantum_kvconfig" > ~/.config/Kvantum/kvantum.kvconfig
@@ -87,6 +88,8 @@ restore_system() {
     rm -rf ~/.config/Kvantum/AeroGlass
     rm -rf ~/.local/share/sounds/frutiger-aero
     rm -rf ~/.local/share/icons/crystal-remix-icon-theme-diinki-version
+    rm -rf ~/.local/share/icons/AeroCursors
+    rm -rf ~/.local/share/plasma/look-and-feel/AeroAuthUI
 
     for svc in cups bluetooth ModemManager; do
         var="SVC_$svc"
@@ -118,7 +121,7 @@ optimize_system() {
 
 install_dependencies() {
     echo -e "${GREEN}[*] Instalando dependencias estéticas...${NC}"
-    sudo apt install -y gamemode qt5-style-kvantum qt5-style-kvantum-themes oxygen-cursor-theme oxygen-cursor-theme-extra jq git
+    sudo apt install -y gamemode qt5-style-kvantum qt5-style-kvantum-themes oxygen-cursor-theme oxygen-cursor-theme-extra jq git fonts-noto-ui-core
 }
 
 apply_visuals() {
@@ -185,7 +188,6 @@ apply_startup_shutdown() {
     git clone --depth 1 https://github.com/aeroshell-desktop/aerothemeplasma.git "$TEMP_SDDM"
     
     sudo mkdir -p /usr/share/sddm/themes/
-    # Usar el mod de SDDM disponible en el repo
     if [ -d "$TEMP_SDDM/plasma/sddm/sddm-theme-mod" ]; then
         sudo cp -r "$TEMP_SDDM/plasma/sddm/sddm-theme-mod" /usr/share/sddm/themes/Aero
         echo -e "[Theme]\nCurrent=Aero" | sudo tee /etc/sddm.conf.d/aero.conf > /dev/null
@@ -205,7 +207,41 @@ apply_startup_shutdown() {
     fi
 
     rm -rf "$TEMP_SDDM" "$TEMP_PLYMOUTH"
-    echo -e "${GREEN}[V] Temas de Inicio/Cierre aplicados.${NC}"
+}
+
+apply_polish() {
+    echo -e "${GREEN}[*] Aplicando Pulido Visual (Cursores, Splash, Fuentes)...${NC}"
+    init_state
+
+    # 1. Cursores Aero Auténticos
+    echo -e "${BLUE}[*] Instalando cursores Aero auténticos...${NC}"
+    TEMP_CURSORS="/tmp/aero_cursors"
+    rm -rf "$TEMP_CURSORS"
+    git clone --depth 1 https://github.com/lLexian/Windows-7-Aero-Cursors_Linux.git "$TEMP_CURSORS"
+    mkdir -p "$HOME/.local/share/icons/AeroCursors"
+    cp -r "$TEMP_CURSORS/"* "$HOME/.local/share/icons/AeroCursors/"
+    save_setting kcminputrc Mouse cursorTheme
+    kwriteconfig5 --file kcminputrc --group Mouse --key cursorTheme AeroCursors
+
+    # 2. Splash Screen Post-Login (AuthUI)
+    echo -e "${BLUE}[*] Instalando Splash Screen Aero...${NC}"
+    TEMP_POLISH="/tmp/aero_polish"
+    rm -rf "$TEMP_POLISH"
+    git clone --depth 1 https://github.com/aeroshell-desktop/aerothemeplasma.git "$TEMP_POLISH"
+    mkdir -p "$HOME/.local/share/plasma/look-and-feel/AeroAuthUI"
+    cp -r "$TEMP_POLISH/plasma/look-and-feel/authui7/"* "$HOME/.local/share/plasma/look-and-feel/AeroAuthUI/"
+    save_setting ksplashrc SecondShell Theme
+    kwriteconfig5 --file ksplashrc --group SecondShell --key Theme AeroAuthUI
+    
+    # 3. Tipografía y Suavizado
+    echo -e "${BLUE}[*] Ajustando tipografía (Estilo Segoe UI)...${NC}"
+    # Usar Noto Sans con ajustes de era
+    kwriteconfig5 --file kdeglobals --group General --key font "Noto Sans,10,-1,5,50,0,0,0,0,0"
+    kwriteconfig5 --file kdeglobals --group General --key toolBarFont "Noto Sans,10,-1,5,50,0,0,0,0,0"
+    kwriteconfig5 --file kdeglobals --group General --key menuFont "Noto Sans,10,-1,5,50,0,0,0,0,0"
+
+    rm -rf "$TEMP_CURSORS" "$TEMP_POLISH"
+    echo -e "${GREEN}[V] Pulido Visual completado.${NC}"
 }
 
 apply_wallpaper() {
@@ -287,14 +323,15 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     fi
 
     # Menu Interactivo
-    CHOICES=$(whiptail --title "Frutiger Aero Optimizer v3.0 (Master Release)" --checklist \
-    "Selecciona las acciones a realizar (Espacio para marcar):" 22 75 9 \
+    CHOICES=$(whiptail --title "Frutiger Aero Optimizer v3.1 (Visual Polish)" --checklist \
+    "Selecciona las acciones a realizar (Espacio para marcar):" 24 75 10 \
     "OPTIMIZE" "Limpieza de sistema y APT" ON \
     "DEPS" "Instalar temas y dependencias" ON \
     "VISUALS" "Kvantum AeroGlass y efectos KDE" ON \
     "BAR_ICONS" "Estilo Oxygen para Panel e Iconos Crystal" ON \
     "SOUNDS" "Esquema de sonidos Oxygen" ON \
     "BOOT_LOGIN" "Temas Aero para SDDM y Plymouth" ON \
+    "POLISH" "Cursores Aero, Splash Screen y Fuentes" ON \
     "WALLPAPER" "Elegir fondo de pantalla" ON \
     "CHROME" "Bordes Aero y Tema para Chrome" ON \
     "SERVICES" "Deshabilitar Impresoras/BT/Baloo" OFF 3>&1 1>&2 2>&3)
@@ -312,6 +349,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
             "\"BAR_ICONS\"") apply_bar_and_icons ;;
             "\"SOUNDS\"") apply_sounds ;;
             "\"BOOT_LOGIN\"") apply_startup_shutdown ;;
+            "\"POLISH\"") apply_polish ;;
             "\"WALLPAPER\"") apply_wallpaper ;;
             "\"CHROME\"") apply_chrome_tweaks ;;
             "\"SERVICES\"") disable_services ;;
@@ -319,7 +357,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     done
 
     echo -e "${CYAN}---------------------------------------------------${NC}"
-    echo -e "${GREEN}  ¡Operación v3.0 completada con éxito!            ${NC}"
+    echo -e "${GREEN}  ¡Operación v3.1 completada con éxito!            ${NC}"
     echo -e "${BLUE}  Por favor, reinicia para ver los cambios totales. ${NC}"
     echo -e "${CYAN}---------------------------------------------------${NC}"
 fi

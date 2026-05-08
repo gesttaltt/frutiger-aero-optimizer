@@ -1,4 +1,4 @@
-# Frutiger Aero Optimizer & KDE Customizer v3.0 (Master Release) 🫧🐬✨
+# Frutiger Aero Optimizer & KDE Customizer v3.1 (Visual Polish) 🫧🐬✨
 
 Este script transforma tu instalación de **Kubuntu 24.04 LTS** en una cápsula del tiempo de la estética **Frutiger Aero** (circa 2004-2013), combinando optimización de rendimiento moderno con la nostalgia visual del brillo, el agua y la transparencia.
 
@@ -7,17 +7,19 @@ Este script transforma tu instalación de **Kubuntu 24.04 LTS** en una cápsula 
 
 ---
 
-## ✨ Novedades de la v3.0 (Master Release)
-- **🖥️ Inicio y Cierre Aero:** Integración de temas **SDDM** (Pantalla de login) y **Plymouth** (Splash de arranque) basados en el estilo clásico de Aero.
-- **🎨 Iconografía Crystal:** Instalación automática del set de iconos **Crystal Remix**, con degradados vibrantes y skeuomorfismo puro.
-- **📱 Panel Oxygen:** Configuración del estilo de panel (taskbar) **Oxygen** para recuperar los reflejos y el efecto cristal profundo.
-- **🛡️ Sistema de Seguridad (Undo):** Nueva bandera `--restore` para revertir todos los cambios y volver al estado original del sistema en cualquier momento.
-- **🌐 Optimización para Chrome:** Configuración automática para que Google Chrome herede los bordes de ventana del sistema y soporte para temas Aero de la Web Store.
-- **🕹️ Menú Interactivo:** Interfaz basada en `whiptail` para elegir exactamente qué componentes aplicar.
+## ✨ Novedades de la v3.1 (Visual Polish)
+- **🖱️ Cursores Aero Auténticos:** Port pixel-perfect de los cursores originales de Windows 7/Vista.
+- **🖥️ Splash Screen "AuthUI":** Recreación de la animación de inicio de sesión clásica de Aero tras el login.
+- **🔠 Tipografía Optimizada:** Ajustes de fuentes y suavizado para emular la claridad de Segoe UI.
+- **🖥️ Inicio y Cierre Aero:** Integración de temas **SDDM** (Pantalla de login) y **Plymouth** (Splash de arranque).
+- **🎨 Iconografía Crystal:** Instalación automática del set de iconos **Crystal Remix**.
+- **📱 Panel Oxygen:** Estilo de panel (taskbar) **Oxygen** con reflejos de cristal.
+- **🛡️ Sistema de Seguridad (Undo):** Bandera `--restore` mejorada para manejar todos los nuevos componentes.
 
 ---
 
 ## 🚀 Características Principales
+...
 
 ### 🛠️ Optimización y Rendimiento
 - **Limpieza Profunda:** Purga de caches de APT, diarios del sistema y miniaturas.
