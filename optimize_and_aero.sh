@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Frutiger Aero Optimizer & System Cleaner v3.5 (The Glass & Light Update) 🫧🐬✨
+# Frutiger Aero Optimizer & System Cleaner v3.6 (Robustness Update) 🫧🐬✨
 # DESARROLLADO CON IA GENERATIVA (GEMINI)
 # SOLO PARA KUBUNTU 24.04 LTS (NOBLE)
 
@@ -17,19 +17,46 @@ NC='\033[0m'
 STATE_FILE="$HOME/.frutiger_aero_state.sh"
 LOG_FILE="$HOME/.frutiger_aero.log"
 
-# --- SISTEMA DE LOGS ---
+# --- SISTEMA DE LOGS Y ERRORES ---
 
 log_message() {
     local level=$1
     local message=$2
     local timestamp
     timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+    
+    # Asegurar que el directorio del log existe
+    mkdir -p "$(dirname "$LOG_FILE")"
+    
     echo "[$timestamp] [$level] $message" >> "$LOG_FILE"
-    if [[ "$level" == "ERROR" ]]; then
-        echo -e "${RED}[!] $message${NC}"
-    elif [[ "$level" == "WARNING" ]]; then
-        echo -e "${YELLOW}[?] $message${NC}"
+    
+    case "$level" in
+        "ERROR")   echo -e "${RED}[!] ERROR: $message${NC}" >&2 ;;
+        "WARNING") echo -e "${YELLOW}[?] ADVERTENCIA: $message${NC}" ;;
+        "SUCCESS") echo -e "${GREEN}[V] $message${NC}" ;;
+        *)         echo -e "${BLUE}[*] $message${NC}" ;;
+    esac
+}
+
+# Ejecuta un comando y aborta si falla, con mensaje claro
+safe_run() {
+    local msg="$1"
+    shift
+    if ! "$@"; then
+        log_message "ERROR" "Falló: $msg. Abortando para proteger el sistema."
+        exit 1
     fi
+}
+
+# Intenta ejecutar un comando, si falla loguea advertencia y continúa
+try_run() {
+    local msg="$1"
+    shift
+    if ! "$@"; then
+        log_message "WARNING" "No se pudo completar: $msg. El script continuará."
+        return 1
+    fi
+    return 0
 }
 
 # --- COMPROBACIÓN DE REQUISITOS ---
@@ -47,22 +74,27 @@ check_requirements() {
 
     if [ ${#missing[@]} -ne 0 ]; then
         log_message "WARNING" "Faltan dependencias: ${missing[*]}. Intentando instalar..."
-        sudo apt update && sudo apt install -y "${missing[@]}"
+        if ! sudo apt update && sudo apt install -y "${missing[@]}"; then
+            log_message "ERROR" "No se pudieron instalar las dependencias necesarias: ${missing[*]}"
+            exit 1
+        fi
     else
         log_message "INFO" "Todos los requisitos básicos están presentes."
     fi
 
-    # Verificar conexión a internet
+    # Verificar conexión a internet para operaciones de red
     if ! ping -c 1 8.8.8.8 &> /dev/null; then
-        log_message "ERROR" "No hay conexión a internet. Algunas funciones fallarán."
-        exit 1
+        log_message "WARNING" "Sin conexión a internet. Las descargas de temas fallarán."
+        INTERNET_AVAILABLE=false
+    else
+        INTERNET_AVAILABLE=true
     fi
 }
 
 # --- FUNCIONES DE SEGURIDAD ---
 
 show_help() {
-    echo -e "${CYAN}Frutiger Aero Optimizer v3.3 - Guía de Uso${NC}"
+    echo -e "${CYAN}Frutiger Aero Optimizer v3.6 - Guía de Uso${NC}"
     echo -e ""
     echo -e "${BLUE}ARGUMENTOS:${NC}"
     echo -e "  --help, -h     Muestra esta ayuda."
@@ -85,10 +117,16 @@ save_setting() {
     local group=$2
     local key=$3
     local var_name="OLD_${file//./_}_${group// /_}_${key}"
+    
     if ! grep -q "$var_name=" "$STATE_FILE" 2>/dev/null; then
         local value
-        value=$(kreadconfig5 --file "$file" --group "$group" --key "$key")
-        echo "$var_name=\"$value\"" >> "$STATE_FILE"
+        if ! value=$(kreadconfig5 --file "$file" --group "$group" --key "$key" 2>/dev/null); then
+            log_message "WARNING" "No se pudo leer la configuración previa de $file -> $group -> $key"
+            value=""
+        fi
+        # Escapar comillas dobles para el guardado
+        local escaped_value="${value//\"/\\\"}"
+        echo "$var_name=\"$escaped_value\"" >> "$STATE_FILE"
     fi
 }
 
@@ -97,13 +135,16 @@ restore_setting() {
     local group=$2
     local key=$3
     local var_name="OLD_${file//./_}_${group// /_}_${key}"
-    local value=${!var_name}
     
     if grep -q "$var_name=" "$STATE_FILE"; then
+        # Extraer el valor usando sed para mayor seguridad con caracteres especiales
+        local value
+        value=$(grep "^$var_name=" "$STATE_FILE" | cut -d'=' -f2- | sed 's/^"//;s/"$//')
+        
         if [ -n "$value" ]; then
-            kwriteconfig5 --file "$file" --group "$group" --key "$key" "$value"
+            try_run "Restaurar $file ($key)" kwriteconfig5 --file "$file" --group "$group" --key "$key" "$value"
         else
-            kwriteconfig5 --file "$file" --group "$group" --key "$key" --delete
+            try_run "Eliminar configuración huérfana $file ($key)" kwriteconfig5 --file "$file" --group "$group" --key "$key" --delete
         fi
     fi
 }
@@ -170,62 +211,64 @@ restore_system() {
 
 apply_fonts() {
     log_message "INFO" "Configurando tipografía Frutiger Aero..."
-    echo -e "${GREEN}[*] Instalando fuentes clásicas (Segoe UI / Tahoma style)...${NC}"
     
     # Instalamos fuentes de Microsoft libres (si están en repo) o alternativas
-    sudo apt install -y fonts-liberation fonts-noto || true
+    try_run "Instalar fuentes básicas" sudo apt install -y fonts-liberation fonts-noto
     
-    # Intentamos configurar fuentes vía kwriteconfig5
-    # Segoe UI es la fuente por defecto de Vista/7. Si no está, usamos Noto Sans
     local font="Noto Sans,10,-1,5,50,0,0,0,0,0"
-    kwriteconfig5 --file kdeglobals --group General --key font "$font"
-    kwriteconfig5 --file kdeglobals --group General --key fixed "Monospace,10,-1,5,50,0,0,0,0,0"
-    kwriteconfig5 --file kdeglobals --group General --key menuFont "$font"
-    kwriteconfig5 --file kdeglobals --group General --key toolBarFont "$font"
-    log_message "INFO" "Fuentes configuradas."
+    try_run "Configurar fuente general" kwriteconfig5 --file kdeglobals --group General --key font "$font"
+    try_run "Configurar fuente fixed" kwriteconfig5 --file kdeglobals --group General --key fixed "Monospace,10,-1,5,50,0,0,0,0,0"
+    try_run "Configurar fuente menú" kwriteconfig5 --file kdeglobals --group General --key menuFont "$font"
+    try_run "Configurar fuente barra" kwriteconfig5 --file kdeglobals --group General --key toolBarFont "$font"
+    
+    log_message "SUCCESS" "Tipografía configurada correctamente."
 }
 
 apply_decorations() {
     log_message "INFO" "Configurando decoraciones de ventana..."
-    echo -e "${GREEN}[*] Aplicando bordes de ventana estilo Aero Glass...${NC}"
     
-    # 1. Descargar tema de decoración Aurorae (SevenBlack es muy fiel)
     local decoration_dir="$HOME/.local/share/aurorae/themes"
     mkdir -p "$decoration_dir"
     
     if [ ! -d "$decoration_dir/SevenBlack" ]; then
-        log_message "INFO" "Descargando tema Aurorae SevenBlack..."
-        TEMP_DEC="/tmp/aero_dec"
-        rm -rf "$TEMP_DEC"
-        # Usamos un repositorio conocido que contenga temas Aero Aurorae
-        git clone --depth 1 https://github.com/Gomogura/SevenBlack.git "$TEMP_DEC" || true
-        if [ -d "$TEMP_DEC" ]; then
-            cp -r "$TEMP_DEC" "$decoration_dir/SevenBlack"
+        if [ "$INTERNET_AVAILABLE" = false ]; then
+            log_message "WARNING" "No hay internet para descargar el tema SevenBlack. Se omitirá."
+            return 1
         fi
+
+        log_message "INFO" "Descargando tema Aurorae SevenBlack..."
+        local TEMP_DEC="/tmp/aero_dec"
+        rm -rf "$TEMP_DEC"
+        
+        if try_run "Clonar tema SevenBlack" git clone --depth 1 https://github.com/Gomogura/SevenBlack.git "$TEMP_DEC"; then
+            cp -r "$TEMP_DEC" "$decoration_dir/SevenBlack"
+            log_message "SUCCESS" "Tema SevenBlack descargado e instalado."
+        else
+            log_message "ERROR" "No se pudo descargar el tema visual. La experiencia será incompleta."
+        fi
+        rm -rf "$TEMP_DEC"
     fi
 
-    # 2. Activar la decoración en KWin
-    kwriteconfig5 --file kwinrc --group org.kde.kdecoration2 --key library org.kde.kwin.aurorae
-    kwriteconfig5 --file kwinrc --group org.kde.kdecoration2 --key theme "__aurorae__svg__SevenBlack"
+    # Activar la decoración en KWin
+    try_run "Configurar KWin (Aurorae)" kwriteconfig5 --file kwinrc --group org.kde.kdecoration2 --key library org.kde.kwin.aurorae
+    try_run "Configurar tema SevenBlack" kwriteconfig5 --file kwinrc --group org.kde.kdecoration2 --key theme "__aurorae__svg__SevenBlack"
     
     # Forzar recarga de KWin
-    qdbus org.kde.KWin /KWin reconfigure || true
-    log_message "INFO" "Decoración SevenBlack aplicada."
+    try_run "Recargar KWin" qdbus org.kde.KWin /KWin reconfigure
 }
 
 optimize_gpu() {
     log_message "INFO" "Detectando Hardware de Video..."
-    echo -e "${GREEN}[*] Detectando GPU y aplicando optimizaciones de fluidez...${NC}"
     
     if lspci | grep -i "nvidia" > /dev/null; then
         log_message "INFO" "GPU NVIDIA detectada. Aplicando mejoras..."
-        if command -v nvidia-settings > /dev/null; then
-            nvidia-settings --assign CurrentMetaMode="nvidia-auto-select +0+0 {ForceFullCompositionPipeline=On}" || true
+        if command -v nvidia-settings &> /dev/null; then
+            try_run "Configurar NVIDIA Pipeline" nvidia-settings --assign CurrentMetaMode="nvidia-auto-select +0+0 {ForceFullCompositionPipeline=On}"
         fi
-        sudo nvidia-smi -pm 1 || true
+        try_run "Activar Persistencia NVIDIA" sudo nvidia-smi -pm 1
         if [ -f /etc/default/grub ] && ! grep -q "nvidia_drm.modeset=1" /etc/default/grub; then
-            sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="nvidia_drm.modeset=1 /' /etc/default/grub
-            sudo update-grub
+            safe_run "Configurar GRUB (NVIDIA DRM)" sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="nvidia_drm.modeset=1 /' /etc/default/grub
+            safe_run "Actualizar GRUB" sudo update-grub
         fi
     elif lspci | grep -iE "amd|ati" > /dev/null; then
         log_message "INFO" "GPU AMD detectada. Activando TearFree..."
@@ -240,39 +283,37 @@ optimize_gpu() {
 
 apply_glass_effects() {
     log_message "INFO" "Aplicando Glass & Light Tweaks..."
-    echo -e "${GREEN}[*] Mejorando efectos de cristal y luz (Blur & Glow)...${NC}"
     
     # 1. Brillo en bordes de ventana (Edge Highlight)
-    kwriteconfig5 --file kwinrc --group Plugins --key edgehighlightEnabled true
+    try_run "Activar Edge Highlight" kwriteconfig5 --file kwinrc --group Plugins --key edgehighlightEnabled true
     
     # 2. Forzar Renderizado de Calidad para Blur
-    kwriteconfig5 --file kdeglobals --group General --key RenderingMode "Quality"
+    try_run "Configurar Calidad de Renderizado" kwriteconfig5 --file kdeglobals --group General --key RenderingMode "Quality"
     
     # 3. Soporte GTK (Aero style para apps no-KDE)
-    sudo apt install -y kde-config-gtk-style adwaita-icon-theme-full || true
-    kwriteconfig5 --file kdeglobals --group GTK --key gtk-theme "Breeze"
+    try_run "Instalar soporte GTK" sudo apt install -y kde-config-gtk-style adwaita-icon-theme-full
+    try_run "Configurar Tema GTK" kwriteconfig5 --file kdeglobals --group GTK --key gtk-theme "Breeze"
     
-    qdbus org.kde.KWin /KWin reconfigure || true
+    try_run "Recargar KWin" qdbus org.kde.KWin /KWin reconfigure
 }
 
 optimize_system() {
     log_message "INFO" "Iniciando limpieza de sistema"
-    echo -e "${GREEN}[*] Limpiando caches y optimizando sistema...${NC}"
-    sudo apt update
-    sudo apt autoremove -y
-    sudo apt clean
-    sudo journalctl --vacuum-time=3d
-    rm -rf ~/.cache/thumbnails/*
-    sudo systemctl enable --now fstrim.timer
+    safe_run "Actualizar repositorios" sudo apt update
+    try_run "Limpiar paquetes innecesarios" sudo apt autoremove -y
+    try_run "Limpiar cache de APT" sudo apt clean
+    try_run "Limpiar logs antiguos" sudo journalctl --vacuum-time=3d
+    try_run "Limpiar miniaturas" rm -rf "$HOME/.cache/thumbnails/*"
+    try_run "Activar fstrim" sudo systemctl enable --now fstrim.timer
 }
 
 install_dependencies() {
-    echo -e "${GREEN}[*] Instalando dependencias estéticas...${NC}"
-    sudo apt install -y gamemode qt5-style-kvantum qt5-style-kvantum-themes oxygen-cursor-theme oxygen-cursor-theme-extra jq git
+    log_message "INFO" "Instalando dependencias estéticas..."
+    safe_run "Instalar dependencias" sudo apt install -y gamemode qt5-style-kvantum qt5-style-kvantum-themes oxygen-cursor-theme oxygen-cursor-theme-extra jq git
 }
 
 apply_visuals() {
-    echo -e "${GREEN}[*] Aplicando configuraciones visuales Frutiger Aero...${NC}"
+    log_message "INFO" "Aplicando configuraciones visuales Frutiger Aero..."
     init_state
     save_setting kdeglobals General widgetStyle
     save_setting kdeglobals Icons Theme
@@ -282,126 +323,159 @@ apply_visuals() {
     save_setting kwinrc Plugins blurEnabled
     save_setting kdeglobals KDE AnimationDurationFactor
 
-    KVANTUM_DIR="$HOME/.config/Kvantum"
+    local KVANTUM_DIR="$HOME/.config/Kvantum"
     mkdir -p "$KVANTUM_DIR"
-    THEME_SOURCE="$(dirname "$(readlink -f "$0")")/assets/kvantum/AeroGlass"
+    local THEME_SOURCE="$(dirname "$(readlink -f "$0")")/assets/kvantum/AeroGlass"
 
     if [ -d "$THEME_SOURCE" ]; then
-        echo -e "${BLUE}[*] Instalando tema Kvantum AeroGlass...${NC}"
+        log_message "INFO" "Instalando tema Kvantum AeroGlass local..."
         mkdir -p "$KVANTUM_DIR/AeroGlass"
         cp -r "$THEME_SOURCE/"* "$KVANTUM_DIR/AeroGlass/"
         echo -e "[General]\ntheme=AeroGlass" > "$KVANTUM_DIR/kvantum.kvconfig"
     fi
 
-    kwriteconfig5 --file kdeglobals --group General --key widgetStyle kvantum
-    kwriteconfig5 --file kdeglobals --group Icons --key Theme oxygen
-    kwriteconfig5 --file kcminputrc --group Mouse --key cursorTheme Oxygen_White
-    kwriteconfig5 --file kwinrc --group Plugins --key magiclampEnabled true
-    kwriteconfig5 --file kwinrc --group Plugins --key wobblywindowsEnabled true
-    kwriteconfig5 --file kwinrc --group Plugins --key blurEnabled true
-    kwriteconfig5 --file kdeglobals --group KDE --key AnimationDurationFactor 1.2
+    try_run "Configurar widgetStyle" kwriteconfig5 --file kdeglobals --group General --key widgetStyle kvantum
+    try_run "Configurar Icons Theme" kwriteconfig5 --file kdeglobals --group Icons --key Theme oxygen
+    try_run "Configurar Cursor" kwriteconfig5 --file kcminputrc --group Mouse --key cursorTheme Oxygen_White
+    try_run "Activar Lámpara Mágica" kwriteconfig5 --file kwinrc --group Plugins --key magiclampEnabled true
+    try_run "Activar Ventanas Gelatinosas" kwriteconfig5 --file kwinrc --group Plugins --key wobblywindowsEnabled true
+    try_run "Activar Blur" kwriteconfig5 --file kwinrc --group Plugins --key blurEnabled true
+    try_run "Ajustar velocidad de animación" kwriteconfig5 --file kdeglobals --group KDE --key AnimationDurationFactor 1.2
 }
 
 apply_bar_and_icons() {
-    echo -e "${GREEN}[*] Mejorando Barra de Tareas (Panel) e Iconos...${NC}"
+    log_message "INFO" "Mejorando Barra de Tareas e Iconos..."
     init_state
     
     # 1. Mejorar el Panel (Plasma Style Oxygen)
     save_setting plasmarc Theme name
-    kwriteconfig5 --file plasmarc --group Theme --key name oxygen
+    try_run "Configurar Tema de Panel" kwriteconfig5 --file plasmarc --group Theme --key name oxygen
 
     # 2. Instalar Iconos Crystal Remix (Frutiger Aero Style)
-    echo -e "${BLUE}[*] Descargando iconos Crystal Remix...${NC}"
-    TEMP_ICONS="/tmp/aero_icons"
-    rm -rf "$TEMP_ICONS"
-    git clone --depth 1 https://github.com/diinki/diinki-aero.git "$TEMP_ICONS"
-    
-    mkdir -p "$HOME/.local/share/icons"
-    cp -r "$TEMP_ICONS/IconTheme/crystal-remix-icon-theme-diinki-version" "$HOME/.local/share/icons/"
-    
-    save_setting kdeglobals Icons Theme
-    kwriteconfig5 --file kdeglobals --group Icons --key Theme crystal-remix-icon-theme-diinki-version
-    
-    rm -rf "$TEMP_ICONS"
+    if [ "$INTERNET_AVAILABLE" = true ]; then
+        log_message "INFO" "Descargando iconos Crystal Remix..."
+        local TEMP_ICONS="/tmp/aero_icons"
+        rm -rf "$TEMP_ICONS"
+        if try_run "Clonar iconos Crystal" git clone --depth 1 https://github.com/diinki/diinki-aero.git "$TEMP_ICONS"; then
+            mkdir -p "$HOME/.local/share/icons"
+            cp -r "$TEMP_ICONS/IconTheme/crystal-remix-icon-theme-diinki-version" "$HOME/.local/share/icons/"
+            
+            save_setting kdeglobals Icons Theme
+            try_run "Configurar Iconos" kwriteconfig5 --file kdeglobals --group Icons --key Theme crystal-remix-icon-theme-diinki-version
+        fi
+        rm -rf "$TEMP_ICONS"
+    else
+        log_message "WARNING" "No hay internet para descargar iconos. Se usará Oxygen por defecto."
+        try_run "Configurar Iconos Oxygen" kwriteconfig5 --file kdeglobals --group Icons --key Theme oxygen
+    fi
 }
 
 apply_startup_shutdown() {
-    echo -e "${GREEN}[*] Aplicando Temas de Inicio y Cierre (SDDM y Plymouth)...${NC}"
+    log_message "INFO" "Aplicando Temas de Inicio y Cierre..."
     
-    # SDDM Theme (Login Screen)
-    echo -e "${BLUE}[*] Instalando tema SDDM Aero...${NC}"
-    TEMP_SDDM="/tmp/aero_sddm"
-    rm -rf "$TEMP_SDDM"
-    git clone --depth 1 https://github.com/aeroshell-desktop/aerothemeplasma.git "$TEMP_SDDM"
-    
-    sudo mkdir -p /usr/share/sddm/themes/
-    # Usar el mod de SDDM disponible en el repo
-    if [ -d "$TEMP_SDDM/plasma/sddm/sddm-theme-mod" ]; then
-        sudo cp -r "$TEMP_SDDM/plasma/sddm/sddm-theme-mod" /usr/share/sddm/themes/Aero
-        echo -e "[Theme]\nCurrent=Aero" | sudo tee /etc/sddm.conf.d/aero.conf > /dev/null
+    if [ "$INTERNET_AVAILABLE" = false ]; then
+        log_message "WARNING" "No hay internet para descargar temas de arranque. Se omitirá."
+        return 1
     fi
 
-    # Plymouth Theme (Boot Splash)
-    echo -e "${BLUE}[*] Instalando tema Plymouth Aero Vista...${NC}"
-    TEMP_PLYMOUTH="/tmp/aero_plymouth"
+    # SDDM Theme
+    log_message "INFO" "Instalando tema SDDM Aero..."
+    local TEMP_SDDM="/tmp/aero_sddm"
+    rm -rf "$TEMP_SDDM"
+    if try_run "Clonar SDDM Aero" git clone --depth 1 https://github.com/aeroshell-desktop/aerothemeplasma.git "$TEMP_SDDM"; then
+        sudo mkdir -p /usr/share/sddm/themes/
+        if [ -d "$TEMP_SDDM/plasma/sddm/sddm-theme-mod" ]; then
+            safe_run "Instalar SDDM Aero" sudo cp -r "$TEMP_SDDM/plasma/sddm/sddm-theme-mod" /usr/share/sddm/themes/Aero
+            echo -e "[Theme]\nCurrent=Aero" | sudo tee /etc/sddm.conf.d/aero.conf > /dev/null
+        fi
+    fi
+
+    # Plymouth Theme
+    log_message "INFO" "Instalando tema Plymouth Aero Vista..."
+    local TEMP_PLYMOUTH="/tmp/aero_plymouth"
     rm -rf "$TEMP_PLYMOUTH"
-    git clone --depth 1 https://github.com/furkrn/PlymouthVista.git "$TEMP_PLYMOUTH"
-    
-    sudo mkdir -p /usr/share/plymouth/themes/
-    if [ -d "$TEMP_PLYMOUTH/PlymouthVista" ]; then
-        sudo cp -r "$TEMP_PLYMOUTH/PlymouthVista" /usr/share/plymouth/themes/
-        echo -e "${YELLOW}[!] Reconstruyendo initramfs (tardará unos segundos)...${NC}"
-        sudo plymouth-set-default-theme -R PlymouthVista || true
+    if try_run "Clonar Plymouth Vista" git clone --depth 1 https://github.com/furkrn/PlymouthVista.git "$TEMP_PLYMOUTH"; then
+        sudo mkdir -p /usr/share/plymouth/themes/
+        if [ -d "$TEMP_PLYMOUTH/PlymouthVista" ]; then
+            safe_run "Instalar Plymouth Vista" sudo cp -r "$TEMP_PLYMOUTH/PlymouthVista" /usr/share/plymouth/themes/
+            log_message "INFO" "Reconstruyendo initramfs (puede tardar)..."
+            try_run "Establecer tema Plymouth" sudo plymouth-set-default-theme -R PlymouthVista
+        fi
     fi
 
     rm -rf "$TEMP_SDDM" "$TEMP_PLYMOUTH"
-    echo -e "${GREEN}[V] Temas de Inicio/Cierre aplicados.${NC}"
 }
 
 apply_wallpaper() {
-    echo -e "${GREEN}[*] Configurando el fondo de pantalla...${NC}"
-    ASSETS_DIR="$(dirname "$(readlink -f "$0")")/assets/wallpapers"
+    log_message "INFO" "Configurando el fondo de pantalla..."
+    local ASSETS_DIR="$(dirname "$(readlink -f "$0")")/assets/wallpapers"
+    local opt
+    
+    if [ ! -d "$ASSETS_DIR" ]; then
+        log_message "ERROR" "No se encontró el directorio de assets para wallpapers."
+        return 1
+    fi
+
     if [ -n "$WALLPAPER_CHOICE" ]; then
         opt="$WALLPAPER_CHOICE"
     else
         local options=()
         mapfile -t options < <(ls "$ASSETS_DIR")
-        opt=$(whiptail --title "Selección de Wallpaper" --menu "Elige un fondo:" 15 60 5 \
-            "${options[0]}" "Frutiger Vista 1" \
-            "${options[1]}" "Frutiger Vista 2" \
-            "${options[2]}" "Frutiger Vista 3" \
-            "Omitir" "No cambiar" 3>&1 1>&2 2>&3)
+        if command -v whiptail &> /dev/null; then
+            opt=$(whiptail --title "Selección de Wallpaper" --menu "Elige un fondo:" 15 60 5 \
+                "${options[0]}" "Frutiger Vista 1" \
+                "${options[1]}" "Frutiger Vista 2" \
+                "${options[2]}" "Frutiger Vista 3" \
+                "Omitir" "No cambiar" 3>&1 1>&2 2>&3)
+        else
+            opt="Omitir"
+        fi
     fi
 
     if [[ "$opt" != "Omitir" && -n "$opt" ]]; then
-        plasma-apply-wallpaperimage "$ASSETS_DIR/$opt"
+        try_run "Aplicar Wallpaper" plasma-apply-wallpaperimage "$ASSETS_DIR/$opt"
     fi
 }
 
 apply_sounds() {
-    echo -e "${GREEN}[*] Configurando esquema de sonidos...${NC}"
+    log_message "INFO" "Configurando esquema de sonidos..."
     init_state
     save_setting kdeglobals Sounds EnableSounds
     save_setting kdeglobals Sounds Theme
 
-    mkdir -p ~/.local/share/sounds/frutiger-aero/stereo
-    echo -e "[Sound Theme]\nName=Frutiger Aero\nExample=Oxygen-Sys-Log-In\nInherits=oxygen" > ~/.local/share/sounds/frutiger-aero/index.theme
-    ln -sf /usr/share/sounds/Oxygen-Sys-Log-In.ogg ~/.local/share/sounds/frutiger-aero/stereo/service-login.ogg || true
-    ln -sf /usr/share/sounds/Oxygen-Sys-Log-Out.ogg ~/.local/share/sounds/frutiger-aero/stereo/service-logout.ogg || true
-    kwriteconfig5 --file kdeglobals --group Sounds --key EnableSounds true
-    kwriteconfig5 --file kdeglobals --group Sounds --key Theme frutiger-aero
+    local SOUND_DIR="$HOME/.local/share/sounds/frutiger-aero/stereo"
+    mkdir -p "$SOUND_DIR"
+    echo -e "[Sound Theme]\nName=Frutiger Aero\nExample=Oxygen-Sys-Log-In\nInherits=oxygen" > "$HOME/.local/share/sounds/frutiger-aero/index.theme"
+    
+    # Intentar linkar sonidos de Oxygen si están presentes
+    local oxy_in="/usr/share/sounds/Oxygen-Sys-Log-In.ogg"
+    local oxy_out="/usr/share/sounds/Oxygen-Sys-Log-Out.ogg"
+    
+    [ -f "$oxy_in" ] && ln -sf "$oxy_in" "$SOUND_DIR/service-login.ogg"
+    [ -f "$oxy_out" ] && ln -sf "$oxy_out" "$SOUND_DIR/service-logout.ogg"
+    
+    try_run "Habilitar sonidos" kwriteconfig5 --file kdeglobals --group Sounds --key EnableSounds true
+    try_run "Configurar esquema de sonidos" kwriteconfig5 --file kdeglobals --group Sounds --key Theme frutiger-aero
 }
 
 apply_chrome_tweaks() {
-    echo -e "${GREEN}[*] Optimizando Google Chrome para Frutiger Aero...${NC}"
-    CHROME_PREFS="$HOME/.config/google-chrome/Default/Preferences"
+    log_message "INFO" "Optimizando Google Chrome..."
+    local CHROME_PREFS="$HOME/.config/google-chrome/Default/Preferences"
     
     if [ -f "$CHROME_PREFS" ]; then
-        echo -e "${BLUE}[!] Activando borde de ventana del sistema (Aero Glass)...${NC}"
         if pgrep -x "chrome" > /dev/null; then
-            echo -e "${YELLOW}[!] Chrome está abierto. Ciérralo para aplicar cambios de borde.${NC}"
+            log_message "WARNING" "Chrome está abierto. Ciérralo para aplicar cambios de borde."
         fi
-        jq '.browser.custom_chrome_frame = true' "$CHROME_PREFS" > "$CHROME_PREFS.tmp" && mv "$CHROME_PREFS.tmp" "$CHROME_PREFS"
+        
+        if command -v jq &> /dev/null; then
+            if jq '.browser.custom_chrome_frame = true' "$CHROME_PREFS" > "$CHROME_PREFS.tmp"; then
+                mv "$CHROME_PREFS.tmp" "$CHROME_PREFS"
+                log_message "SUCCESS" "Borde de sistema activado para Chrome."
+            else
+                log_message "ERROR" "No se pudo modificar la preferencia de Chrome."
+                rm -f "$CHROME_PREFS.tmp"
+            fi
+        fi
     fi
 
     echo -e "${CYAN}---------------------------------------------------${NC}"
@@ -409,15 +483,16 @@ apply_chrome_tweaks() {
     echo -e "Para completar el look, instala este tema de la Web Store:"
     echo -e "${BLUE}https://chromewebstore.google.com/detail/frutiger-aero-neue-wii-te/cnahbmhhiegadigdjaldcioapappfmik${NC}"
     echo -e "${CYAN}---------------------------------------------------${NC}"
-    sleep 3
 }
 
 disable_services() {
-    echo -e "${GREEN}[*] Deshabilitando servicios innecesarios...${NC}"
+    log_message "INFO" "Deshabilitando servicios innecesarios..."
     init_state
-    sudo systemctl stop cups bluetooth ModemManager || true
-    sudo systemctl disable cups bluetooth ModemManager || true
-    balooctl disable || true
+    for svc in cups bluetooth ModemManager; do
+        try_run "Detener $svc" sudo systemctl stop "$svc"
+        try_run "Deshabilitar $svc" sudo systemctl disable "$svc"
+    done
+    try_run "Deshabilitar Baloo" balooctl disable
 }
 
 # --- LÓGICA PRINCIPAL ---
@@ -432,20 +507,30 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     fi
 
     # Comprobación de sistema
-    OS_VER=$(grep "VERSION_ID" /etc/os-release | cut -d'"' -f2)
-    OS_NAME=$(grep "^ID=" /etc/os-release | cut -d'=' -f2)
+    if [ -f /etc/os-release ]; then
+        OS_VER=$(grep "VERSION_ID" /etc/os-release | cut -d'"' -f2)
+        OS_NAME=$(grep "^ID=" /etc/os-release | cut -d'=' -f2)
 
-    if [[ "$OS_NAME" != "ubuntu" ]] || [[ "$OS_VER" != "24.04" ]]; then
-        echo -e "${RED}[!] ERROR: Sistema no compatible.${NC}"
+        if [[ "$OS_NAME" != "ubuntu" ]] || [[ "$OS_VER" != "24.04" ]]; then
+            log_message "ERROR" "Este script está validado solo para Kubuntu 24.04. Tu sistema: $OS_NAME $OS_VER"
+            exit 1
+        fi
+    else
+        log_message "ERROR" "No se pudo identificar el sistema operativo."
         exit 1
     fi
 
     # Requisitos y Logs
     check_requirements
-    log_message "INFO" "Iniciando sesión de optimización v3.5"
+    log_message "INFO" "Sesión de optimización iniciada. Usuario: $USER"
 
     # Menu Interactivo
-    CHOICES=$(whiptail --title "Frutiger Aero Optimizer v3.5 (The Glass & Light Update)" --checklist \
+    if ! command -v whiptail &> /dev/null; then
+        log_message "ERROR" "whiptail no está instalado. No se puede mostrar el menú."
+        exit 1
+    fi
+
+    CHOICES=$(whiptail --title "Frutiger Aero Optimizer v3.6 (Robustness Update)" --checklist \
     "Selecciona las acciones a realizar (Espacio para marcar):" 22 75 12 \
     "OPTIMIZE" "Limpieza de sistema y APT" ON \
     "GPU" "Detección de Hardware & Video Boost (Universal)" ON \
@@ -462,28 +547,31 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     "SERVICES" "Deshabilitar Impresoras/BT/Baloo" OFF 3>&1 1>&2 2>&3)
 
     if [ -z "$CHOICES" ]; then
-        echo "Cancelado por el usuario."
+        echo "Operación cancelada."
         exit 0
     fi
 
     for choice in $CHOICES; do
+        # Eliminar comillas si whiptail las añade
+        choice=$(echo "$choice" | sed 's/"//g')
         case $choice in
-            "\"OPTIMIZE\"") optimize_system ;;
-            "\"GPU\"") optimize_gpu ;;
-            "\"GLASS\"") apply_glass_effects ;;
-            "\"DEPS\"") install_dependencies ;;
-            "\"FONTS\"") apply_fonts ;;
-            "\"DECOR\"") apply_decorations ;;
-            "\"VISUALS\"") apply_visuals ;;
-            "\"BAR_ICONS\"") apply_bar_and_icons ;;
-            "\"SOUNDS\"") apply_sounds ;;
-            "\"BOOT_LOGIN\"") apply_startup_shutdown ;;
-            "\"WALLPAPER\"") apply_wallpaper ;;
-            "\"CHROME\"") apply_chrome_tweaks ;;
-            "\"SERVICES\"") disable_services ;;
+            "OPTIMIZE")   optimize_system ;;
+            "GPU")        optimize_gpu ;;
+            "GLASS")      apply_glass_effects ;;
+            "DEPS")       install_dependencies ;;
+            "FONTS")      apply_fonts ;;
+            "DECOR")      apply_decorations ;;
+            "VISUALS")    apply_visuals ;;
+            "BAR_ICONS")  apply_bar_and_icons ;;
+            "SOUNDS")     apply_sounds ;;
+            "BOOT_LOGIN") apply_startup_shutdown ;;
+            "WALLPAPER")  apply_wallpaper ;;
+            "CHROME")     apply_chrome_tweaks ;;
+            "SERVICES")   disable_services ;;
         esac
     done
 
+    log_message "SUCCESS" "Optimización finalizada exitosamente."
     echo -e "${CYAN}---------------------------------------------------${NC}"
     echo -e "${GREEN}  ¡Operación v3.5 completada con éxito!            ${NC}"
     echo -e "${BLUE}  Log guardado en: $LOG_FILE                      ${NC}"

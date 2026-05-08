@@ -2,6 +2,15 @@
 
 Todas las novedades y cambios notables de este proyecto serán documentados en este archivo.
 
+## [3.6] - Robustness & Error Handling Update - 2026-05-08
+### Añadido
+- **Sistema Safe-Run:** Implementación de envoltorios para comandos críticos que abortan el script de forma segura en caso de fallo catastrófico.
+- **Manejo de Errores Try-Run:** Los fallos en operaciones no críticas (como descargas de temas opcionales) ahora se registran como advertencias sin interrumpir el flujo principal.
+- **Validación de Red Proactiva:** El script ahora detecta la falta de internet y ajusta su comportamiento, evitando intentos de descarga fallidos.
+- **Mejora en Gestión de Estado:** Refactorización de `save_setting` y `restore_setting` para manejar valores con caracteres especiales y fallos en `kreadconfig5`.
+- **Logs Enriquecidos:** El sistema de registros ahora incluye niveles `SUCCESS` y mensajes más descriptivos para facilitar el diagnóstico.
+- **Validación de Entorno:** Mejorada la detección de Kubuntu 24.04 y presencia de herramientas críticas como `whiptail`.
+
 ## [3.5] - The Glass & Light Update - 2026-05-07
 ### Añadido
 - **Hardware Auto-Detection:** El script ahora detecta si usas NVIDIA, AMD o Intel y aplica optimizaciones de vídeo específicas (TearFree / Composition Pipeline).
