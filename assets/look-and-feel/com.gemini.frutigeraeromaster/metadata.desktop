@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Frutiger Aero Master
+Comment=The ultimate Frutiger Aero experience. Glossy, Glassy, and Organic.
+Type=Service
+X-KDE-ServiceTypes=Plasma/LookAndFeel
+X-KDE-PluginInfo-Author=Gemini CLI & Gestalt
+X-KDE-PluginInfo-Email=gestalt@example.com
+X-KDE-PluginInfo-Id=com.gemini.frutigeraeromaster
+X-KDE-PluginInfo-Name=Frutiger Aero Master
+X-KDE-PluginInfo-Version=1.0
+X-KDE-PluginInfo-License=GPL
+X-KDE-PluginInfo-Category=Plasma Look And Feel

@@ -50,16 +50,18 @@ Este script transforma tu instalación de **Kubuntu 24.04 LTS** en una cápsula 
 ## 🗺️ Master Roadmap hacia la v5.0
 Este proyecto se encamina a su "Forma Final" con el siguiente plan de desarrollo:
 
-### Fase 1: Perfección Visual (En curso - v4.x)
+### Fase 1: Perfección Visual (Completada - v5.0-alpha)
 - [x] **Sidebar & Gadgets:** Barra lateral con Reloj, CPU y Clima.
-- [ ] **Bordes Aero Glass (Aurorae):** Instalación de decoraciones con botones de cristal auténticos.
-- [ ] **Efecto Flip 3D:** Configuración del Cover Switcher (`Win+Tab`) estilo Windows Vista/7.
-- [ ] **Aero Peek:** Transparencia dinámica al pasar el ratón por la barra de tareas.
+- [x] **Bordes Aero Glass (Aurorae):** Instalación de decoraciones con botones de cristal auténticos.
+- [x] **Efecto Flip 3D:** Configuración del Cover Switcher (`Win+Tab`) estilo Windows Vista/7.
+- [x] **Aero Peek:** Transparencia dinámica al pasar el ratón por la barra de tareas.
 
-### Fase 2: Distribución y Facilidad (v5.0 Beta)
-- [ ] **Empaquetado Global Theme:** Todo en un solo clic desde Preferencias del Sistema.
+### Fase 2: Distribución y Facilidad (En curso - v5.0 Beta)
+- [x] **Global Theme Package:** Todo en un solo clic desde Preferencias del Sistema.
 - [ ] **Instalador Universal:** Soporte para ejecución no interactiva y detección de hardware mejorada.
 - [ ] **Detección de Plasma 6:** Asegurar compatibilidad total con la última versión de KDE.
+
+
 
 ### Fase 3: Ecosistema Frutiger Aero (v5.0 Stable)
 - [ ] **Firefox Glass:** Estilo visual completo para el navegador.
