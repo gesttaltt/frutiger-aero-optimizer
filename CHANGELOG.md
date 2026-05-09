@@ -2,6 +2,11 @@
 
 Todas las novedades y cambios notables de este proyecto serán documentados en este archivo.
 
+## [4.3] - Sidebar & Gadgets - 2026-05-07
+### Añadido
+- **Windows Sidebar:** Automatización de panel lateral derecho con gadgets (Analog Clock, System Monitor, Weather, Notes).
+- **Restauración Mejorada:** El sistema de restauración ahora puede detectar y eliminar la sidebar creada.
+
 ## [4.2] - Visual Polish & Stability - 2026-05-07
 ### Añadido
 - **Arquitectura Determinista:** Sistema de logs, ejecución segura y fallbacks inteligentes.

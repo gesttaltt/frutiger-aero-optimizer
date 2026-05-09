@@ -7,7 +7,8 @@ Este script transforma tu instalación de **Kubuntu 24.04 LTS** en una cápsula 
 
 ---
 
-## ✨ Novedades de la v4.2
+## ✨ Novedades de la v4.3
+- **📊 Sidebar de Windows:** Creación automática de una barra lateral vertical con gadgets clásicos (Reloj, CPU, Memoria, Clima).
 - **🛠️ Arquitectura v4:** Sistema de logs robusto (`~/.frutiger_aero.log`), ejecución determinista y manejo de errores modular.
 - **🖱️ Cursores Aero Auténticos:** Port fiel de los cursores originales de Windows 7.
 - **🖥️ Splash Screen AuthUI:** Animación post-login integrada para una inmersión total.
