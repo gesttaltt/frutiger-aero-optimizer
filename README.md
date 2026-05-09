@@ -47,10 +47,28 @@ Este script transforma tu instalación de **Kubuntu 24.04 LTS** en una cápsula 
 
 ---
 
-## 🤝 Créditos
-- **Iconos:** Crystal Remix ([diinki](https://github.com/diinki/diinki-aero)) y Oxylite.
-- **Temas:** [AeroThemePlasma](https://github.com/aeroshell-desktop/aerothemeplasma).
-- **Cursores:** [lLexian](https://github.com/lLexian/Windows-7-Aero-Cursors_Linux).
+## 🗺️ Master Roadmap hacia la v5.0
+Este proyecto se encamina a su "Forma Final" con el siguiente plan de desarrollo:
+
+### Fase 1: Perfección Visual (En curso - v4.x)
+- [x] **Sidebar & Gadgets:** Barra lateral con Reloj, CPU y Clima.
+- [ ] **Bordes Aero Glass (Aurorae):** Instalación de decoraciones con botones de cristal auténticos.
+- [ ] **Efecto Flip 3D:** Configuración del Cover Switcher (`Win+Tab`) estilo Windows Vista/7.
+- [ ] **Aero Peek:** Transparencia dinámica al pasar el ratón por la barra de tareas.
+
+### Fase 2: Distribución y Facilidad (v5.0 Beta)
+- [ ] **Empaquetado Global Theme:** Todo en un solo clic desde Preferencias del Sistema.
+- [ ] **Instalador Universal:** Soporte para ejecución no interactiva y detección de hardware mejorada.
+- [ ] **Detección de Plasma 6:** Asegurar compatibilidad total con la última versión de KDE.
+
+### Fase 3: Ecosistema Frutiger Aero (v5.0 Stable)
+- [ ] **Firefox Glass:** Estilo visual completo para el navegador.
+- [ ] **Discord & Spotify:** Skins Aero automatizados.
+- [ ] **VLC & Music Players:** Pieles skeuomórficas clásicas.
+
+### Fase 4: Comunidad y Galería
+- [ ] **Showcase Assets:** Galería de capturas y video del resultado final.
+- [ ] **Wiki de Personalización:** Guía manual para detalles que el script no puede automatizar.
 
 ---
-*Digital Optimism, Transparency, and Water.* 🫧🐬✨
+
