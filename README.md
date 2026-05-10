@@ -1,24 +1,16 @@
-# Frutiger Aero Optimizer & KDE Customizer v5.0-beta (Master) 🫧🐬✨
+# Frutiger Aero Optimizer & KDE Customizer v5.1-stable 🫧🐬✨
 
-Este script transforma tu instalación de **Kubuntu 24.04 LTS** en una cápsula del tiempo de la estética **Frutiger Aero**, combinando una arquitectura modular profesional con la nostalgia visual del brillo, el agua y la transparencia.
-
----
-
-## ✨ Novedades de la v5.0-beta
-- **💎 Kvantum Glass Engine:** Implementación de transparencia real y desenfoque (blur) en todas las aplicaciones Qt (Dolphin, Settings, etc.) usando el tema `Windows7Aero`.
-- **🎵 Authentic Soundscape:** Esquema de sonidos completo portado de Windows 7 (Logon, Notify, Error) en formato `.ogg` nativo.
-- **📊 Sidebar de Windows:** Creación automática de una barra lateral vertical con gadgets clásicos (Reloj, CPU, Memoria, Clima).
-- **🖱️ Cursores Aero Auténticos:** Port fiel de los cursores originales de Windows 7.
-- **🖥️ Splash Screen Master:** Animación post-login integrada en el Global Theme.
-- **📁 Crystal Icons:** Colección de iconos skeuomórficos `Crystal Remix` pre-configurada.
+Este script transforma tu instalación de **Ubuntu** y sus sabores en una cápsula del tiempo de la estética **Frutiger Aero**, combinando una arquitectura modular profesional con la nostalgia visual del brillo, el agua y la transparencia.
 
 ---
 
-## 🚀 Módulos Destacados
-- **GLOBAL_THEME:** Paquete 'Look & Feel' que unifica colores, splash y decoraciones.
-- **KVANTUM:** El motor que permite el efecto "Glass" (vidrio) en las ventanas.
-- **AURORAE:** Bordes de ventana con botones de cristal auténticos.
-- **SOUNDS:** Librería de sonidos auténticos de la era 2007.
+## ✨ Novedades de la v5.1-stable
+- **🎨 Soporte Multi-Flavor:** Transformación completa para **Kubuntu (KDE)**, **Ubuntu (GNOME)** y **Xubuntu (Xfce)**.
+- **🌍 Compatibilidad Multi-Versión:** Soporte oficial para versiones **22.04, 23.10, 24.04 y 24.10**.
+- **🚀 Plasma 6 Ready:** Detección automática de KDE Plasma 5/6 para configuraciones adaptativas.
+- **🤖 Modo Full Auto:** Nueva bandera `--auto` para una instalación completa sin interrupciones según tu escritorio.
+- **💎 Kvantum Glass Engine:** Transparencia real y desenfoque (blur) optimizado.
+- **🎵 Authentic Soundscape:** Esquema de sonidos de Windows 7 en formato `.ogg` nativo.
 
 ---
 
@@ -31,36 +23,39 @@ Este script transforma tu instalación de **Kubuntu 24.04 LTS** en una cápsula 
    chmod +x optimize_and_aero.sh
    ```
 
-2. **Ejecutar el Menú Maestro:**
+2. **Ejecutar el Menú Interactivo:**
    ```bash
    ./optimize_and_aero.sh
    ```
 
-3. **Restaurar el Sistema (Undo):**
+3. **Ejecutar Instalación Automática (One-Click):**
+   ```bash
+   ./optimize_and_aero.sh --auto
+   ```
+
+4. **Restaurar el Sistema (Undo):**
    ```bash
    ./optimize_and_aero.sh --restore
    ```
 
 ---
 
-## 🗺️ Master Roadmap hacia la v5.0 Stable
+## 🗺️ Master Roadmap v5.x
 
-### Fase 1: Perfección Visual (Completada)
-- [x] **Sidebar & Gadgets:** Barra lateral con Reloj, CPU y Clima.
-- [x] **Bordes Aero Glass (Aurorae):** Instalación de decoraciones con botones de cristal.
-- [x] **Efecto Flip 3D:** Configuración del Cover Switcher (`Win+Tab`).
-- [x] **Kvantum Glass:** Transparencia real en widgets de aplicaciones.
+### ✅ Fase 1: Perfección Visual (Completada)
+- [x] **Kvantum Glass:** Transparencia real en widgets de aplicaciones (KDE).
+- [x] **GTK Support:** Temas Aero para GNOME y Xfce.
+- [x] **Bordes Aero Glass:** Decoraciones con botones de cristal (Aurorae/Xfwm4).
 
-### Fase 2: Distribución y Audio (Completada - v5.0-beta)
-- [x] **Global Theme Package:** Integración en Preferencias del Sistema.
-- [x] **Sound Scheme:** Port de sonidos Windows 7 a KDE.
-- [x] **Aero Cursors:** Instalación automatizada.
-- [x] **Arquitectura Determinista:** Sistema de logs y restauración (`--restore`) mejorado.
+### ✅ Fase 2: Distribución y Audio (Completada)
+- [x] **Multi-Flavor Support:** Soporte para Kubuntu, Ubuntu y Xubuntu.
+- [x] **KDE Plasma 6 Support:** Arquitectura adaptativa.
+- [x] **Sound Scheme:** Port de sonidos Windows 7 a Linux.
 
-### Fase 3: Ecosistema Frutiger Aero (Próximamente)
+### 🚀 Fase 3: Ecosistema Frutiger Aero (Próximamente)
 - [ ] **Firefox Glass:** Estilo visual completo para el navegador via `userChrome.css`.
 - [ ] **Discord & Spotify:** Skins Aero automatizados.
-- [ ] **VLC & Music Players:** Pieles skeuomórficas clásicas.
+- [ ] **Lubuntu Support:** Próxima expansión hacia LXQt.
 
 ---
 
