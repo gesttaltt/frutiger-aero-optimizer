@@ -1,29 +1,36 @@
-# Contribuir al Frutiger Aero Optimizer 🫧🐬
+# Contribuir al Frutiger Aero Optimizer 🫧🐬✨
 
-¡Gracias por tu interés en mejorar este proyecto! Aquí tienes algunas guías para colaborar.
+¡Gracias por tu interés en mejorar este proyecto! Ayúdanos a preservar la estética más brillante de la historia digital.
 
 ## 🛠️ Desarrollo
-Este proyecto utiliza un script principal en Bash y assets locales.
 
-### Estándares de Código
-- Usamos **ShellCheck** para validar todos los cambios en el script.
-- Los cambios deben ser modulares (preferiblemente dentro de funciones).
-- Toda nueva característica visual debe incluir una opción de restauración en la función `restore_system`.
+Este proyecto combina scripts de automatización en **Bash** con una suite de assets temáticos.
 
-### Flujo de Trabajo
-1. Haz un fork del repositorio.
-2. Crea una rama para tu mejora (`git checkout -b feature/nueva-mejora`).
-3. Realiza tus cambios y verifica que `shellcheck optimize_and_aero.sh` no devuelva errores críticos.
-4. Envía un Pull Request.
+### 📝 Estándares de Código
+- **Validación:** Usamos **ShellCheck** para garantizar la seguridad y compatibilidad del script.
+- **Modularidad:** Todas las mejoras deben estar encapsuladas en funciones (ej: `apply_new_feature()`).
+- **Determinismo:** Cada cambio debe ser reversible. Asegúrate de actualizar la función `restore_system()` con la lógica de "Undo" correspondiente.
+- **Sudo:** Minimiza el uso de sudo; solo utilízalo para cambios a nivel de sistema (/usr, /etc).
 
-## 🎨 Assets
-Si quieres añadir fondos de pantalla o iconos:
-- Los wallpapers deben ser de alta resolución (mínimo 1080p).
-- Deben seguir estrictamente la estética Frutiger Aero (brillo, agua, naturaleza, skeuomorfismo).
-- Asegúrate de tener los derechos o que el asset sea de uso libre.
+### 🚀 Flujo de Trabajo
+1.  **Fork:** Crea tu propia copia del repo.
+2.  **Rama:** Usa nombres descriptivos (`git checkout -b feat/discord-glass`).
+3.  **Local Lint:** Ejecuta `shellcheck optimize_and_aero.sh` antes de enviar.
+4.  **PR:** Describe detalladamente qué cambia visualmente y en qué sabores de Ubuntu ha sido testeado.
 
-## 🧪 Pruebas
-Si encuentras un error, por favor abre un *Issue* detallando:
-- Tu versión exacta de Kubuntu.
-- Los pasos para reproducir el error.
-- El comportamiento esperado vs. el real.
+## 🎨 Assets y Estética
+
+Si deseas contribuir con recursos visuales:
+- **Calidad:** Los wallpapers deben ser 1920x1080 o superior.
+- **Fidelidad:** El estilo debe ser puramente **Frutiger Aero** (vidrio, burbujas, aurora, azul brillante, skeuomorfismo). Nada de minimalismo plano.
+- **Licencia:** Asegúrate de que los assets sean de dominio público o bajo licencias permisivas.
+
+## 🧪 Reporte de Errores
+
+Si el script falla, abre un *Issue* incluyendo:
+1.  Salida de `OS: | DE: | Session:` (mostrada en la cabecera del script).
+2.  Log del error (puedes encontrarlo en `~/.frutiger_aero.log`).
+3.  Tu hardware detectado (GPU vendor).
+
+---
+¡Hagamos que el escritorio vuelva a brillar! 🐬✨

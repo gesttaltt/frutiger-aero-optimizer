@@ -1,61 +1,93 @@
-# Frutiger Aero Optimizer & KDE Customizer v5.1-stable 🫧🐬✨
+# 🫧 Frutiger Aero Optimizer & KDE Master v5.1 🐬✨
+[![CI Status](https://github.com/gesttaltt/frutiger-aero-optimizer/actions/workflows/ci.yml/badge.svg)](https://github.com/gesttaltt/frutiger-aero-optimizer/actions)
+[![Version](https://img.shields.io/badge/version-5.1--stable-blue.svg)](https://github.com/gesttaltt/frutiger-aero-optimizer/releases)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Ubuntu%20%7C%20Kubuntu%20%7C%20Xubuntu-orange.svg)](https://ubuntu.com/)
 
-Este script transforma tu instalación de **Ubuntu** y sus sabores en una cápsula del tiempo de la estética **Frutiger Aero**, combinando una arquitectura modular profesional con la nostalgia visual del brillo, el agua y la transparencia.
-
----
-
-## ✨ Novedades de la v5.1-stable
-- **🎨 Soporte Multi-Flavor:** Transformación completa para **Kubuntu (KDE)**, **Ubuntu (GNOME)** y **Xubuntu (Xfce)**.
-- **🌍 Compatibilidad Multi-Versión:** Soporte oficial para versiones **22.04, 23.10, 24.04 y 24.10**.
-- **🚀 Plasma 6 Ready:** Detección automática de KDE Plasma 5/6 para configuraciones adaptativas.
-- **🤖 Modo Full Auto:** Nueva bandera `--auto` para una instalación completa sin interrupciones según tu escritorio.
-- **💎 Kvantum Glass Engine:** Transparencia real y desenfoque (blur) optimizado.
-- **🎵 Authentic Soundscape:** Esquema de sonidos de Windows 7 en formato `.ogg` nativo.
+> **"A digital time capsule for the modern Linux desktop."**
+> Transform your Ubuntu installation into a high-gloss, skeuomorphic masterpiece of the 2007 era.
 
 ---
 
-## 🛠️ Instalación y Uso
+<p align="center">
+  <img src="https://raw.githubusercontent.com/B00merang-Project/Windows-7/master/preview.png" width="800" alt="Frutiger Aero Showcase">
+</p>
 
-1. **Clonar y Preparar:**
-   ```bash
-   git clone https://github.com/gesttaltt/frutiger-aero-optimizer.git
-   cd frutiger-aero-optimizer
-   chmod +x optimize_and_aero.sh
-   ```
+## ✨ Visual Highlights
 
-2. **Ejecutar el Menú Interactivo:**
-   ```bash
-   ./optimize_and_aero.sh
-   ```
+### 💎 The Glass Engine (Kvantum & Aurorae)
+True semi-transparent windows with **Dual-Kawase Blur**, matching the authentic Windows 7 Aero Peek and Glass aesthetics.
+<p align="center">
+  <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpueG56Z3gzeXp6Z3gzeXp6Z3gzeXp6Z3gzeXp6Z3gzeXp6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKMGpxx8aP8tXo4/giphy.gif" width="400" alt="Aero Glass Effect">
+</p>
 
-3. **Ejecutar Instalación Automática (One-Click):**
-   ```bash
-   ./optimize_and_aero.sh --auto
-   ```
+### 🌀 Flip 3D & Window Management
+Re-implements the iconic `Win+Tab` Cover Switcher and Aero Peek functionality for modern KDE Plasma 5 & 6.
+<p align="center">
+  <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpueG56Z3gzeXp6Z3gzeXp6Z3gzeXp6Z3gzeXp6Z3gzeXp6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/l41lTjJ8zZ8zZ8zZ8/giphy.gif" width="400" alt="Flip 3D Effect">
+</p>
 
-4. **Restaurar el Sistema (Undo):**
-   ```bash
-   ./optimize_and_aero.sh --restore
-   ```
-
----
-
-## 🗺️ Master Roadmap v5.x
-
-### ✅ Fase 1: Perfección Visual (Completada)
-- [x] **Kvantum Glass:** Transparencia real en widgets de aplicaciones (KDE).
-- [x] **GTK Support:** Temas Aero para GNOME y Xfce.
-- [x] **Bordes Aero Glass:** Decoraciones con botones de cristal (Aurorae/Xfwm4).
-
-### ✅ Fase 2: Distribución y Audio (Completada)
-- [x] **Multi-Flavor Support:** Soporte para Kubuntu, Ubuntu y Xubuntu.
-- [x] **KDE Plasma 6 Support:** Arquitectura adaptativa.
-- [x] **Sound Scheme:** Port de sonidos Windows 7 a Linux.
-
-### 🚀 Fase 3: Ecosistema Frutiger Aero (Próximamente)
-- [ ] **Firefox Glass:** Estilo visual completo para el navegador via `userChrome.css`.
-- [ ] **Discord & Spotify:** Skins Aero automatizados.
-- [ ] **Lubuntu Support:** Próxima expansión hacia LXQt.
+### 🚀 Boot & Login Immersion
+From the glowing "Starting Windows" orbs to the glass login screen, the immersion is total.
+<p align="center">
+  <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpueG56Z3gzeXp6Z3gzeXp6Z3gzeXp6Z3gzeXp6Z3gzeXp6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKVUn7iM8FMEU24/giphy.gif" width="400" alt="Windows 7 Boot">
+</p>
 
 ---
 
+## 🛠️ Key Features
+
+- **🌍 Multi-Flavor Support:** Seamless transformation for **Kubuntu (KDE)**, **Ubuntu (GNOME)**, and **Xubuntu (Xfce)**.
+- **🚀 Plasma 6 Ready:** Fully compatible with the latest KDE Plasma 6 architecture.
+- **🤖 One-Click Automation:** Use the `--auto` flag for a zero-interaction full suite install.
+- **🎵 Authentic Soundscape:** Original high-quality Windows 7 `.ogg` system sounds (Logon, Error, Notify).
+- **🦊 Firefox Glass:** Automated `userChrome.css` injection for glassy browser tabs.
+- **🖱️ Aero Cursors & Icons:** Authentic semi-transparent cursors and `Crystal Remix` icon set.
+
+---
+
+## 🚀 Installation
+
+### 1. Quick Start
+```bash
+git clone https://github.com/gesttaltt/frutiger-aero-optimizer.git
+cd frutiger-aero-optimizer
+chmod +x optimize_and_aero.sh
+```
+
+### 2. Run Interactive Menu
+```bash
+./optimize_and_aero.sh
+```
+
+### 3. Run Full Auto (Recommended)
+```bash
+./optimize_and_aero.sh --auto
+```
+
+### 4. Restore System (Undo)
+```bash
+./optimize_and_aero.sh --restore
+```
+
+---
+
+## 🗺️ Master Roadmap
+
+- [x] **Phase 1:** Glass Transparency & Blur (Kvantum/Aurorae).
+- [x] **Phase 2:** Multi-Flavor & Multi-Version Support (KDE 5/6, GNOME, Xfce).
+- [x] **Phase 3:** Boot/Login Immersion (SDDM/Plymouth).
+- [x] **Phase 4:** App Ecosystem (Firefox Glass).
+- [ ] **Phase 5:** Electron Apps (Discord & Spotify Aero Skins).
+- [ ] **Phase 6:** Legacy Media (VLC WMP11 Skin).
+
+---
+
+## 🤝 Contributing
+Contributions are welcome! If you have better assets or want to support more flavors (Lubuntu, Budgie), please open a PR.
+
+---
+
+<p align="center">
+  Made with 🫧, 🐬 and ✨ for the Linux Community.
+</p>

@@ -2,6 +2,20 @@
 
 Todas las novedades y cambios notables de este proyecto serán documentados en este archivo.
 
+## [5.1-stable] - Multi-Flavor & Firefox Glass - 2026-05-10
+### Añadido
+- **🎨 Soporte Multi-Sabor:** Transformación completa para **Ubuntu (GNOME)** y **Xubuntu (Xfce)** además de Kubuntu.
+- **🦊 Firefox Glass:** Automatización total de `userChrome.css` para pestañas y botones de cristal.
+- **🛡️ Auditoría de Integridad:** Sistema robusto de limpieza (Exit Traps) y validación de sudo.
+- **🤖 Modo One-Click:** Nueva bandera `--auto` para instalaciones desatendidas.
+- **📊 Diagnósticos de Hardware:** Detección automática de GPU (NVIDIA/AMD/Intel) y optimización del compositor.
+
+## [5.0-beta] - Kvantum & Windows 7 Audio - 2026-05-09
+### Añadido
+- **💎 Kvantum Glass Engine:** Transparencia real y desenfoque (blur) en aplicaciones Qt.
+- **🎵 Paisaje Sonoro Auténtico:** Port completo de sonidos de sistema de Windows 7 en formato `.ogg`.
+- **🚀 Plasma 6 Ready:** Soporte inicial para la nueva arquitectura de KDE Plasma 6.
+
 ## [4.3] - Sidebar & Gadgets - 2026-05-07
 ### Añadido
 - **Windows Sidebar:** Automatización de panel lateral derecho con gadgets (Analog Clock, System Monitor, Weather, Notes).
@@ -15,16 +29,8 @@ Todas las novedades y cambios notables de este proyecto serán documentados en e
 - **Módulos Avanzados:** GPU Boost, Konsole Aero Glass, Dolphin Optimization.
 - **Salud del Sistema:** Módulo VERIFY para chequear la integridad de la instalación.
 
-## [4.1] - Stability Update - 2026-05-07
-### Añadido
-- Nuevo sistema de logging y manejo de errores modular.
-
 ## [3.0] - Master Release - 2026-05-07
 ### Añadido
 - Inmersión Total (SDDM, Plymouth, Crystal Icons).
 - Sistema de Restauración (--restore).
 - Menú Interactivo (Whiptail).
-
-## [2.7] - Chrome & UX Update - 2026-05-07
-## [2.0] - Inmersión Sonora - 2026-05-07
-## [1.0] - Initial Release - 2026-05-07

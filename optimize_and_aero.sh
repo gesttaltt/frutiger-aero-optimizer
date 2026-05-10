@@ -233,6 +233,11 @@ restore_system() {
         rm -f "$FF_DIR/$PROFILE_PATH/user.js"
     fi
 
+    # Revertir SDDM & Plymouth (Root req)
+    sudo rm -f /etc/sddm.conf.d/aero.conf
+    sudo update-alternatives --remove default.plymouth /usr/share/plymouth/themes/PlymouthVista/PlymouthVista.plymouth 2>/dev/null || true
+    # (El usuario deberá actualizar initramfs manualmente si desea quitar el splash por completo)
+
     rm "$STATE_FILE"
     log_message "SUCCESS" "Reversión Master completada."
     exit 0
@@ -538,6 +543,49 @@ EOF
     fi
 }
 
+apply_boot_login() {
+    log_message "INFO" "Instalando Temas de Inicio y Bloqueo (Root req)..."
+    
+    # 1. SDDM (Login Screen) - Solo para KDE
+    if [[ "$DE_TYPE" == "kde" ]]; then
+        local SDDM_THEME_DIR="/usr/share/sddm/themes/win7-sddm-theme"
+        if [ ! -d "$SDDM_THEME_DIR" ]; then
+            log_message "INFO" "Descargando tema SDDM Windows 7..."
+            local TEMP_SDDM="/tmp/aero_sddm"
+            TEMP_DIRS+=("$TEMP_SDDM")
+            if git clone --depth 1 https://github.com/syrupderg/win7-sddm-theme.git "$TEMP_SDDM"; then
+                sudo mkdir -p "$SDDM_THEME_DIR"
+                sudo cp -r "$TEMP_SDDM/"* "$SDDM_THEME_DIR/"
+                
+                # Configurar SDDM
+                sudo mkdir -p /etc/sddm.conf.d
+                echo -e "[Theme]\nCurrent=win7-sddm-theme" | sudo tee /etc/sddm.conf.d/aero.conf > /dev/null
+                log_message "SUCCESS" "Tema SDDM Windows 7 instalado."
+            fi
+        fi
+    fi
+
+    # 2. Plymouth (Boot Splash)
+    local PLYMOUTH_THEME_DIR="/usr/share/plymouth/themes/PlymouthVista"
+    if [ ! -d "$PLYMOUTH_THEME_DIR" ]; then
+        log_message "INFO" "Descargando tema Plymouth Windows 7..."
+        local TEMP_PLYMOUTH="/tmp/aero_plymouth"
+        TEMP_DIRS+=("$TEMP_PLYMOUTH")
+        if git clone --depth 1 https://github.com/furkrn/PlymouthVista.git "$TEMP_PLYMOUTH"; then
+            sudo mkdir -p "$PLYMOUTH_THEME_DIR"
+            sudo cp -r "$TEMP_PLYMOUTH/"* "$PLYMOUTH_THEME_DIR/"
+            
+            # Registrar y aplicar tema Plymouth
+            sudo update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth "$PLYMOUTH_THEME_DIR/PlymouthVista.plymouth" 100
+            sudo update-alternatives --set default.plymouth "$PLYMOUTH_THEME_DIR/PlymouthVista.plymouth"
+            
+            log_message "INFO" "Actualizando initramfs (esto puede tardar)..."
+            sudo update-initramfs -u
+            log_message "SUCCESS" "Tema Plymouth Windows 7 instalado."
+        fi
+    fi
+}
+
 apply_gpu_boost() {
     log_message "INFO" "Aplicando optimizaciones para GPU: $GPU_VENDOR..."
     
@@ -577,31 +625,34 @@ apply_flavor_aero() {
     case "$DE_TYPE" in
         "kde")
             # Secuencia Óptima KDE: Componentes -> Tema Global
-            log_message "INFO" "Paso 1/9: Optimizando GPU..."
+            log_message "INFO" "Paso 1/10: Optimizando GPU..."
             apply_gpu_boost
             
-            log_message "INFO" "Paso 2/9: Instalando bordes Aurorae..."
+            log_message "INFO" "Paso 2/10: Instalando bordes Aurorae..."
             apply_aurorae_glass
             
-            log_message "INFO" "Paso 3/9: Configurando Kvantum Glass..."
+            log_message "INFO" "Paso 3/10: Configurando Kvantum Glass..."
             apply_kvantum
             
-            log_message "INFO" "Paso 4/9: Instalando Iconos Crystal..."
+            log_message "INFO" "Paso 4/10: Instalando Iconos Crystal..."
             apply_bar_and_icons
             
-            log_message "INFO" "Paso 5/9: Instalando Cursores Aero..."
+            log_message "INFO" "Paso 5/10: Instalando Cursores Aero..."
             apply_cursors
             
-            log_message "INFO" "Paso 6/9: Instalando Esquema de Sonido..."
+            log_message "INFO" "Paso 6/10: Instalando Esquema de Sonido..."
             apply_sounds
             
-            log_message "INFO" "Paso 7/9: Configurando Konsole Glass..."
+            log_message "INFO" "Paso 7/10: Configurando Konsole Glass..."
             apply_konsole_glass
             
-            log_message "INFO" "Paso 8/9: Configurando Firefox Glass..."
+            log_message "INFO" "Paso 8/10: Configurando Firefox Glass..."
             apply_firefox_glass
             
-            log_message "INFO" "Paso 9/9: Aplicando Tema Global (Master)..."
+            log_message "INFO" "Paso 9/10: Temas SDDM y Plymouth..."
+            apply_boot_login
+            
+            log_message "INFO" "Paso 10/10: Aplicando Tema Global (Master)..."
             apply_global_theme
             ;;
             
@@ -663,12 +714,14 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         if [[ "$DE_TYPE" == "kde" ]]; then
             CHOICES=$(whiptail --title "Frutiger Aero Optimizer v5.1 (KDE)" --checklist \
             "Selecciona los componentes (Espacio para marcar):" 24 78 12 \
-            "FULL" "INSTALACIÓN COMPLETA (Secuencial)" ON \
+            "FULL" "INSTALACIÓN COMPLETA (Recomendado)" ON \
+            "GPU_BOOST" "Optimización de Rendimiento GPU" OFF \
             "AURORAE" "Bordes de Ventana Glass" OFF \
             "KVANTUM" "Efecto Glass en Apps" OFF \
             "BAR_ICONS" "Iconos Crystal Remix" OFF \
             "CURSORS" "Cursores Aero" OFF \
             "SOUNDS" "Esquema de Sonidos" OFF \
+            "BOOT_LOGIN" "Temas de Inicio y Bloqueo" OFF \
             "OPTIMIZE" "Limpieza de sistema" OFF 3>&1 1>&2 2>&3)
 
             if [ -z "$CHOICES" ]; then exit 0; fi
@@ -678,11 +731,13 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
             else
                 for choice in $CHOICES; do
                     case $choice in
+                        "\"GPU_BOOST\"") apply_gpu_boost ;;
                         "\"AURORAE\"") apply_aurorae_glass ;;
                         "\"KVANTUM\"") apply_kvantum ;;
                         "\"BAR_ICONS\"") apply_bar_and_icons ;;
                         "\"CURSORS\"") apply_cursors ;;
                         "\"SOUNDS\"") apply_sounds ;;
+                        "\"BOOT_LOGIN\"") apply_boot_login ;;
                     esac
                 done
             fi
