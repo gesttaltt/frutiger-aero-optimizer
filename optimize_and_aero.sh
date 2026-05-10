@@ -14,7 +14,6 @@ GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 YELLOW='\033[1;33m'
-MAGENTA='\033[0;35m'
 NC='\033[0m'
 
 STATE_FILE="$HOME/.frutiger_aero_state.sh"
@@ -188,7 +187,6 @@ apply_global_theme() {
     local SCRIPT_DIR; SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     local THEME_ID="com.gemini.frutigeraeromaster"
     local THEME_SOURCE="$SCRIPT_DIR/assets/look-and-feel/$THEME_ID"
-    local THEME_DEST="$HOME/.local/share/plasma/look-and-feel/$THEME_ID"
 
     if [ -d "$THEME_SOURCE" ]; then
         mkdir -p "$HOME/.local/share/plasma/look-and-feel"
@@ -291,7 +289,10 @@ apply_kvantum() {
 
     if ! dpkg -l | grep -q "$KV_PKG"; then
         log_message "INFO" "Instalando motor Kvantum ($KV_PKG)..."
-        sudo apt update && sudo apt install -y "$KV_PKG" qt5-style-kvantum-themes || true
+        sudo apt update
+        if ! sudo apt install -y "$KV_PKG" qt5-style-kvantum-themes; then
+            log_message "WARNING" "No se pudo instalar $KV_PKG automáticamente."
+        fi
     fi
 
     if [ -d "$KV_SOURCE" ]; then

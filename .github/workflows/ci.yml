@@ -1,4 +1,4 @@
-name: Project Quality Assurance
+name: Frutiger Aero Master CI 🫧🐬✨
 
 on:
   push:
@@ -8,25 +8,52 @@ on:
 
 jobs:
   lint:
+    name: 🔍 ShellCheck & Lint
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Install Dependencies
-      run: sudo apt-get install -y shellcheck jq
+    - name: Install ShellCheck
+      run: sudo apt-get install -y shellcheck
     - name: Run ShellCheck
       run: shellcheck optimize_and_aero.sh
 
   verify-assets:
+    name: 📦 Asset Integrity Check
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Check Required Directories
+    - name: Verify Sound Assets
       run: |
-        test -d assets/wallpapers
-        test -d assets/sounds
-        test -d assets/kvantum/AeroGlass
-    - name: Check Critical Files
+        test -d assets/sounds/Aero/stereo
+        test -f assets/sounds/Aero/index.theme
+        test -s assets/sounds/Aero/stereo/desktop-login.ogg
+    - name: Verify Kvantum Assets
       run: |
-        test -f assets/kvantum/AeroGlass/AeroGlass.kvconfig
-        test -f assets/kvantum/AeroGlass/AeroGlass.svg
-        test -x optimize_and_aero.sh
+        test -d assets/kvantum/Windows7Aero
+        test -f assets/kvantum/Windows7Aero/Windows7Aero.kvconfig
+    - name: Verify Look and Feel Assets
+      run: |
+        test -d assets/look-and-feel/com.gemini.frutigeraeromaster
+        test -f assets/look-and-feel/com.gemini.frutigeraeromaster/contents/defaults
+
+  smoke-test:
+    name: 🚀 Smoke Test (Multi-DE Detection)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+        de: [kde, gnome, xfce]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Whiptail (Dependency)
+      run: sudo apt-get install -y whiptail
+    - name: Test DE Detection and Basic Syntax
+      env:
+        XDG_CURRENT_DESKTOP: ${{ matrix.de }}
+      run: |
+        # Check syntax
+        bash -n optimize_and_aero.sh
+        # Run script in a way that checks version but doesn't enter interactive loop
+        # We can use a trick: export a variable to mock the environment
+        # and check if the detect_system function works as expected
+        bash -c "source ./optimize_and_aero.sh && detect_system && echo 'Detected DE: \$DE_TYPE' | grep -i '${{ matrix.de }}'"
