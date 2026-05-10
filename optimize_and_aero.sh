@@ -233,6 +233,9 @@ restore_system() {
         rm -f "$FF_DIR/$PROFILE_PATH/user.js"
     fi
 
+    # Revertir Discord (Vencord)
+    rm -rf "$HOME/.config/Vencord/themes/AeroCord.theme.css"
+
     # Revertir SDDM & Plymouth (Root req)
     sudo rm -f /etc/sddm.conf.d/aero.conf
     sudo update-alternatives --remove default.plymouth /usr/share/plymouth/themes/PlymouthVista/PlymouthVista.plymouth 2>/dev/null || true
@@ -586,6 +589,29 @@ apply_boot_login() {
     fi
 }
 
+apply_discord_glass() {
+    log_message "INFO" "Instalando Discord Aero Glass (via Vencord)..."
+    
+    # 1. Instalar Vencord (Mod de Cliente) - Usar el instalador CLI si es posible
+    if ! command -v vencord-installer &> /dev/null; then
+        log_message "INFO" "Descargando instalador de Vencord..."
+        local TEMP_VENCORD="/tmp/vencord_installer"
+        TEMP_DIRS+=("$TEMP_VENCORD")
+        curl -sS https://raw.githubusercontent.com/Vencord/Installer/main/install.sh | bash -s -- --install-only || true
+    fi
+
+    # 2. Descargar Tema AeroCord
+    local VENCORD_THEMES="$HOME/.config/Vencord/themes"
+    mkdir -p "$VENCORD_THEMES"
+    
+    log_message "INFO" "Descargando tema AeroCord..."
+    if curl -L "https://raw.githubusercontent.com/repojun/AeroCord/main/AeroCord.css" -o "$VENCORD_THEMES/AeroCord.theme.css"; then
+        log_message "SUCCESS" "Discord Aero Glass configurado. Activa 'AeroCord' en Ajustes de Vencord."
+    else
+        log_message "ERROR" "No se pudo descargar el tema de Discord."
+    fi
+}
+
 apply_gpu_boost() {
     log_message "INFO" "Aplicando optimizaciones para GPU: $GPU_VENDOR..."
     
@@ -625,34 +651,37 @@ apply_flavor_aero() {
     case "$DE_TYPE" in
         "kde")
             # Secuencia Óptima KDE: Componentes -> Tema Global
-            log_message "INFO" "Paso 1/10: Optimizando GPU..."
+            log_message "INFO" "Paso 1/11: Optimizando GPU..."
             apply_gpu_boost
             
-            log_message "INFO" "Paso 2/10: Instalando bordes Aurorae..."
+            log_message "INFO" "Paso 2/11: Instalando bordes Aurorae..."
             apply_aurorae_glass
             
-            log_message "INFO" "Paso 3/10: Configurando Kvantum Glass..."
+            log_message "INFO" "Paso 3/11: Configurando Kvantum Glass..."
             apply_kvantum
             
-            log_message "INFO" "Paso 4/10: Instalando Iconos Crystal..."
+            log_message "INFO" "Paso 4/11: Instalando Iconos Crystal..."
             apply_bar_and_icons
             
-            log_message "INFO" "Paso 5/10: Instalando Cursores Aero..."
+            log_message "INFO" "Paso 5/11: Instalando Cursores Aero..."
             apply_cursors
             
-            log_message "INFO" "Paso 6/10: Instalando Esquema de Sonido..."
+            log_message "INFO" "Paso 6/11: Instalando Esquema de Sonido..."
             apply_sounds
             
-            log_message "INFO" "Paso 7/10: Configurando Konsole Glass..."
+            log_message "INFO" "Paso 7/11: Configurando Konsole Glass..."
             apply_konsole_glass
             
-            log_message "INFO" "Paso 8/10: Configurando Firefox Glass..."
+            log_message "INFO" "Paso 8/11: Configurando Firefox Glass..."
             apply_firefox_glass
             
-            log_message "INFO" "Paso 9/10: Temas SDDM y Plymouth..."
+            log_message "INFO" "Paso 9/11: Configurando Discord Glass..."
+            apply_discord_glass
+            
+            log_message "INFO" "Paso 10/11: Temas SDDM y Plymouth..."
             apply_boot_login
             
-            log_message "INFO" "Paso 10/10: Aplicando Tema Global (Master)..."
+            log_message "INFO" "Paso 11/11: Aplicando Tema Global (Master)..."
             apply_global_theme
             ;;
             
@@ -721,6 +750,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
             "BAR_ICONS" "Iconos Crystal Remix" OFF \
             "CURSORS" "Cursores Aero" OFF \
             "SOUNDS" "Esquema de Sonidos" OFF \
+            "DISCORD_GLASS" "Discord Aero (Vencord)" OFF \
             "BOOT_LOGIN" "Temas de Inicio y Bloqueo" OFF \
             "OPTIMIZE" "Limpieza de sistema" OFF 3>&1 1>&2 2>&3)
 
@@ -737,6 +767,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
                         "\"BAR_ICONS\"") apply_bar_and_icons ;;
                         "\"CURSORS\"") apply_cursors ;;
                         "\"SOUNDS\"") apply_sounds ;;
+                        "\"DISCORD_GLASS\"") apply_discord_glass ;;
                         "\"BOOT_LOGIN\"") apply_boot_login ;;
                     esac
                 done
