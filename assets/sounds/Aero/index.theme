@@ -1,0 +1,7 @@
+[Sound Theme]
+Name=Frutiger Aero (Windows 7)
+Comment=Authentic 2007-era soundscape
+Directories=stereo
+
+[stereo]
+OutputProfile=stereo

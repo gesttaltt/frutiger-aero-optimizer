@@ -117,6 +117,8 @@ restore_system() {
     rm -rf ~/.local/share/aurorae/themes/Ten-Aero
     rm -rf ~/.local/share/icons/AeroCursors
     rm -rf ~/.local/share/icons/crystal-remix-icon-theme-diinki-version
+    rm -rf ~/.local/share/sounds/Aero
+    rm -rf ~/.config/Kvantum/Windows7Aero
 
     rm "$STATE_FILE"
     log_message "SUCCESS" "Reversión Master completada."
@@ -129,6 +131,17 @@ apply_global_theme() {
     log_message "INFO" "Instalando y Aplicando el Paquete Global Theme Master..."
     init_state
     
+    # Guardar configuración actual
+    save_setting kdeglobals General widgetStyle
+    save_setting kdeglobals Icons Theme
+    save_setting kcminputrc Mouse cursorTheme
+    save_setting kdeglobals Sounds Theme
+    save_setting ksplashrc SecondShell Theme
+    save_setting plasmarc Theme name
+    save_setting kwinrc "org.kde.kdecoration2" library
+    save_setting kwinrc "org.kde.kdecoration2" theme
+    save_setting kwinrc TabBox LayoutName
+
     local SCRIPT_DIR; SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     local THEME_ID="com.gemini.frutigeraeromaster"
     local THEME_SOURCE="$SCRIPT_DIR/assets/look-and-feel/$THEME_ID"
@@ -192,6 +205,71 @@ apply_cursors() {
     fi
 }
 
+apply_sounds() {
+    log_message "INFO" "Instalando Esquema de Sonido Aero..."
+    init_state
+    save_setting kdeglobals Sounds Theme
+
+    local SCRIPT_DIR; SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local SOUND_SOURCE="$SCRIPT_DIR/assets/sounds/Aero"
+    local SOUND_DEST="$HOME/.local/share/sounds/Aero"
+
+    if [ -d "$SOUND_SOURCE" ]; then
+        mkdir -p "$SOUND_DEST"
+        cp -r "$SOUND_SOURCE/"* "$SOUND_DEST/"
+        
+        # Aplicar el esquema de sonido
+        kwriteconfig5 --file kdeglobals --group "Sounds" --key "Theme" "Aero"
+        log_message "SUCCESS" "Esquema de sonido instalado y configurado."
+    else
+        log_message "ERROR" "No se encontraron los assets de sonido en $SOUND_SOURCE"
+    fi
+}
+
+apply_kvantum() {
+    log_message "INFO" "Instalando y Configurando Kvantum Aero Glass..."
+    init_state
+    save_setting kdeglobals General widgetStyle
+    save_setting kwinrc Plugins blurEnabled
+    save_setting kwinrc Plugins backgroundcontrastEnabled
+
+    local SCRIPT_DIR; SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local KV_SOURCE="$SCRIPT_DIR/assets/kvantum/Windows7Aero"
+    local KV_DEST="$HOME/.config/Kvantum/Windows7Aero"
+
+    # Asegurar que Kvantum esté instalado
+    if ! dpkg -l | grep -q "qt5-style-kvantum"; then
+        log_message "INFO" "Instalando motor Kvantum..."
+        sudo apt update && sudo apt install -y qt5-style-kvantum qt5-style-kvantum-themes
+    fi
+
+    if [ -d "$KV_SOURCE" ]; then
+        mkdir -p "$KV_DEST"
+        cp -r "$KV_SOURCE/"* "$KV_DEST/"
+        
+        # Aplicar el tema en Kvantum
+        if command -v kvantummanager &> /dev/null; then
+            kvantummanager --set Windows7Aero
+        fi
+
+        # Configurar KDE para usar Kvantum
+        kwriteconfig5 --file kdeglobals --group "KDE" --key "widgetStyle" "kvantum"
+        
+        # Optimizar Blur y Contraste para el efecto Glass
+        kwriteconfig5 --file kwinrc --group "Plugins" --key "blurEnabled" "true"
+        kwriteconfig5 --file kwinrc --group "Effect-Blur" --key "BlurRadius" "12"
+        kwriteconfig5 --file kwinrc --group "Plugins" --key "backgroundcontrastEnabled" "true"
+        
+        if command -v qdbus &> /dev/null; then
+            qdbus org.kde.KWin /KWin reconfigure
+        fi
+        
+        log_message "SUCCESS" "Kvantum Aero Glass configurado."
+    else
+        log_message "ERROR" "No se encontraron los assets de Kvantum en $KV_SOURCE"
+    fi
+}
+
 # --- LÓGICA PRINCIPAL ---
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
@@ -210,8 +288,10 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     "Roadmap Fase 2: Distribución Master (Espacio para marcar):" 24 78 12 \
     "GLOBAL_THEME" "INSTALACIÓN MAESTRA (Look & Feel + Assets)" ON \
     "AURORAE" "Instalar Bordes Aurorae Glass" ON \
+    "KVANTUM" "Efecto Glass en Ventanas (Kvantum)" ON \
     "BAR_ICONS" "Instalar Iconos Crystal" ON \
     "CURSORS" "Instalar Cursores Aero" ON \
+    "SOUNDS" "Esquema de Sonidos Windows 7" ON \
     "SIDEBAR" "Sidebar vertical con Gadgets" ON \
     "BOOT_LOGIN" "Temas SDDM y Plymouth" ON \
     "CHROME" "Bordes Aero para Google Chrome" ON \
@@ -224,8 +304,10 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     for choice in $CHOICES; do
         case $choice in
             "\"AURORAE\"") apply_aurorae_glass ;;
+            "\"KVANTUM\"") apply_kvantum ;;
             "\"BAR_ICONS\"") apply_bar_and_icons ;;
             "\"CURSORS\"") apply_cursors ;;
+            "\"SOUNDS\"") apply_sounds ;;
         esac
     done
 

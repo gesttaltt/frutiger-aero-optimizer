@@ -23,3 +23,6 @@ Engine=KSplashQML
 
 [kwinrc][WindowSwitcher]
 LayoutName=coverswitch
+
+[kdeglobals][Sounds]
+Theme=Aero
