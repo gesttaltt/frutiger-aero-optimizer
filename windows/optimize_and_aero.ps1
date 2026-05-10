@@ -13,7 +13,7 @@
     Supported: Windows 10 (2004+), Windows 11
 #>
 
-# --- CONFIGURACIÓN Y COLORES ---
+# --- CONFIGURACION Y COLORES ---
 $ErrorActionPreference = "Continue"
 $OutputEncoding = [System.Text.Encoding]::UTF8
 
@@ -30,7 +30,7 @@ function Write-AeroLog {
     Write-Host "[$Timestamp] [$Level] $Message" -ForegroundColor $Color
 }
 
-# --- DETECCIÓN DE SISTEMA ---
+# --- DETECCION DE SISTEMA ---
 function Get-SystemInfo {
     $OS = Get-WmiObject Win32_OperatingSystem
     $Global:OS_NAME = $OS.Caption
@@ -51,16 +51,16 @@ function Check-Admin {
 
 # --- FUNCIONES DE SEGURIDAD ---
 function Create-RestorePoint {
-    Write-AeroLog "INFO" "Creando Punto de Restauración del Sistema (Seguridad)..."
+    Write-AeroLog "INFO" "Creando Punto de Restauracion del Sistema (Seguridad)..."
     try {
         Checkpoint-Computer -Description "FrutigerAero_Master_Install" -RestorePointType "MODIFY_SETTINGS"
-        Write-AeroLog "SUCCESS" "Punto de restauración creado con éxito."
+        Write-AeroLog "SUCCESS" "Punto de restauracion creado con exito."
     } catch {
-        Write-AeroLog "WARNING" "No se pudo crear el punto de restauración. Asegúrate de que la protección del sistema esté activada."
+        Write-AeroLog "WARNING" "No se pudo crear el punto de restauracion. Asegurate de que la proteccion del sistema este activada."
     }
 }
 
-# --- MÓDULOS DE TRANSFORMACIÓN ---
+# --- MODULOS DE TRANSFORMACION ---
 
 function Install-Dependencies {
     Write-AeroLog "INFO" "Verificando Winget y descargando componentes..."
@@ -69,7 +69,11 @@ function Install-Dependencies {
 
     foreach ($tool in $tools) {
         Write-AeroLog "INFO" "Instalando $tool via Winget..."
-        winget install $tool --accept-package-agreements --accept-source-agreements --silent || Write-AeroLog "WARNING" "No se pudo instalar $tool automáticamente."
+        try {
+            winget install $tool --accept-package-agreements --accept-source-agreements --silent
+        } catch {
+            Write-AeroLog "WARNING" "No se pudo instalar $tool automaticamente."
+        }
     }
 }
 
@@ -162,10 +166,10 @@ function Refresh-Shell {
 }
 
 function Optimize-System {
-    Write-AeroLog "INFO" "Iniciando Limpieza y Optimización de Windows..."
+    Write-AeroLog "INFO" "Iniciando Limpieza y Optimizacion de Windows..."
     # 1. Limpieza de archivos temporales (System)
     DISM /Online /Cleanup-Image /StartComponentCleanup /Quiet
-    Write-AeroLog "SUCCESS" "Optimización de sistema completada."
+    Write-AeroLog "SUCCESS" "Optimizacion de sistema completada."
 }
 
 function Install-SpotifyGlass {
@@ -190,7 +194,7 @@ function Install-SpotifyGlass {
         & spicetify backup apply
         Write-AeroLog "SUCCESS" "Spotify Aero Glass configurado."
     } catch {
-        Write-AeroLog "WARNING" "No se pudo configurar Spotify Aero. Asegúrate de tener Spotify instalado desde su web."
+        Write-AeroLog "WARNING" "No se pudo configurar Spotify Aero. Asegurate de tener Spotify instalado desde su web."
     }
 }
 
@@ -210,11 +214,11 @@ function Apply-VlcSkin {
         }
         Write-AeroLog "SUCCESS" "VLC Skin WMP11 aplicado."
     } else {
-        Write-AeroLog "ERROR" "No se encontró el asset de skin para VLC en $skinSource"
+        Write-AeroLog "ERROR" "No se encontro el asset de skin para VLC en $skinSource"
     }
 }
 
-# --- LÓGICA PRINCIPAL ---
+# --- LOGICA PRINCIPAL ---
 function Show-Header {
     Clear-Host
     Write-Host "############################################################" -ForegroundColor Cyan
@@ -231,22 +235,22 @@ function Show-Header {
 $AutoMode = $args -contains "--auto" -or $args -contains "-a"
 $RestoreMode = $args -contains "--restore" -or $args -contains "-r"
 
-# --- LÓGICA DE INICIO ---
+# --- LOGICA DE INICIO ---
 if ($MyInvocation.InvocationName -ne '.' -and $MyInvocation.InvocationName -ne '&') {
     Get-SystemInfo
     Check-Admin
 }
 
 if ($RestoreMode) {
-    Write-AeroLog "WARNING" "Modo Restauración activado..."
-    Write-AeroLog "INFO" "Usa 'rstrui.exe' para volver al punto de restauración creado por este script."
+    Write-AeroLog "WARNING" "Modo Restauracion activado..."
+    Write-AeroLog "INFO" "Usa 'rstrui.exe' para volver al punto de restauracion creado por este script."
     exit 0
 }
 
 Show-Header
 
 if ($AutoMode) {
-    Write-AeroLog "INFO" "Ejecutando en MODO AUTOMÁTICO..."
+    Write-AeroLog "INFO" "Ejecutando en MODO AUTOMATICO..."
     Create-RestorePoint
     Install-Dependencies
     Apply-AeroAssets
@@ -255,7 +259,7 @@ if ($AutoMode) {
     Apply-VlcSkin
     Refresh-Shell
     Optimize-System
-    Write-AeroLog "SUCCESS" "¡TRANSFORMACIÓN COMPLETADA! Disfruta del brillo."
+    Write-AeroLog "SUCCESS" "TRANSFORMACION COMPLETADA! Disfruta del brillo."
 } else {
-    Write-AeroLog "INFO" "Inicia el script con --auto para una instalación rápida."
+    Write-AeroLog "INFO" "Inicia el script con --auto para una instalacion rapida."
 }
