@@ -2,13 +2,16 @@
 
 Todas las novedades y cambios notables de este proyecto serán documentados en este archivo.
 
-## [5.1-stable] - Multi-Flavor & Firefox Glass - 2026-05-10
+## [5.1-stable] - Multi-Flavor & Windows Port - 2026-05-10
 ### Añadido
-- **🎨 Soporte Multi-Sabor:** Transformación completa para **Ubuntu (GNOME)** y **Xubuntu (Xfce)** además de Kubuntu.
+- **🎨 Soporte Multi-Sabor:** Transformación completa para **Ubuntu (GNOME)** y **Xubuntu (Xfce)**.
+- **🪟 Windows Port (v1.0):** Script PowerShell completo para Windows 10/11 con DWM Glass, sonidos e iconos.
+- **🎧 Media Immersion:** Automatización de skins para **Spotify** (WMPotify) y **VLC** (WMP11).
+- **🧪 Testing Suite:** Implementación de pruebas unitarias y de regresión (Bats para Linux, Pester para Windows).
 - **🦊 Firefox Glass:** Automatización total de `userChrome.css` para pestañas y botones de cristal.
 - **🛡️ Auditoría de Integridad:** Sistema robusto de limpieza (Exit Traps) y validación de sudo.
 - **🤖 Modo One-Click:** Nueva bandera `--auto` para instalaciones desatendidas.
-- **📊 Diagnósticos de Hardware:** Detección automática de GPU (NVIDIA/AMD/Intel) y optimización del compositor.
+- **📊 Diagnósticos de Hardware:** Detección automática de GPU (NVIDIA/AMD/Intel).
 
 ## [5.0-beta] - Kvantum & Windows 7 Audio - 2026-05-09
 ### Añadido

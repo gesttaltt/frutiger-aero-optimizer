@@ -42,33 +42,32 @@ From the glowing "Starting Windows" orbs to the glass login screen, the immersio
 - **🤖 One-Click Automation:** Use the `--auto` flag for a zero-interaction full suite install.
 - **🎵 Authentic Soundscape:** Original high-quality Windows 7 `.ogg` system sounds (Logon, Error, Notify).
 - **🦊 Firefox Glass:** Automated `userChrome.css` injection for glassy browser tabs.
+- **💬 Discord & Spotify:** Automated Aero/Glass skins via Vencord and Spicetify.
+- **🎬 VLC Media Player:** Integrated skeuomorphic Windows Media Player 11 skin.
 - **🖱️ Aero Cursors & Icons:** Authentic semi-transparent cursors and `Crystal Remix` icon set.
+- **🪟 Windows Port:** Full support for Windows 10/11 customization via PowerShell.
 
 ---
 
 ## 🚀 Installation
 
-### 1. Quick Start
-```bash
-git clone https://github.com/gesttaltt/frutiger-aero-optimizer.git
-cd frutiger-aero-optimizer
-chmod +x optimize_and_aero.sh
-```
+### 🐧 Linux (Ubuntu/Kubuntu/Xubuntu)
+1. **Quick Start**
+   ```bash
+   git clone https://github.com/gesttaltt/frutiger-aero-optimizer.git
+   cd frutiger-aero-optimizer
+   chmod +x optimize_and_aero.sh
+   ./optimize_and_aero.sh --auto
+   ```
 
-### 2. Run Interactive Menu
-```bash
-./optimize_and_aero.sh
-```
-
-### 3. Run Full Auto (Recommended)
-```bash
-./optimize_and_aero.sh --auto
-```
-
-### 4. Restore System (Undo)
-```bash
-./optimize_and_aero.sh --restore
-```
+### 🪟 Windows (10/11)
+1. **Quick Start (Admin PowerShell)**
+   ```powershell
+   git clone https://github.com/gesttaltt/frutiger-aero-optimizer.git
+   cd frutiger-aero-optimizer
+   .\windows\optimize_and_aero.ps1 --auto
+   ```
+   *See [Windows README](windows/README.md) for more details.*
 
 ---
 
