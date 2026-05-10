@@ -60,7 +60,8 @@ jobs:
         XDG_CURRENT_DESKTOP: ${{ matrix.de }}
       run: |
         bash -n optimize_and_aero.sh
-        bash -c "source ./optimize_and_aero.sh && detect_system && echo 'Detected DE: \$DE_TYPE' | grep -i '${{ matrix.de }}'"
+        # Run detection and print for debugging, then verify
+        bash -c "source ./optimize_and_aero.sh && detect_system && echo \"Detected DE: \$DE_TYPE\" && echo \"\$DE_TYPE\" | grep -i '${{ matrix.de }}'"
 
   windows-test:
     name: 🪟 Windows Port Tests
