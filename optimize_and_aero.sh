@@ -19,46 +19,85 @@ NC='\033[0m'
 STATE_FILE="$HOME/.frutiger_aero_state.sh"
 LOG_FILE="$HOME/.frutiger_aero.log"
 
-# --- DETECCIÓN DE ENTORNO ---
+# --- DETECCIÓN DE ENTORNO Y HARDWARE ---
 
 detect_system() {
+    # OS Info
     OS_NAME=$(grep "^ID=" /etc/os-release | cut -d'=' -f2 | tr -d '"')
     OS_VER=$(grep "VERSION_ID" /etc/os-release | cut -d'"' -f2)
     
-    # Detectar Entorno de Escritorio (DE)
-    if [ -n "$XDG_CURRENT_DESKTOP" ]; then
-        CURRENT_DE=$(echo "$XDG_CURRENT_DESKTOP" | tr '[:upper:]' '[:lower:]')
-    elif [ -n "$DESKTOP_SESSION" ]; then
-        CURRENT_DE=$(echo "$DESKTOP_SESSION" | tr '[:upper:]' '[:lower:]')
-    else
-        CURRENT_DE="unknown"
-    fi
-
-    # Normalizar DE
-    case "$CURRENT_DE" in
-        *kde*|*plasma*)  DE_TYPE="kde" ;;
+    # Session Type
+    SESSION_TYPE="${XDG_SESSION_TYPE:-unknown}"
+    
+    # Entorno de Escritorio (DE)
+    raw_de="${XDG_CURRENT_DESKTOP:-$DESKTOP_SESSION}"
+    raw_de=$(echo "$raw_de" | tr '[:upper:]' '[:lower:]')
+    
+    case "$raw_de" in
+        *kde*|*plasma*)   DE_TYPE="kde" ;;
         *gnome*|*ubuntu*) DE_TYPE="gnome" ;;
-        *xfce*)          DE_TYPE="xfce" ;;
-        *)               DE_TYPE="unknown" ;;
+        *xfce*)           DE_TYPE="xfce" ;;
+        *)                DE_TYPE="unknown" ;;
     esac
     
-    # Comandos KDE (si aplica)
+    # Específicos de KDE
     if [[ "$DE_TYPE" == "kde" ]]; then
         if command -v plasmashell --version &>/dev/null; then
             PLASMA_VER=$(plasmashell --version | cut -d' ' -f2 | cut -d'.' -f1)
         else
             PLASMA_VER=5
         fi
-
+        
         if [[ "$PLASMA_VER" == "6" ]]; then
-            KREAD="kreadconfig6"; KWRITE="kwriteconfig6"
+            KREAD="kreadconfig6"
+            KWRITE="kwriteconfig6"
         else
-            KREAD="kreadconfig5"; KWRITE="kwriteconfig5"
+            KREAD="kreadconfig5"
+            KWRITE="kwriteconfig5"
         fi
     fi
 }
 
+detect_hardware() {
+    # GPU Detection
+    if command -v lspci &>/dev/null; then
+        gpu_info=$(lspci | grep -iE "vga|3d|display")
+        case "$gpu_info" in
+            *NVIDIA*) GPU_VENDOR="NVIDIA" ;;
+            *AMD*|*ATI*)  GPU_VENDOR="AMD" ;;
+            *Intel*)  GPU_VENDOR="Intel" ;;
+            *)        GPU_VENDOR="Generic/Other" ;;
+        esac
+    else
+        GPU_VENDOR="Unknown (lspci missing)"
+    fi
+    
+    # CPU Detection
+    CPU_MODEL=$(grep -m1 "model name" /proc/cpuinfo | cut -d: -f2 | sed 's/^[ \t]*//')
+}
+
+check_dependencies() {
+    local missing=()
+    local deps=("git" "curl" "ffmpeg" "whiptail")
+    
+    [[ "$DE_TYPE" == "kde" ]] && deps+=("kvantummanager" "$KREAD" "$KWRITE")
+    [[ "$DE_TYPE" == "gnome" ]] && deps+=("gsettings" "gnome-tweaks")
+    [[ "$DE_TYPE" == "xfce" ]] && deps+=("xfconf-query")
+
+    for dep in "${deps[@]}"; do
+        if ! command -v "$dep" &>/dev/null; then
+            missing+=("$dep")
+        fi
+    done
+
+    if [ ${#missing[@]} -ne 0 ]; then
+        log_message "WARNING" "Faltan dependencias: ${missing[*]}. El script intentará instalarlas cuando sea necesario."
+    fi
+}
+
 detect_system
+detect_hardware
+check_dependencies
 
 # --- SISTEMA DE LOGS Y ERRORES ---
 
@@ -387,7 +426,8 @@ show_header() {
     echo -e "${CYAN}#   ${NC}Multi-Flavor Restoration & Visual Polish               ${CYAN}#${NC}"
     echo -e "${CYAN}#                                                          #${NC}"
     echo -e "${CYAN}############################################################${NC}"
-    echo -e "${BLUE}Sistema detectado: $OS_NAME $OS_VER ($DE_TYPE)${NC}\n"
+    echo -e "${BLUE}OS: $OS_NAME $OS_VER | DE: $DE_TYPE | Session: $SESSION_TYPE${NC}"
+    echo -e "${BLUE}GPU: $GPU_VENDOR | CPU: $CPU_MODEL${NC}\n"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
