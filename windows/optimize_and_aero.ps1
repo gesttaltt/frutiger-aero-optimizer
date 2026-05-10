@@ -231,8 +231,11 @@ function Show-Header {
 $AutoMode = $args -contains "--auto" -or $args -contains "-a"
 $RestoreMode = $args -contains "--restore" -or $args -contains "-r"
 
-Get-SystemInfo
-Check-Admin
+# --- LÓGICA DE INICIO ---
+if ($MyInvocation.InvocationName -ne '.' -and $MyInvocation.InvocationName -ne '&') {
+    Get-SystemInfo
+    Check-Admin
+}
 
 if ($RestoreMode) {
     Write-AeroLog "WARNING" "Modo Restauración activado..."

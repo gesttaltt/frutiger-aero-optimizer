@@ -52,7 +52,7 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y whiptail bats
+        sudo apt-get install -y whiptail bats pciutils
     - name: Run Unit Tests (Bats)
       run: bats tests/linux/unit_tests.bats
     - name: Test DE Detection and Basic Syntax

@@ -35,15 +35,20 @@ trap cleanup EXIT INT TERM
 
 detect_system() {
     # OS Info
-    OS_NAME=$(grep "^ID=" /etc/os-release | cut -d'=' -f2 | tr -d '"')
-    OS_VER=$(grep "VERSION_ID" /etc/os-release | cut -d'"' -f2)
+    if [ -f /etc/os-release ]; then
+        OS_NAME=$(grep "^ID=" /etc/os-release | cut -d'=' -f2 | tr -d '"')
+        OS_VER=$(grep "VERSION_ID" /etc/os-release | cut -d'"' -f2)
+    else
+        OS_NAME="unknown"
+        OS_VER="unknown"
+    fi
     
     # Session Type
     SESSION_TYPE="${XDG_SESSION_TYPE:-unknown}"
     
     # Entorno de Escritorio (DE)
     raw_de="${XDG_CURRENT_DESKTOP:-$DESKTOP_SESSION}"
-    raw_de=$(echo "$raw_de" | tr '[:upper:]' '[:lower:]')
+    raw_de=$(echo "${raw_de:-unknown}" | tr '[:upper:]' '[:lower:]')
     
     case "$raw_de" in
         *kde*|*plasma*)   DE_TYPE="kde" ;;
@@ -73,7 +78,7 @@ detect_system() {
 detect_hardware() {
     # GPU Detection
     if command -v lspci &>/dev/null; then
-        gpu_info=$(lspci | grep -iE "vga|3d|display")
+        gpu_info=$(lspci | grep -iE "vga|3d|display" || echo "")
         case "$gpu_info" in
             *NVIDIA*) GPU_VENDOR="NVIDIA" ;;
             *AMD*|*ATI*)  GPU_VENDOR="AMD" ;;
@@ -81,11 +86,15 @@ detect_hardware() {
             *)        GPU_VENDOR="Generic/Other" ;;
         esac
     else
-        GPU_VENDOR="Unknown (lspci missing)"
+        GPU_VENDOR="Unknown"
     fi
     
     # CPU Detection
-    CPU_MODEL=$(grep -m1 "model name" /proc/cpuinfo | cut -d: -f2 | sed 's/^[ \t]*//')
+    if [ -f /proc/cpuinfo ]; then
+        CPU_MODEL=$(grep -m1 "model name" /proc/cpuinfo | cut -d: -f2 | sed 's/^[ \t]*//' || echo "Unknown")
+    else
+        CPU_MODEL="Unknown"
+    fi
 }
 
 check_dependencies() {
@@ -107,9 +116,12 @@ check_dependencies() {
     fi
 }
 
-detect_system
-detect_hardware
-check_dependencies
+# --- INICIO ---
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    detect_system
+    detect_hardware
+    check_dependencies
+fi
 
 # --- SISTEMA DE LOGS Y ERRORES ---
 
