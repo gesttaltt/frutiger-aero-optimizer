@@ -224,6 +224,15 @@ restore_system() {
     rm -rf ~/.themes/Windows-7
     rm -rf ~/.icons/Windows-7
 
+    # Revertir Firefox
+    local FF_DIR="$HOME/.mozilla/firefox"
+    if [ -d "$FF_DIR" ]; then
+        local PROFILE_PATH
+        PROFILE_PATH=$(grep -E '^Path=' "$FF_DIR/profiles.ini" | head -n 1 | cut -d'=' -f2)
+        rm -rf "$FF_DIR/$PROFILE_PATH/chrome"
+        rm -f "$FF_DIR/$PROFILE_PATH/user.js"
+    fi
+
     rm "$STATE_FILE"
     log_message "SUCCESS" "Reversión Master completada."
     exit 0
@@ -484,6 +493,51 @@ EOF
     log_message "SUCCESS" "Perfil Konsole Glass creado."
 }
 
+apply_firefox_glass() {
+    log_message "INFO" "Instalando Firefox Aero Glass..."
+    local FF_DIR="$HOME/.mozilla/firefox"
+    
+    if [ ! -d "$FF_DIR" ]; then
+        log_message "WARNING" "Firefox no encontrado en $FF_DIR. Saltando paso."
+        return
+    fi
+
+    # Buscar perfil predeterminado
+    local PROFILE_PATH
+    PROFILE_PATH=$(grep -E '^Path=' "$FF_DIR/profiles.ini" | head -n 1 | cut -d'=' -f2)
+    local PROFILE_DIR="$FF_DIR/$PROFILE_PATH"
+
+    if [ ! -d "$PROFILE_DIR" ]; then
+        log_message "ERROR" "No se pudo localizar el perfil de Firefox."
+        return
+    fi
+
+    # Habilitar personalización en Firefox (user.js)
+    local USER_JS="$PROFILE_DIR/user.js"
+    log_message "INFO" "Configurando preferencias de Firefox en $PROFILE_PATH..."
+    cat <<EOF >> "$USER_JS"
+user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
+user_pref("layers.acceleration.force-enabled", true);
+user_pref("gfx.webrender.all", true);
+user_pref("svg.context-properties.content.enabled", true);
+EOF
+
+    # Descargar Tema (Aero-UserChrome)
+    local CHROME_DIR="$PROFILE_DIR/chrome"
+    mkdir -p "$CHROME_DIR"
+    
+    local TEMP_FF="/tmp/aero_firefox"
+    TEMP_DIRS+=("$TEMP_FF")
+    rm -rf "$TEMP_FF"
+    log_message "INFO" "Descargando tema Aero-UserChrome..."
+    if git clone --depth 1 https://github.com/Aero-UserChrome/Aero-UserChrome.git "$TEMP_FF"; then
+        cp -r "$TEMP_FF/"* "$CHROME_DIR/"
+        log_message "SUCCESS" "Firefox Aero Glass instalado. Reinicia Firefox para ver los cambios."
+    else
+        log_message "ERROR" "No se pudo descargar el tema de Firefox."
+    fi
+}
+
 apply_gpu_boost() {
     log_message "INFO" "Aplicando optimizaciones para GPU: $GPU_VENDOR..."
     
@@ -523,28 +577,31 @@ apply_flavor_aero() {
     case "$DE_TYPE" in
         "kde")
             # Secuencia Óptima KDE: Componentes -> Tema Global
-            log_message "INFO" "Paso 1/8: Optimizando GPU..."
+            log_message "INFO" "Paso 1/9: Optimizando GPU..."
             apply_gpu_boost
             
-            log_message "INFO" "Paso 2/8: Instalando bordes Aurorae..."
+            log_message "INFO" "Paso 2/9: Instalando bordes Aurorae..."
             apply_aurorae_glass
             
-            log_message "INFO" "Paso 3/8: Configurando Kvantum Glass..."
+            log_message "INFO" "Paso 3/9: Configurando Kvantum Glass..."
             apply_kvantum
             
-            log_message "INFO" "Paso 4/8: Instalando Iconos Crystal..."
+            log_message "INFO" "Paso 4/9: Instalando Iconos Crystal..."
             apply_bar_and_icons
             
-            log_message "INFO" "Paso 5/8: Instalando Cursores Aero..."
+            log_message "INFO" "Paso 5/9: Instalando Cursores Aero..."
             apply_cursors
             
-            log_message "INFO" "Paso 6/8: Instalando Esquema de Sonido..."
+            log_message "INFO" "Paso 6/9: Instalando Esquema de Sonido..."
             apply_sounds
             
-            log_message "INFO" "Paso 7/8: Configurando Konsole Glass..."
+            log_message "INFO" "Paso 7/9: Configurando Konsole Glass..."
             apply_konsole_glass
             
-            log_message "INFO" "Paso 8/8: Aplicando Tema Global (Master)..."
+            log_message "INFO" "Paso 8/9: Configurando Firefox Glass..."
+            apply_firefox_glass
+            
+            log_message "INFO" "Paso 9/9: Aplicando Tema Global (Master)..."
             apply_global_theme
             ;;
             
