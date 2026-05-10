@@ -45,6 +45,15 @@
 
 ---
 
+## 📦 Downloads (One-Click)
+
+Don't want to clone the repository? Download the latest pre-packaged version for your OS:
+
+- **[🐧 Download for Linux (.tar.gz)](https://github.com/gesttaltt/frutiger-aero-optimizer/releases/latest)**
+- **[🪟 Download for Windows (.zip)](https://github.com/gesttaltt/frutiger-aero-optimizer/releases/latest)**
+
+---
+
 ## 🚀 Quick Start
 
 ### 🐧 Linux (Bash)

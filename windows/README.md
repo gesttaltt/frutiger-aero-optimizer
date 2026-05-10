@@ -18,6 +18,14 @@ Este es el port oficial para Windows de la suite de personalización Frutiger Ae
 - Conexión a Internet (para descargar motores vía Winget).
 
 ## 🚀 Instalación Rápida
+
+### Opción A: Descarga Directa (Recomendada)
+1. **[Descargar FrutigerAero_Windows.zip](https://github.com/gesttaltt/frutiger-aero-optimizer/releases/latest)**
+2. Extrae el contenido en una carpeta.
+3. Abre PowerShell como Administrador en esa carpeta.
+4. Ejecuta: `.\optimize_and_aero.ps1 --auto`
+
+### Opción B: Clonar Repositorio
 1. Abre PowerShell como Administrador.
 2. Clona el repositorio:
    ```powershell

@@ -1,0 +1,72 @@
+name: Build & Publish Release 📦
+
+on:
+  push:
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+jobs:
+  create-release:
+    name: 🚀 Create GitHub Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+
+  package-linux:
+    name: 🐧 Package Linux (Bash)
+    needs: create-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Prepare Linux Package
+        run: |
+          mkdir -p release-linux
+          cp optimize_and_aero.sh README.md CHANGELOG.md LICENSE release-linux/
+          cp -r assets release-linux/
+          tar -czvf FrutigerAero_Linux.tar.gz -C release-linux .
+
+      - name: Upload Linux Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: FrutigerAero_Linux.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  package-windows:
+    name: 🪟 Package Windows (PowerShell)
+    needs: create-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Prepare Windows Package
+        run: |
+          mkdir -p release-windows
+          cp windows/optimize_and_aero.ps1 release-windows/
+          cp windows/README.md release-windows/
+          cp CHANGELOG.md LICENSE release-windows/
+          cp -r windows/assets release-windows/
+          zip -r FrutigerAero_Windows.zip release-windows/*
+
+      - name: Upload Windows Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: FrutigerAero_Windows.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
