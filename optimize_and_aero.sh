@@ -416,6 +416,52 @@ apply_xfce() {
     log_message "SUCCESS" "Xfce transformurado. Se recomienda activar Picom para el efecto Glass."
 }
 
+# --- MÓDULO DE ORQUESTACIÓN ---
+
+apply_flavor_aero() {
+    log_message "INFO" "Iniciando instalación secuencial para: $DE_TYPE..."
+    
+    case "$DE_TYPE" in
+        "kde")
+            # Secuencia Óptima KDE: Componentes -> Tema Global
+            log_message "INFO" "Paso 1/6: Instalando bordes Aurorae..."
+            apply_aurorae_glass
+            
+            log_message "INFO" "Paso 2/6: Configurando Kvantum Glass..."
+            apply_kvantum
+            
+            log_message "INFO" "Paso 3/6: Instalando Iconos Crystal..."
+            apply_bar_and_icons
+            
+            log_message "INFO" "Paso 4/6: Instalando Cursores Aero..."
+            apply_cursors
+            
+            log_message "INFO" "Paso 5/6: Instalando Esquema de Sonido..."
+            apply_sounds
+            
+            log_message "INFO" "Paso 6/6: Aplicando Tema Global (Master)..."
+            apply_global_theme
+            ;;
+            
+        "gnome")
+            # Secuencia Óptima GNOME: Dependencias -> Temas -> Config
+            apply_gnome
+            ;;
+            
+        "xfce")
+            # Secuencia Óptima Xfce: Compositor -> Temas -> Config
+            apply_xfce
+            ;;
+            
+        *)
+            log_message "ERROR" "No hay una secuencia de instalación definida para el entorno: $DE_TYPE"
+            return 1
+            ;;
+    esac
+    
+    log_message "SUCCESS" "Transformación de sabor $DE_TYPE completada exitosamente."
+}
+
 # --- LÓGICA PRINCIPAL ---
 
 show_header() {
@@ -449,31 +495,42 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     fi
 
     if [ "$AUTO_MODE" = true ]; then
-        case "$DE_TYPE" in
-            "kde") apply_aurorae_glass; apply_kvantum; apply_bar_and_icons; apply_cursors; apply_sounds; apply_global_theme ;;
-            "gnome") apply_gnome ;;
-            "xfce") apply_xfce ;;
-            *) log_message "ERROR" "Entorno $DE_TYPE no compatible para modo automático." ;;
-        esac
+        apply_flavor_aero
     else
         # Menu adaptativo según el DE
         if [[ "$DE_TYPE" == "kde" ]]; then
             CHOICES=$(whiptail --title "Frutiger Aero Optimizer v5.1 (KDE)" --checklist \
             "Selecciona los componentes (Espacio para marcar):" 24 78 12 \
-            "GLOBAL_THEME" "INSTALACIÓN COMPLETA (KDE)" ON \
-            "AURORAE" "Bordes de Ventana Glass" ON \
-            "KVANTUM" "Efecto Glass en Apps" ON \
-            "BAR_ICONS" "Iconos Crystal Remix" ON \
-            "CURSORS" "Cursores Aero" ON \
-            "SOUNDS" "Esquema de Sonidos" ON \
+            "FULL" "INSTALACIÓN COMPLETA (Secuencial)" ON \
+            "AURORAE" "Bordes de Ventana Glass" OFF \
+            "KVANTUM" "Efecto Glass en Apps" OFF \
+            "BAR_ICONS" "Iconos Crystal Remix" OFF \
+            "CURSORS" "Cursores Aero" OFF \
+            "SOUNDS" "Esquema de Sonidos" OFF \
             "OPTIMIZE" "Limpieza de sistema" OFF 3>&1 1>&2 2>&3)
+
+            if [ -z "$CHOICES" ]; then exit 0; fi
+
+            if [[ $CHOICES == *"FULL"* ]]; then
+                apply_flavor_aero
+            else
+                for choice in $CHOICES; do
+                    case $choice in
+                        "\"AURORAE\"") apply_aurorae_glass ;;
+                        "\"KVANTUM\"") apply_kvantum ;;
+                        "\"BAR_ICONS\"") apply_bar_and_icons ;;
+                        "\"CURSORS\"") apply_cursors ;;
+                        "\"SOUNDS\"") apply_sounds ;;
+                    esac
+                done
+            fi
         elif [[ "$DE_TYPE" == "gnome" ]]; then
-            if (whiptail --title "Aero para GNOME" --yesno "Se detectó GNOME. ¿Deseas aplicar la transformación Aero?" 10 60); then
-                apply_gnome
+            if (whiptail --title "Aero para GNOME" --yesno "Se detectó GNOME. ¿Deseas aplicar la transformación Aero secuencial?" 10 60); then
+                apply_flavor_aero
             fi
         elif [[ "$DE_TYPE" == "xfce" ]]; then
-            if (whiptail --title "Aero para Xfce" --yesno "Se detectó Xfce. ¿Deseas aplicar la transformación Aero?" 10 60); then
-                apply_xfce
+            if (whiptail --title "Aero para Xfce" --yesno "Se detectó Xfce. ¿Deseas aplicar la transformación Aero secuencial?" 10 60); then
+                apply_flavor_aero
             fi
         else
             log_message "ERROR" "Entorno detectado ($DE_TYPE) no soportado por el menú."
@@ -481,18 +538,10 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         fi
     fi
 
-    if [ -n "$CHOICES" ]; then
-        for choice in $CHOICES; do
-            case $choice in
-                "\"AURORAE\"") apply_aurorae_glass ;;
-                "\"KVANTUM\"") apply_kvantum ;;
-                "\"BAR_ICONS\"") apply_bar_and_icons ;;
-                "\"CURSORS\"") apply_cursors ;;
-                "\"SOUNDS\"") apply_sounds ;;
-                "\"GLOBAL_THEME\"") apply_global_theme ;;
-                "\"OPTIMIZE\"") sudo apt update && sudo apt autoremove -y && sudo apt clean ;;
-            esac
-        done
+    # Limpieza final (si se seleccionó u ocurrió automáticamente)
+    if [[ $CHOICES == *"OPTIMIZE"* ]]; then
+        log_message "INFO" "Limpiando paquetes innecesarios..."
+        sudo apt update && sudo apt autoremove -y && sudo apt clean 
     fi
 
     echo -e "\n${GREEN}############################################################${NC}"
