@@ -45,15 +45,27 @@ jobs:
         de: [kde, gnome, xfce]
     steps:
     - uses: actions/checkout@v4
-    - name: Install Whiptail (Dependency)
-      run: sudo apt-get install -y whiptail
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y whiptail bats
+    - name: Run Unit Tests (Bats)
+      run: bats tests/linux/unit_tests.bats
     - name: Test DE Detection and Basic Syntax
       env:
         XDG_CURRENT_DESKTOP: ${{ matrix.de }}
       run: |
-        # Check syntax
         bash -n optimize_and_aero.sh
-        # Run script in a way that checks version but doesn't enter interactive loop
-        # We can use a trick: export a variable to mock the environment
-        # and check if the detect_system function works as expected
         bash -c "source ./optimize_and_aero.sh && detect_system && echo 'Detected DE: \$DE_TYPE' | grep -i '${{ matrix.de }}'"
+
+  windows-test:
+    name: 🪟 Windows Port Tests
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Run Pester Tests
+      shell: powershell
+      run: |
+        # Initialize variables for testing if needed
+        # In a real CI, we might skip the Admin check or mock it
+        Invoke-Pester -Path windows/tests/unit_tests.Tests.ps1 -Output Detailed
