@@ -623,6 +623,56 @@ apply_discord_glass() {
     fi
 }
 
+apply_spotify_glass() {
+    log_message "INFO" "Instalando Spotify Aero Glass (via Spicetify)..."
+    
+    if ! command -v spicetify &> /dev/null; then
+        log_message "INFO" "Descargando e instalando Spicetify..."
+        curl -fsSL https://raw.githubusercontent.com/spicetify/cli/main/install.sh | sh || true
+    fi
+
+    # Configurar WMPotify theme
+    local SPICETIFY_THEMES="$HOME/.config/spicetify/Themes"
+    mkdir -p "$SPICETIFY_THEMES"
+    
+    log_message "INFO" "Descargando tema WMPotify para Spotify..."
+    local TEMP_SP="/tmp/aero_spotify"
+    TEMP_DIRS+=("$TEMP_SP")
+    if git clone --depth 1 https://github.com/p-p-h/WMPotify.git "$TEMP_SP" 2>/dev/null; then
+        cp -r "$TEMP_SP/"* "$SPICETIFY_THEMES/WMPotify/"
+        
+        # Aplicar tema
+        if command -v spicetify &> /dev/null; then
+            spicetify config current_theme WMPotify || true
+            spicetify backup apply || true
+        fi
+        log_message "SUCCESS" "Spotify Aero Glass configurado."
+    else
+        log_message "ERROR" "No se pudo descargar el tema de Spotify."
+    fi
+}
+
+apply_vlc_skin() {
+    log_message "INFO" "Aplicando skin Windows Media Player 11 a VLC..."
+    local VLC_SKINS="$HOME/.local/share/vlc/skins2"
+    mkdir -p "$VLC_SKINS"
+    
+    local SKIN_SOURCE="$SCRIPT_DIR/assets/vlc/WMP11.vlt"
+    if [ -f "$SKIN_SOURCE" ]; then
+        cp "$SKIN_SOURCE" "$VLC_SKINS/"
+        
+        # Configurar VLC para usar skins
+        local VLCRC="$HOME/.config/vlc/vlcrc"
+        if [ -f "$VLCRC" ]; then
+            sed -i 's/^#intf=/intf=skins2/' "$VLCRC"
+            sed -i "s|^#skins2-last=|skins2-last=$VLC_SKINS/WMP11.vlt|" "$VLCRC"
+        fi
+        log_message "SUCCESS" "VLC Skin WMP11 aplicado."
+    else
+        log_message "ERROR" "No se encontró el asset de skin para VLC."
+    fi
+}
+
 apply_gpu_boost() {
     log_message "INFO" "Aplicando optimizaciones para GPU: $GPU_VENDOR..."
     
@@ -702,37 +752,43 @@ apply_flavor_aero() {
     case "$DE_TYPE" in
         "kde")
             # Secuencia Óptima KDE: Componentes -> Tema Global
-            log_message "INFO" "Paso 1/11: Optimizando GPU..."
+            log_message "INFO" "Paso 1/13: Optimizando GPU..."
             apply_gpu_boost
             
-            log_message "INFO" "Paso 2/11: Instalando bordes Aurorae..."
+            log_message "INFO" "Paso 2/13: Instalando bordes Aurorae..."
             apply_aurorae_glass
             
-            log_message "INFO" "Paso 3/11: Configurando Kvantum Glass..."
+            log_message "INFO" "Paso 3/13: Configurando Kvantum Glass..."
             apply_kvantum
             
-            log_message "INFO" "Paso 4/11: Instalando Iconos Crystal..."
+            log_message "INFO" "Paso 4/13: Instalando Iconos Crystal..."
             apply_bar_and_icons
             
-            log_message "INFO" "Paso 5/11: Instalando Cursores Aero..."
+            log_message "INFO" "Paso 5/13: Instalando Cursores Aero..."
             apply_cursors
             
-            log_message "INFO" "Paso 6/11: Instalando Esquema de Sonido..."
+            log_message "INFO" "Paso 6/13: Instalando Esquema de Sonido..."
             apply_sounds
             
-            log_message "INFO" "Paso 7/11: Configurando Konsole Glass..."
+            log_message "INFO" "Paso 7/13: Configurando Konsole Glass..."
             apply_konsole_glass
             
-            log_message "INFO" "Paso 8/11: Configurando Firefox Glass..."
+            log_message "INFO" "Paso 8/13: Configurando Firefox Glass..."
             apply_firefox_glass
             
-            log_message "INFO" "Paso 9/11: Configurando Discord Glass..."
+            log_message "INFO" "Paso 9/13: Configurando Discord Glass..."
             apply_discord_glass
             
-            log_message "INFO" "Paso 10/11: Temas SDDM y Plymouth..."
+            log_message "INFO" "Paso 10/13: Configurando Spotify Glass..."
+            apply_spotify_glass
+            
+            log_message "INFO" "Paso 11/13: Aplicando Skin WMP11 a VLC..."
+            apply_vlc_skin
+            
+            log_message "INFO" "Paso 12/13: Temas SDDM y Plymouth..."
             apply_boot_login
             
-            log_message "INFO" "Paso 11/11: Aplicando Tema Global (Master)..."
+            log_message "INFO" "Paso 13/13: Aplicando Tema Global (Master)..."
             apply_global_theme
             ;;
             
@@ -804,6 +860,8 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
             "CURSORS" "Cursores Aero" OFF \
             "SOUNDS" "Esquema de Sonidos" OFF \
             "DISCORD_GLASS" "Discord Aero (Vencord)" OFF \
+            "SPOTIFY_GLASS" "Spotify Aero (Spicetify)" OFF \
+            "VLC_SKIN" "VLC Skin (WMP11)" OFF \
             "BOOT_LOGIN" "Temas de Inicio y Bloqueo" OFF \
             "OPTIMIZE" "Limpieza profunda de sistema" OFF \
             "SERVICES" "Deshabilitar servicios extra (Bloat)" OFF 3>&1 1>&2 2>&3)
@@ -824,6 +882,8 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
                         "\"CURSORS\"") apply_cursors ;;
                         "\"SOUNDS\"") apply_sounds ;;
                         "\"DISCORD_GLASS\"") apply_discord_glass ;;
+                        "\"SPOTIFY_GLASS\"") apply_spotify_glass ;;
+                        "\"VLC_SKIN\"") apply_vlc_skin ;;
                         "\"BOOT_LOGIN\"") apply_boot_login ;;
                         "\"OPTIMIZE\"") apply_system_optimizer ;;
                         "\"SERVICES\"") apply_service_tuning ;;

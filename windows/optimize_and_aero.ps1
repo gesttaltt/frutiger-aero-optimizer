@@ -9,7 +9,7 @@
 
 .NOTES
     Author: Gemini CLI / Gestalt
-    Version: 1.0-stable (Animation-Enhanced)
+    Version: 1.0-stable (Media-Enhanced)
     Supported: Windows 10 (2004+), Windows 11
 #>
 
@@ -168,6 +168,52 @@ function Optimize-System {
     Write-AeroLog "SUCCESS" "Optimización de sistema completada."
 }
 
+function Install-SpotifyGlass {
+    Write-AeroLog "INFO" "Instalando Spotify Aero Glass (via Spicetify)..."
+    try {
+        # Instalar Spicetify CLI (Note: Runs as user, might need careful handling if script is Admin)
+        # We try to run it via powershell -Command to ensure it doesn't block the main thread
+        powershell -Command "iwr -useb https://raw.githubusercontent.com/spicetify/cli/main/install.ps1 | iex"
+        
+        # Descargar tema WMPotify
+        $spDir = "$env:APPDATA\spicetify\Themes\WMPotify"
+        if (!(Test-Path $spDir)) {
+            New-Item -ItemType Directory -Force -Path $spDir | Out-Null
+            $tempSp = Join-Path $env:TEMP "aero_spotify"
+            if (Test-Path $tempSp) { Remove-Item -Recurse -Force $tempSp }
+            git clone --depth 1 https://github.com/p-p-h/WMPotify.git $tempSp
+            Copy-Item -Path "$tempSp\*" -Destination $spDir -Recurse -Force
+        }
+        
+        # Aplicar
+        & spicetify config current_theme WMPotify
+        & spicetify backup apply
+        Write-AeroLog "SUCCESS" "Spotify Aero Glass configurado."
+    } catch {
+        Write-AeroLog "WARNING" "No se pudo configurar Spotify Aero. Asegúrate de tener Spotify instalado desde su web."
+    }
+}
+
+function Apply-VlcSkin {
+    Write-AeroLog "INFO" "Aplicando skin WMP11 a VLC..."
+    $vlcAppPath = "$env:APPDATA\vlc"
+    $vlcSkins = Join-Path $vlcAppPath "skins2"
+    if (!(Test-Path $vlcSkins)) { New-Item -ItemType Directory -Force -Path $vlcSkins | Out-Null }
+    
+    $skinSource = Join-Path $PSScriptRoot "assets\vlc\WMP11.vlt"
+    if (Test-Path $skinSource) {
+        Copy-Item -Path $skinSource -Destination $vlcSkins -Force
+        
+        $vlcrc = Join-Path $vlcAppPath "vlcrc"
+        if (Test-Path $vlcrc) {
+            (Get-Content $vlcrc) -replace "^#intf=", "intf=skins2" | Set-Content $vlcrc
+        }
+        Write-AeroLog "SUCCESS" "VLC Skin WMP11 aplicado."
+    } else {
+        Write-AeroLog "ERROR" "No se encontró el asset de skin para VLC en $skinSource"
+    }
+}
+
 # --- LÓGICA PRINCIPAL ---
 function Show-Header {
     Clear-Host
@@ -202,6 +248,8 @@ if ($AutoMode) {
     Install-Dependencies
     Apply-AeroAssets
     Apply-AeroAnimations
+    Install-SpotifyGlass
+    Apply-VlcSkin
     Refresh-Shell
     Optimize-System
     Write-AeroLog "SUCCESS" "¡TRANSFORMACIÓN COMPLETADA! Disfruta del brillo."

@@ -78,8 +78,10 @@ chmod +x optimize_and_aero.sh
 - [x] **Phase 2:** Multi-Flavor & Multi-Version Support (KDE 5/6, GNOME, Xfce).
 - [x] **Phase 3:** Boot/Login Immersion (SDDM/Plymouth).
 - [x] **Phase 4:** App Ecosystem (Firefox Glass).
-- [ ] **Phase 5:** Electron Apps (Discord & Spotify Aero Skins).
-- [ ] **Phase 6:** Legacy Media (VLC WMP11 Skin).
+- [x] **Phase 5:** Electron Apps (Discord & Spotify Aero Skins).
+- [x] **Phase 6:** Legacy Media (VLC WMP11 Skin).
+- [ ] **Phase 7:** Windows Port Finalization.
+- [ ] **Phase 8:** Lubuntu (LXQt) Support.
 
 ---
 
