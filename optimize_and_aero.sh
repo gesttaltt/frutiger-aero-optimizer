@@ -176,7 +176,8 @@ init_state() {
     if [ ! -f "$STATE_FILE" ]; then
         echo "# Archivo de estado Frutiger Aero" > "$STATE_FILE"
         # Guardar estado de servicios críticos
-        for svc in cups bluetooth ModemManager; do
+        local services=("cups" "bluetooth" "ModemManager" "avahi-daemon" "geoclue")
+        for svc in "${services[@]}"; do
             state=$(systemctl is-enabled "$svc" 2>/dev/null || echo "disabled")
             echo "SVC_$svc=\"$state\"" >> "$STATE_FILE"
         done
@@ -213,6 +214,16 @@ restore_system() {
         restore_setting xfce xsettings /Net/ThemeName
         restore_setting xfce xfwm4 /general/theme
     fi
+
+    # Revertir Servicios
+    local services=("cups" "bluetooth" "ModemManager" "avahi-daemon" "geoclue")
+    for svc in "${services[@]}"; do
+        var_name="SVC_$svc"
+        if [ "${!var_name}" == "enabled" ]; then
+            sudo systemctl enable "$svc" 2>/dev/null || true
+            sudo systemctl start "$svc" 2>/dev/null || true
+        fi
+    done
 
     # Limpieza de directorios
     rm -rf ~/.local/share/plasma/look-and-feel/com.gemini.frutigeraeromaster
@@ -637,6 +648,46 @@ apply_gpu_boost() {
     log_message "SUCCESS" "Optimizaciones de GPU aplicadas."
 }
 
+apply_system_optimizer() {
+    log_message "INFO" "Iniciando Limpieza Profunda del Sistema..."
+    
+    # 1. Limpiar Journal logs antiguos (> 3 días)
+    sudo journalctl --vacuum-time=3d
+    
+    # 2. Limpiar Caches de miniaturas y apps
+    rm -rf "$HOME/.cache/thumbnails/*"
+    
+    # 3. Limpieza de paquetes
+    sudo apt autoremove --purge -y
+    sudo apt clean
+    
+    # 4. zRAM (Opcional pero recomendado para performance)
+    if ! dpkg -l | grep -q "zram-config"; then
+        log_message "INFO" "Instalando zRAM para mejorar respuesta de memoria..."
+        sudo apt install -y zram-config
+    fi
+    
+    log_message "SUCCESS" "Limpieza y optimización completada."
+}
+
+apply_service_tuning() {
+    log_message "INFO" "Iniciando Ajuste de Servicios (Background Processes)..."
+    init_state
+    
+    # Lista de servicios candidatos a deshabilitar
+    local services=("ModemManager" "cups" "avahi-daemon" "geoclue")
+    
+    for svc in "${services[@]}"; do
+        if systemctl is-active "$svc" &>/dev/null; then
+            log_message "INFO" "Deshabilitando servicio no esencial: $svc..."
+            sudo systemctl stop "$svc" || true
+            sudo systemctl disable "$svc" || true
+        fi
+    done
+    
+    log_message "SUCCESS" "Servicios ajustados para máximo rendimiento."
+}
+
 # --- MÓDULO DE ORQUESTACIÓN ---
 
 apply_flavor_aero() {
@@ -738,6 +789,8 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 
     if [ "$AUTO_MODE" = true ]; then
         apply_flavor_aero
+        apply_system_optimizer
+        apply_service_tuning
     else
         # Menu adaptativo según el DE
         if [[ "$DE_TYPE" == "kde" ]]; then
@@ -752,12 +805,15 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
             "SOUNDS" "Esquema de Sonidos" OFF \
             "DISCORD_GLASS" "Discord Aero (Vencord)" OFF \
             "BOOT_LOGIN" "Temas de Inicio y Bloqueo" OFF \
-            "OPTIMIZE" "Limpieza de sistema" OFF 3>&1 1>&2 2>&3)
+            "OPTIMIZE" "Limpieza profunda de sistema" OFF \
+            "SERVICES" "Deshabilitar servicios extra (Bloat)" OFF 3>&1 1>&2 2>&3)
 
             if [ -z "$CHOICES" ]; then exit 0; fi
 
             if [[ $CHOICES == *"FULL"* ]]; then
                 apply_flavor_aero
+                apply_system_optimizer
+                apply_service_tuning
             else
                 for choice in $CHOICES; do
                     case $choice in
@@ -769,16 +825,22 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
                         "\"SOUNDS\"") apply_sounds ;;
                         "\"DISCORD_GLASS\"") apply_discord_glass ;;
                         "\"BOOT_LOGIN\"") apply_boot_login ;;
+                        "\"OPTIMIZE\"") apply_system_optimizer ;;
+                        "\"SERVICES\"") apply_service_tuning ;;
                     esac
                 done
             fi
         elif [[ "$DE_TYPE" == "gnome" ]]; then
-            if (whiptail --title "Aero para GNOME" --yesno "Se detectó GNOME. ¿Deseas aplicar la transformación Aero secuencial?" 10 60); then
+            if (whiptail --title "Aero para GNOME" --yesno "Se detectó GNOME. ¿Deseas aplicar la transformación Aero secuencial y optimizar el sistema?" 10 60); then
                 apply_flavor_aero
+                apply_system_optimizer
+                apply_service_tuning
             fi
         elif [[ "$DE_TYPE" == "xfce" ]]; then
-            if (whiptail --title "Aero para Xfce" --yesno "Se detectó Xfce. ¿Deseas aplicar la transformación Aero secuencial?" 10 60); then
+            if (whiptail --title "Aero para Xfce" --yesno "Se detectó Xfce. ¿Deseas aplicar la transformación Aero secuencial y optimizar el sistema?" 10 60); then
                 apply_flavor_aero
+                apply_system_optimizer
+                apply_service_tuning
             fi
         else
             log_message "ERROR" "Entorno detectado ($DE_TYPE) no soportado por el menú."
@@ -786,11 +848,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         fi
     fi
 
-    # Limpieza final (si se seleccionó o se activó modo auto completo)
-    if [[ $CHOICES == *"OPTIMIZE"* ]] || [[ "$AUTO_MODE" == "true" ]]; then
-        log_message "INFO" "Limpiando paquetes innecesarios..."
-        sudo apt autoremove -y && sudo apt clean 
-    fi
+    # Eliminar la lógica redundante de limpieza al final
 
     echo -e "\n${GREEN}############################################################${NC}"
     echo -e "${GREEN}#   ¡INSTALACIÓN COMPLETADA CON ÉXITO! 🫧🐬✨             #${NC}"
