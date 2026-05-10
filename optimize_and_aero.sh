@@ -18,6 +18,18 @@ NC='\033[0m'
 
 STATE_FILE="$HOME/.frutiger_aero_state.sh"
 LOG_FILE="$HOME/.frutiger_aero.log"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# --- MANEJO DE LIMPIEZA ---
+TEMP_DIRS=()
+cleanup() {
+    for dir in "${TEMP_DIRS[@]}"; do
+        if [ -d "$dir" ]; then
+            rm -rf "$dir"
+        fi
+    done
+}
+trap cleanup EXIT INT TERM
 
 # --- DETECCIÓN DE ENTORNO Y HARDWARE ---
 
@@ -128,39 +140,50 @@ try_run() {
 # --- FUNCIONES DE SEGURIDAD ---
 
 save_setting() {
-    local file=$1; local group=$2; local key=$3
-    local var_name="OLD_${file//./_}_${group// /_}_${key}"
+    local type=$1; local file=$2; local group=$3; local key=$4
+    local var_name="OLD_${type}_${file//./_}_${group// /_}_${key//\//_}"
+    
     if ! grep -q "$var_name=" "$STATE_FILE" 2>/dev/null; then
-        local value
-        value=$($KREAD --file "$file" --group "$group" --key "$key" 2>/dev/null || echo "")
+        local value=""
+        case "$type" in
+            "kde")   value=$($KREAD --file "$file" --group "$group" --key "$key" 2>/dev/null || echo "") ;;
+            "gnome") value=$(gsettings get "$file" "$group" 2>/dev/null | tr -d "'") ;;
+            "xfce")  value=$(xfconf-query -c "$file" -p "$group" 2>/dev/null || echo "") ;;
+        esac
         local escaped_value="${value//\"/\\\"}"
         echo "$var_name=\"$escaped_value\"" >> "$STATE_FILE"
     fi
 }
 
 restore_setting() {
-    local file=$1; local group=$2; local key=$3
-    local var_name="OLD_${file//./_}_${group// /_}_${key}"
+    local type=$1; local file=$2; local group=$3; local key=$4
+    local var_name="OLD_${type}_${file//./_}_${group// /_}_${key//\//_}"
+    
     if grep -q "$var_name=" "$STATE_FILE"; then
         local value
         value=$(grep "^$var_name=" "$STATE_FILE" | cut -d'=' -f2- | sed 's/^"//;s/"$//')
-        if [ -n "$value" ]; then
-            $KWRITE --file "$file" --group "$group" --key "$key" "$value"
-        else
-            $KWRITE --file "$file" --group "$group" --key "$key" --delete
-        fi
+        case "$type" in
+            "kde")
+                if [ -n "$value" ]; then $KWRITE --file "$file" --group "$group" --key "$key" "$value"
+                else $KWRITE --file "$file" --group "$group" --key "$key" --delete; fi ;;
+            "gnome") gsettings set "$file" "$group" "$value" ;;
+            "xfce")  xfconf-query -c "$file" -p "$group" -s "$value" ;;
+        esac
     fi
 }
 
 init_state() {
     if [ ! -f "$STATE_FILE" ]; then
         echo "# Archivo de estado Frutiger Aero" > "$STATE_FILE"
+        # Guardar estado de servicios críticos
         for svc in cups bluetooth ModemManager; do
             state=$(systemctl is-enabled "$svc" 2>/dev/null || echo "disabled")
             echo "SVC_$svc=\"$state\"" >> "$STATE_FILE"
         done
-        baloo_state=$(balooctl status 2>&1 | grep -q "is running" && echo "enabled" || echo "disabled")
-        echo "BALOO_STATE=\"$baloo_state\"" >> "$STATE_FILE"
+        if [[ "$DE_TYPE" == "kde" ]]; then
+            baloo_state=$(balooctl status 2>&1 | grep -q "is running" && echo "enabled" || echo "disabled")
+            echo "BALOO_STATE=\"$baloo_state\"" >> "$STATE_FILE"
+        fi
     fi
 }
 
@@ -171,24 +194,24 @@ restore_system() {
     source "$STATE_FILE"
     
     if [[ "$DE_TYPE" == "kde" ]]; then
-        restore_setting kdeglobals General widgetStyle
-        restore_setting kdeglobals Icons Theme
-        restore_setting kcminputrc Mouse cursorTheme
-        restore_setting kwinrc Plugins magiclampEnabled
-        restore_setting kwinrc Plugins wobblywindowsEnabled
-        restore_setting kwinrc Plugins blurEnabled
-        restore_setting kdeglobals Sounds Theme
-        restore_setting ksplashrc SecondShell Theme
-        restore_setting plasmarc Theme name
-        restore_setting kwinrc "org.kde.kdecoration2" library
-        restore_setting kwinrc "org.kde.kdecoration2" theme
-        restore_setting kwinrc TabBox LayoutName
+        restore_setting kde kdeglobals General widgetStyle
+        restore_setting kde kdeglobals Icons Theme
+        restore_setting kde kcminputrc Mouse cursorTheme
+        restore_setting kde kwinrc Plugins magiclampEnabled
+        restore_setting kde kwinrc Plugins wobblywindowsEnabled
+        restore_setting kde kwinrc Plugins blurEnabled
+        restore_setting kde kdeglobals Sounds Theme
+        restore_setting kde ksplashrc SecondShell Theme
+        restore_setting kde plasmarc Theme name
+        restore_setting kde kwinrc "org.kde.kdecoration2" library
+        restore_setting kde kwinrc "org.kde.kdecoration2" theme
+        restore_setting kde kwinrc TabBox LayoutName
     elif [[ "$DE_TYPE" == "gnome" ]]; then
-        gsettings reset org.gnome.desktop.interface gtk-theme
-        gsettings reset org.gnome.desktop.interface icon-theme
+        restore_setting gnome org.gnome.desktop.interface gtk-theme
+        restore_setting gnome org.gnome.desktop.interface icon-theme
     elif [[ "$DE_TYPE" == "xfce" ]]; then
-        xfconf-query -c xsettings -p /Net/ThemeName -r
-        xfconf-query -c xfwm4 -p /general/theme -r
+        restore_setting xfce xsettings /Net/ThemeName
+        restore_setting xfce xfwm4 /general/theme
     fi
 
     # Limpieza de directorios
@@ -213,17 +236,16 @@ apply_global_theme() {
     init_state
     
     # Guardar configuración actual
-    save_setting kdeglobals General widgetStyle
-    save_setting kdeglobals Icons Theme
-    save_setting kcminputrc Mouse cursorTheme
-    save_setting kdeglobals Sounds Theme
-    save_setting ksplashrc SecondShell Theme
-    save_setting plasmarc Theme name
-    save_setting kwinrc "org.kde.kdecoration2" library
-    save_setting kwinrc "org.kde.kdecoration2" theme
-    save_setting kwinrc TabBox LayoutName
+    save_setting kde kdeglobals General widgetStyle
+    save_setting kde kdeglobals Icons Theme
+    save_setting kde kcminputrc Mouse cursorTheme
+    save_setting kde kdeglobals Sounds Theme
+    save_setting kde ksplashrc SecondShell Theme
+    save_setting kde plasmarc Theme name
+    save_setting kde kwinrc "org.kde.kdecoration2" library
+    save_setting kde kwinrc "org.kde.kdecoration2" theme
+    save_setting kde kwinrc TabBox LayoutName
 
-    local SCRIPT_DIR; SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     local THEME_ID="com.gemini.frutigeraeromaster"
     local THEME_SOURCE="$SCRIPT_DIR/assets/look-and-feel/$THEME_ID"
 
@@ -238,7 +260,11 @@ apply_global_theme() {
         else
             log_message "WARNING" "plasma-apply-lookandfeel no encontrado. El tema está instalado pero debe activarse manualmente."
         fi
-        log_message "SUCCESS" "Global Theme Master instalado."
+
+        # ACTIVAR MODO 'FOLDER VIEW' (Desktop Icons)
+        $KWRITE --file kdeglobals --group "Desktop" --key "ContainmentType" "org.kde.desktopcontainment" 2>/dev/null || true
+        
+        log_message "SUCCESS" "Global Theme Master y Folder View instalados."
     else
         log_message "ERROR" "No se encontraron los assets del Global Theme en $THEME_SOURCE"
     fi
@@ -250,6 +276,7 @@ apply_aurorae_glass() {
     if [ ! -d "$THEME_DIR" ]; then
         mkdir -p "$THEME_DIR"
         local TEMP_AURORAE="/tmp/aero_aurorae"
+        TEMP_DIRS+=("$TEMP_AURORAE")
         rm -rf "$TEMP_AURORAE"
         if git clone --depth 1 https://github.com/updeshxp/Ten-Aero.git "$TEMP_AURORAE" 2>/dev/null; then
             cp -r "$TEMP_AURORAE/"* "$THEME_DIR/"
@@ -263,6 +290,7 @@ apply_bar_and_icons() {
     # Crystal Remix
     if [ ! -d "$HOME/.local/share/icons/crystal-remix-icon-theme-diinki-version" ]; then
         local TEMP_ICONS="/tmp/aero_icons"
+        TEMP_DIRS+=("$TEMP_ICONS")
         rm -rf "$TEMP_ICONS"
         if git clone --depth 1 https://github.com/diinki/diinki-aero.git "$TEMP_ICONS" 2>/dev/null; then
             mkdir -p "$HOME/.local/share/icons"
@@ -276,6 +304,7 @@ apply_cursors() {
     log_message "INFO" "Instalando Cursores Aero..."
     if [ ! -d "$HOME/.local/share/icons/AeroCursors" ]; then
         local TEMP_CURSORS="/tmp/aero_cursors"
+        TEMP_DIRS+=("$TEMP_CURSORS")
         rm -rf "$TEMP_CURSORS"
         if git clone --depth 1 https://github.com/lLexian/Windows-7-Aero-Cursors_Linux.git "$TEMP_CURSORS" 2>/dev/null; then
             mkdir -p "$HOME/.local/share/icons/AeroCursors"
@@ -288,9 +317,8 @@ apply_cursors() {
 apply_sounds() {
     log_message "INFO" "Instalando Esquema de Sonido Aero..."
     init_state
-    save_setting kdeglobals Sounds Theme
+    save_setting kde kdeglobals Sounds Theme
 
-    local SCRIPT_DIR; SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     local SOUND_SOURCE="$SCRIPT_DIR/assets/sounds/Aero"
     local SOUND_DEST="$HOME/.local/share/sounds/Aero"
 
@@ -311,11 +339,10 @@ apply_sounds() {
 apply_kvantum() {
     log_message "INFO" "Instalando y Configurando Kvantum Aero Glass..."
     init_state
-    save_setting kdeglobals General widgetStyle
-    save_setting kwinrc Plugins blurEnabled
-    save_setting kwinrc Plugins backgroundcontrastEnabled
+    save_setting kde kdeglobals General widgetStyle
+    save_setting kde kwinrc Plugins blurEnabled
+    save_setting kde kwinrc Plugins backgroundcontrastEnabled
 
-    local SCRIPT_DIR; SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     local KV_SOURCE="$SCRIPT_DIR/assets/kvantum/Windows7Aero"
     local KV_DEST="$HOME/.config/Kvantum/Windows7Aero"
 
@@ -365,7 +392,10 @@ apply_kvantum() {
 
 apply_gnome() {
     log_message "INFO" "Iniciando transformación para GNOME (Ubuntu)..."
-    
+    init_state
+    save_setting gnome org.gnome.desktop.interface gtk-theme
+    save_setting gnome org.gnome.desktop.interface icon-theme
+
     # Dependencias
     log_message "INFO" "Instalando dependencias (Tweaks, Extensiones)..."
     sudo apt update && sudo apt install -y gnome-tweaks gnome-shell-extensions dconf-editor
@@ -375,7 +405,11 @@ apply_gnome() {
     if [ ! -d "$THEME_DIR" ]; then
         mkdir -p "$HOME/.themes"
         log_message "INFO" "Descargando tema GTK Windows 7..."
-        git clone --depth 1 https://github.com/B00merang-Project/Windows-7.git "$THEME_DIR"
+        local TEMP_GNOME_T="/tmp/aero_gnome_t"
+        TEMP_DIRS+=("$TEMP_GNOME_T")
+        if git clone --depth 1 https://github.com/B00merang-Project/Windows-7.git "$TEMP_GNOME_T"; then
+            cp -r "$TEMP_GNOME_T" "$THEME_DIR"
+        fi
     fi
 
     # Descargar Iconos
@@ -383,7 +417,11 @@ apply_gnome() {
     if [ ! -d "$ICON_DIR" ]; then
         mkdir -p "$HOME/.icons"
         log_message "INFO" "Descargando iconos Windows 7..."
-        git clone --depth 1 https://github.com/B00merang-Artwork/Windows-7.git "$ICON_DIR"
+        local TEMP_GNOME_I="/tmp/aero_gnome_i"
+        TEMP_DIRS+=("$TEMP_GNOME_I")
+        if git clone --depth 1 https://github.com/B00merang-Artwork/Windows-7.git "$TEMP_GNOME_I"; then
+            cp -r "$TEMP_GNOME_I" "$ICON_DIR"
+        fi
     fi
 
     # Aplicar vía gsettings
@@ -395,12 +433,16 @@ apply_gnome() {
 
 apply_xfce() {
     log_message "INFO" "Iniciando transformación para Xfce (Xubuntu)..."
-    
+    init_state
+    save_setting xfce xsettings /Net/ThemeName
+    save_setting xfce xfwm4 /general/theme
+
     # Dependencias
     sudo apt update && sudo apt install -y picom xfwm4-themes
 
     # Descargar Tema Xfce Aero Glass
     local TEMP_XFCE="/tmp/aero_xfce"
+    TEMP_DIRS+=("$TEMP_XFCE")
     rm -rf "$TEMP_XFCE"
     log_message "INFO" "Descargando tema Aero Glass para Xfce..."
     if git clone --depth 1 https://github.com/xRUS47x/Aero-Glass-XFCE4.git "$TEMP_XFCE"; then
@@ -416,30 +458,93 @@ apply_xfce() {
     log_message "SUCCESS" "Xfce transformurado. Se recomienda activar Picom para el efecto Glass."
 }
 
+apply_konsole_glass() {
+    log_message "INFO" "Configurando Perfil Konsole Glass..."
+    local PROFILE_DIR="$HOME/.local/share/konsole"
+    mkdir -p "$PROFILE_DIR"
+    
+    local PROFILE_FILE="$PROFILE_DIR/AeroGlass.profile"
+    if [ ! -f "$PROFILE_FILE" ]; then
+        cat <<EOF > "$PROFILE_FILE"
+[Appearance]
+ColorScheme=AeroBlue
+Font=Monospace,12,-1,5,50,0,0,0,0,0
+
+[General]
+Name=AeroGlass
+Parent=FALLBACK/
+
+[Scrolling]
+HistoryMode=2
+EOF
+    fi
+
+    # Aplicar transparencia y blur vía kwriteconfig (configurando el esquema de color si existe)
+    # Nota: El esquema de color AeroBlue debería venir con el Global Theme.
+    log_message "SUCCESS" "Perfil Konsole Glass creado."
+}
+
+apply_gpu_boost() {
+    log_message "INFO" "Aplicando optimizaciones para GPU: $GPU_VENDOR..."
+    
+    case "$GPU_VENDOR" in
+        "NVIDIA")
+            # Forzar composición por OpenGL 3.1 para NVIDIA
+            $KWRITE --file kwinrc --group "Compositing" --key "Backend" "OpenGL"
+            $KWRITE --file kwinrc --group "Compositing" --key "Enabled" "true"
+            ;;
+        "AMD"|"Intel")
+            # Mesa suele funcionar mejor con OpenGL automático o EGL
+            $KWRITE --file kwinrc --group "Compositing" --key "Backend" "OpenGL"
+            ;;
+    esac
+    
+    if command -v qdbus &> /dev/null; then
+        QDBUS_CMD=$(command -v qdbus-qt6 || command -v qdbus-qt5 || command -v qdbus)
+        $QDBUS_CMD org.kde.KWin /Compositor suspend || true
+        sleep 1
+        $QDBUS_CMD org.kde.KWin /Compositor resume || true
+    fi
+    
+    log_message "SUCCESS" "Optimizaciones de GPU aplicadas."
+}
+
 # --- MÓDULO DE ORQUESTACIÓN ---
 
 apply_flavor_aero() {
+    log_message "INFO" "Validando privilegios de administrador..."
+    if ! sudo -v; then
+        log_message "ERROR" "Se requieren privilegios de sudo para continuar."
+        exit 1
+    fi
+
     log_message "INFO" "Iniciando instalación secuencial para: $DE_TYPE..."
     
     case "$DE_TYPE" in
         "kde")
             # Secuencia Óptima KDE: Componentes -> Tema Global
-            log_message "INFO" "Paso 1/6: Instalando bordes Aurorae..."
+            log_message "INFO" "Paso 1/8: Optimizando GPU..."
+            apply_gpu_boost
+            
+            log_message "INFO" "Paso 2/8: Instalando bordes Aurorae..."
             apply_aurorae_glass
             
-            log_message "INFO" "Paso 2/6: Configurando Kvantum Glass..."
+            log_message "INFO" "Paso 3/8: Configurando Kvantum Glass..."
             apply_kvantum
             
-            log_message "INFO" "Paso 3/6: Instalando Iconos Crystal..."
+            log_message "INFO" "Paso 4/8: Instalando Iconos Crystal..."
             apply_bar_and_icons
             
-            log_message "INFO" "Paso 4/6: Instalando Cursores Aero..."
+            log_message "INFO" "Paso 5/8: Instalando Cursores Aero..."
             apply_cursors
             
-            log_message "INFO" "Paso 5/6: Instalando Esquema de Sonido..."
+            log_message "INFO" "Paso 6/8: Instalando Esquema de Sonido..."
             apply_sounds
             
-            log_message "INFO" "Paso 6/6: Aplicando Tema Global (Master)..."
+            log_message "INFO" "Paso 7/8: Configurando Konsole Glass..."
+            apply_konsole_glass
+            
+            log_message "INFO" "Paso 8/8: Aplicando Tema Global (Master)..."
             apply_global_theme
             ;;
             
@@ -538,10 +643,10 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         fi
     fi
 
-    # Limpieza final (si se seleccionó u ocurrió automáticamente)
-    if [[ $CHOICES == *"OPTIMIZE"* ]]; then
+    # Limpieza final (si se seleccionó o se activó modo auto completo)
+    if [[ $CHOICES == *"OPTIMIZE"* ]] || [[ "$AUTO_MODE" == "true" ]]; then
         log_message "INFO" "Limpiando paquetes innecesarios..."
-        sudo apt update && sudo apt autoremove -y && sudo apt clean 
+        sudo apt autoremove -y && sudo apt clean 
     fi
 
     echo -e "\n${GREEN}############################################################${NC}"
