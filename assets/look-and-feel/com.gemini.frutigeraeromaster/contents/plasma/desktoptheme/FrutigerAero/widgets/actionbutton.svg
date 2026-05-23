@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="40">
+  <defs>
+    <linearGradient id="actionGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:white;stop-opacity:0.2" />
+      <stop offset="50%" style="stop-color:white;stop-opacity:0.4" />
+      <stop offset="100%" style="stop-color:white;stop-opacity:0.2" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Normal -->
+  <rect id="normal" x="2" y="5" width="16" height="30" rx="1" fill="url(#actionGradient)" stroke="white" stroke-opacity="0.3" />
+  
+  <!-- Hover -->
+  <rect id="hover" x="2" y="5" width="16" height="30" rx="1" fill="white" fill-opacity="0.5" stroke="white" stroke-opacity="0.6" />
+  
+  <!-- Pressed -->
+  <rect id="pressed" x="2" y="5" width="16" height="30" rx="1" fill="white" fill-opacity="0.7" stroke="white" stroke-opacity="0.8" />
+</svg>

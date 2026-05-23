@@ -39,9 +39,11 @@
 - **🎬 VLC Legacy:** Integrated **Windows Media Player 11** skeuomorphic skin.
 
 ### 🚀 Performance & Safety
+- **🏗️ Modular Architecture:** Logic split into dedicated libraries (`lib/` for Linux, `windows/lib/` for Windows) for better maintainability and resilience.
 - **📊 Hardware Awareness:** GPU-specific (NVIDIA/AMD/Intel) compositor tuning.
 - **🛡️ Fail-Safe Undo:** Full system restoration via `--restore` (Linux) or **System Restore Points** (Windows).
 - **🧹 Optimizer:** Automated journal vacuuming, cache flushing, and **zRAM** configuration.
+- **🔍 Debug Mode:** Run with `--debug` to see detailed execution logs.
 
 ---
 

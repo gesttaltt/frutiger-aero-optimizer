@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="50">
+  <defs>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  
+  <!-- Normal: Transparent -->
+  <g id="normal">
+    <rect x="0" y="0" width="40" height="40" fill="transparent" />
+  </g>
+
+  <!-- Hover: Soft White Glow -->
+  <g id="hover">
+    <rect x="50" y="5" width="40" height="30" rx="3" fill="white" fill-opacity="0.2" filter="url(#glow)" />
+    <rect x="50" y="33" width="40" height="2" fill="white" fill-opacity="0.8" />
+  </g>
+
+  <!-- Active: Stronger Blue/White Glow -->
+  <g id="active">
+    <rect x="100" y="5" width="40" height="30" rx="3" fill="white" fill-opacity="0.3" filter="url(#glow)" />
+    <rect x="100" y="33" width="40" height="3" fill="#00AAFF" filter="url(#glow)" />
+  </g>
+
+  <!-- Attention: Orange/Red Glow -->
+  <g id="attention">
+    <rect x="150" y="5" width="40" height="30" rx="3" fill="orange" fill-opacity="0.2" />
+    <rect x="150" y="33" width="40" height="2" fill="orange" />
+  </g>
+</svg>

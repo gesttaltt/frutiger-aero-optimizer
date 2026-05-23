@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Frutiger Aero
+Comment=Glassy and Glossy Aero theme for Plasma
+X-KDE-PluginInfo-Author=Gemini CLI
+X-KDE-PluginInfo-Email=gestalt@example.com
+X-KDE-PluginInfo-Name=FrutigerAero
+X-KDE-PluginInfo-Version=1.0
+X-KDE-PluginInfo-Website=https://github.com/gesttaltt/frutiger-aero-optimizer
+X-KDE-PluginInfo-Category=Plasma Desktop Theme
+X-KDE-PluginInfo-License=GPL
+X-Plasma-API=python

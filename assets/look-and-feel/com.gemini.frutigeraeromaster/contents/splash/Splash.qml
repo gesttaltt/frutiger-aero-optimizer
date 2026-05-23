@@ -1,105 +1,114 @@
-/*
- *   Copyright 2014 Marco Martin <mart@kde.org>
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License version 2,
- *   or (at your option) any later version, as published by the Free
- *   Software Foundation
- *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details
- *
- *   You should have received a copy of the GNU General Public
- *   License along with this program; if not, write to the
- *   Free Software Foundation, Inc.,
- *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- */
-
-import QtQuick
-import QtQuick.Layouts
-import QtQuick.Controls
-import QtQuick.Templates
-import org.kde.plasma.core as PlasmaCore
-import QtMultimedia
-import "../components"
-
-import aeroshell.utils as AeroShellUtils
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15
 
 Item {
     id: root
-    z: -9
-
-    property int stage
+    property int stage: 0
 
     onStageChanged: {
         if (stage == 5) {
-            //lockSuccess.play();
-
-            //fadeOut.running = true;
-            transitionAnim.opacity = 1;
+            fadeOut.running = true;
         }
     }
-    /*MediaPlayer {
-        id: lockSuccess
-        source: Qt.resolvedUrl("../sounds/lockSuccess.ogg");
-        audioOutput: AudioOutput {}
-    }*/
 
     Rectangle {
-        color: "#1D5F7A"
+        id: background
         anchors.fill: parent
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: "#1D5F7A" }
+            GradientStop { position: 1.0; color: "#2E8AB0" }
+        }
     }
 
-    AeroShellUtils.SDDM { id: sddm }
-
+    // Try to load a background image
     Image {
         id: bgtexture
-        source: sddm.currentBackground
         anchors.fill: parent
+        source: "images/background.jpg"
+        fillMode: Image.PreserveAspectCrop
+        opacity: 0.6
+        visible: status === Image.Ready
     }
 
-    Status {
-        id: statusText
+    ColumnLayout {
         anchors.centerIn: parent
-        anchors.verticalCenterOffset: -36
-        statusText: i18nd("okular", "Welcome")
-        speen: true
+        spacing: 30
+
+        BusyIndicator {
+            id: indicator
+            running: true
+            Layout.alignment: Qt.AlignHCenter
+            contentItem: Item {
+                implicitWidth: 64
+                implicitHeight: 64
+                RotationAnimator {
+                    target: indicator.contentItem
+                    from: 0
+                    to: 360
+                    duration: 1000
+                    running: indicator.running
+                    loops: Animation.Infinite
+                }
+                Canvas {
+                    anchors.fill: parent
+                    onPaint: {
+                        var ctx = getContext("2d");
+                        ctx.reset();
+                        ctx.beginPath();
+                        ctx.arc(width / 2, height / 2, width / 2 - 4, 0, Math.PI * 2);
+                        ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+                        ctx.lineWidth = 4;
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.arc(width / 2, height / 2, width / 2 - 4, 0, Math.PI * 0.5);
+                        ctx.strokeStyle = "white";
+                        ctx.lineWidth = 4;
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        Text {
+            id: statusText
+            text: "Welcome"
+            font.pointSize: 28
+            font.family: "Segoe UI, Selawik, sans-serif"
+            color: "white"
+            Layout.alignment: Qt.AlignHCenter
+            style: Text.Outline
+            styleColor: "rgba(0,0,0,0.2)"
+        }
     }
 
-    RowLayout {
-        anchors {
-            bottom: parent.bottom
-            left: parent.left
-            right: parent.right
-        }
-        height: 96
-        Rectangle { Layout.fillWidth: true }
-        Image {
-            id: watermark
-            source: "../images/watermark.png"
-        }
-        Rectangle { Layout.fillWidth: true }
+    Image {
+        id: watermark
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        anchors.margins: 40
+        source: "images/watermark.png"
+        width: 128
+        height: 128
+        fillMode: Image.PreserveAspectFit
+        opacity: 0.5
+        visible: status === Image.Ready
     }
 
     Rectangle {
         id: transitionAnim
-        opacity: 0
-        color: "black"
         anchors.fill: parent
-        Behavior on opacity {
-            NumberAnimation { duration: 640; }
-        }
+        color: "black"
+        opacity: 0
+        visible: opacity > 0
     }
 
-    /*OpacityAnimator {
+    NumberAnimation {
         id: fadeOut
-        running: false
         target: transitionAnim
+        property: "opacity"
         from: 0
         to: 1
-        duration: 640
-        easing.type: Easing.InOutQuad
-    }*/
+        duration: 600
+    }
 }

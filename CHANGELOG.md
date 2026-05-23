@@ -28,7 +28,10 @@ Todas las novedades y cambios notables de este proyecto serán documentados en e
 ### Añadido
 - **Arquitectura Determinista:** Sistema de logs, ejecución segura y fallbacks inteligentes.
 - **Cursores Aero:** Port auténtico de Windows 7.
-- **Splash Screen:** Integración del Splash Screen "Aero AuthUI".
+- **Splash Screen:** Integración del Splash Screen "Aero AuthUI" (Refactorizado para estabilidad).
+- **Panel Refinement:** Nuevo tema de Plasma "Frutiger Aero" con efectos de brillo (glow) en la barra de tareas y botón "Show Desktop" de cristal.
+- **Glassy Windows:** Aumento intensivo de desenfoque (blur radius 25) y habilitación de translucidez para un look más "glassy".
+- **Visual Polish:** Optimización de desenfoque (blur) y contraste para el panel superior/inferior.
 - **Módulos Avanzados:** GPU Boost, Konsole Aero Glass, Dolphin Optimization.
 - **Salud del Sistema:** Módulo VERIFY para chequear la integridad de la instalación.
 
