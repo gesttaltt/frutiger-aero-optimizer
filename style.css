@@ -96,7 +96,7 @@ body {
     top: 0;
     width: 100%;
     z-index: 100;
-    background: rgba(8, 38, 65, 0.68);
+    background: rgba(8, 38, 65, 0.75);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
@@ -171,6 +171,50 @@ body {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+}
+
+/* Mobile Navigation */
+.mobile-toggle-btn {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+.mobile-toggle-btn .bar {
+    width: 20px;
+    height: 2px;
+    background: #ffffff;
+    transition: all 0.3s ease;
+}
+
+.mobile-nav-menu {
+    display: none;
+    flex-direction: column;
+    padding: 1rem 1.5rem;
+    background: rgba(4, 21, 37, 0.95);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(20px);
+}
+
+.mobile-nav-menu.open {
+    display: flex;
+}
+
+.mobile-nav-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: 0.65rem 0;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mobile-nav-link:hover {
+    color: #ffffff;
 }
 
 /* Glass Buttons */
@@ -524,10 +568,13 @@ body {
 
 .after-image {
     background: radial-gradient(circle at 50% 30%, #0077b6 0%, #032d52 60%, #02182c 100%);
+    background-image: url('assets/wallpapers/wallhaven-yqq26g.png');
+    background-size: cover;
+    background-position: center;
 }
 
 .before-image {
-    background: #1e1e24;
+    background: #181920;
     width: 50%;
     overflow: hidden;
     border-right: 2px solid #ffffff;
@@ -542,18 +589,19 @@ body {
     font-size: 0.8rem;
     font-weight: 600;
     z-index: 5;
+    backdrop-filter: blur(8px);
 }
 
 .label-after {
     right: 1rem;
-    background: rgba(0, 210, 255, 0.25);
-    border: 1px solid rgba(0, 210, 255, 0.5);
+    background: rgba(0, 210, 255, 0.35);
+    border: 1px solid rgba(0, 210, 255, 0.7);
     color: #ffffff;
 }
 
 .label-before {
     left: 1rem;
-    background: rgba(0, 0, 0, 0.55);
+    background: rgba(0, 0, 0, 0.65);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: #e2e8f0;
 }
@@ -566,9 +614,10 @@ body {
 .aero-window {
     padding: 1.25rem;
     border-radius: var(--radius-md);
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(8, 38, 65, 0.65);
     border: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 10px 30px rgba(0, 50, 100, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+    box-shadow: 0 10px 30px rgba(0, 50, 100, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
 }
 
 .window-titlebar {
@@ -644,7 +693,7 @@ body {
 }
 
 .flat-window {
-    background: #2b2b36;
+    background: #23242d;
     border-radius: 6px;
     padding: 1.25rem;
     color: #94a3b8;
@@ -654,7 +703,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #3f3f4e;
+    border-bottom: 1px solid #363745;
     padding-bottom: 0.5rem;
     margin-bottom: 0.75rem;
     font-size: 0.85rem;
@@ -663,7 +712,7 @@ body {
 .fctrl {
     width: 10px;
     height: 10px;
-    background: #555566;
+    background: #4a4b5c;
     border-radius: 50%;
     display: inline-block;
     margin-left: 0.25rem;
@@ -772,6 +821,169 @@ body {
 .sound-info span {
     font-size: 0.8rem;
     color: var(--text-secondary);
+}
+
+/* Wallpaper Gallery Grid */
+.wallpaper-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+}
+
+.wallpaper-card {
+    overflow: hidden;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.wallpaper-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(0, 210, 255, 0.6);
+}
+
+.wallpaper-thumb-wrapper {
+    position: relative;
+    height: 160px;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.wallpaper-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.wallpaper-thumb-wrapper:hover .wallpaper-thumb {
+    transform: scale(1.08);
+}
+
+.wallpaper-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 30, 60, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.wallpaper-thumb-wrapper:hover .wallpaper-overlay {
+    opacity: 1;
+}
+
+.wallpaper-zoom-icon {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #ffffff;
+    background: rgba(0, 210, 255, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-full);
+}
+
+.wallpaper-info {
+    padding: 1rem 1.15rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.wallpaper-info h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.btn-download-wall {
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.35rem 0.75rem;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-full);
+    color: var(--aero-sky);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-download-wall:hover {
+    background: rgba(0, 210, 255, 0.3);
+    border-color: var(--aero-cyan);
+    color: #ffffff;
+}
+
+/* Lightbox Modal */
+.lightbox-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.lightbox-modal.active {
+    display: flex;
+}
+
+.lightbox-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(2, 14, 26, 0.85);
+    backdrop-filter: blur(18px);
+}
+
+.lightbox-content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 85vh;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.3);
+    z-index: 2;
+}
+
+.lightbox-image {
+    max-width: 100%;
+    max-height: 85vh;
+    display: block;
+    object-fit: contain;
+}
+
+.lightbox-close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.lightbox-close-btn:hover {
+    background: rgba(255, 71, 87, 0.8);
+    border-color: #ff4757;
 }
 
 /* Features Grid */
@@ -884,6 +1096,37 @@ body {
     color: #38ef7d;
 }
 
+/* Floating Back to Top Button */
+.back-to-top-btn {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #56ccf2 0%, #0077b6 100%);
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    box-shadow: 0 4px 16px rgba(0, 119, 182, 0.6), inset 0 2px 4px #ffffff;
+    color: #ffffff;
+    font-size: 1.25rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 99;
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.back-to-top-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 22px rgba(0, 210, 255, 0.8), inset 0 2px 4px #ffffff;
+}
+
+.back-to-top-btn.visible {
+    display: flex;
+}
+
 /* Footer */
 .glass-footer {
     background: rgba(2, 14, 26, 0.85);
@@ -933,6 +1176,10 @@ body {
     
     .nav-links {
         display: none;
+    }
+
+    .mobile-toggle-btn {
+        display: flex;
     }
     
     .compare-slider-container {

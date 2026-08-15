@@ -3,10 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Frutiger Aero Optimizer & Master 🫧🐬✨ - 2007 Aesthetic Suite</title>
+    <title>Frutiger Aero Optimizer & Master 🫧🐬✨ - 2007 Aesthetic Restoration Suite</title>
     <meta name="description" content="The ultimate open-source cross-platform suite to restore the high-gloss, skeuomorphic Frutiger Aero aesthetic to Linux (KDE, GNOME, Xfce) and Windows.">
+    <meta name="theme-color" content="#031b2e">
+
+    <!-- OpenGraph / Discord / Twitter Embeds -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://gesttaltt.github.io/frutiger-aero-optimizer/">
+    <meta property="og:title" content="Frutiger Aero Optimizer & Master 🫧🐬✨">
+    <meta property="og:description" content="Restore the high-gloss, skeuomorphic, and organic digital dream of 2007 to your Linux & Windows desktop.">
+    <meta property="og:image" content="assets/branding/aero_banner.jpeg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Frutiger Aero Optimizer & Master 🫧🐬✨">
+    <meta name="twitter:description" content="Restore the high-gloss, skeuomorphic, and organic digital dream of 2007 to your Linux & Windows desktop.">
+    <meta name="twitter:image" content="assets/branding/aero_banner.jpeg">
+
     <link rel="icon" type="image/png" href="assets/look-and-feel/com.gemini.frutigeraeromaster/contents/splash/images/watermark.png">
-    <!-- Google Fonts: Outfit & Inter for high legibility -->
+    <!-- Google Fonts: Outfit & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -27,6 +40,7 @@
                 <a href="#features" class="nav-link">Features</a>
                 <a href="#compare" class="nav-link">Showcase</a>
                 <a href="#soundboard" class="nav-link">Sound Board</a>
+                <a href="#gallery" class="nav-link">Wallpapers</a>
                 <a href="#quickstart" class="nav-link">Install</a>
                 <a href="https://github.com/gesttaltt/frutiger-aero-optimizer/releases" target="_blank" rel="noopener" class="nav-link">Releases</a>
             </nav>
@@ -36,7 +50,21 @@
                     GitHub
                 </a>
                 <a href="#quickstart" class="btn-aero-primary" id="btnHeaderInstall">Get Suite 🫧</a>
+                <button class="mobile-toggle-btn" id="mobileMenuBtn" aria-label="Toggle Navigation Menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
             </div>
+        </div>
+        <!-- Mobile Dropdown Menu -->
+        <div class="mobile-nav-menu" id="mobileNavMenu">
+            <a href="#features" class="mobile-nav-link">Features</a>
+            <a href="#compare" class="mobile-nav-link">Showcase</a>
+            <a href="#soundboard" class="mobile-nav-link">Sound Board</a>
+            <a href="#gallery" class="mobile-nav-link">Wallpapers</a>
+            <a href="#quickstart" class="mobile-nav-link">Install</a>
+            <a href="https://github.com/gesttaltt/frutiger-aero-optimizer/releases" target="_blank" rel="noopener" class="mobile-nav-link">Releases</a>
         </div>
     </header>
 
@@ -88,7 +116,7 @@
                     </a>
                     <a href="#soundboard" class="btn-glass-secondary" id="btnHeroSounds">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
-                        Explore Soundscape
+                        Audition Soundscape
                     </a>
                 </div>
             </div>
@@ -108,7 +136,7 @@
                     <div class="preview-desktop aero-mode">
                         <div class="aero-window glass-card">
                             <div class="window-titlebar">
-                                <span class="win-title">Computer - System Overview</span>
+                                <span class="win-title">✨ Computer - System Overview</span>
                                 <div class="win-controls">
                                     <span class="ctrl min"></span>
                                     <span class="ctrl max"></span>
@@ -138,7 +166,7 @@
                                 <div class="win-controls"><span class="fctrl"></span><span class="fctrl"></span><span class="fctrl"></span></div>
                             </div>
                             <div class="flat-content">
-                                <p>Standard minimalist interface with flat buttons and zero translucency...</p>
+                                <p>Standard minimalist interface with flat buttons, dull borders, and zero translucency...</p>
                             </div>
                         </div>
                     </div>
@@ -160,7 +188,7 @@
             </div>
 
             <div class="sound-board-grid">
-                <button class="sound-card" id="sndLogon" data-src="assets/sounds/Aero/stereo/desktop-login.ogg">
+                <button class="sound-card" id="sndLogon" data-ogg="assets/sounds/Aero/stereo/desktop-login.ogg" data-wav="windows/assets/sounds/Logon.wav">
                     <div class="sound-orb-visual"><span class="play-icon">▶</span></div>
                     <div class="sound-info">
                         <h3>Windows Logon</h3>
@@ -168,7 +196,7 @@
                     </div>
                 </button>
 
-                <button class="sound-card" id="sndNotify" data-src="assets/sounds/Aero/stereo/message-new-instant.ogg">
+                <button class="sound-card" id="sndNotify" data-ogg="assets/sounds/Aero/stereo/message-new-instant.ogg" data-wav="windows/assets/sounds/Windows Notify.wav">
                     <div class="sound-orb-visual"><span class="play-icon">▶</span></div>
                     <div class="sound-info">
                         <h3>Balloon Notification</h3>
@@ -176,7 +204,7 @@
                     </div>
                 </button>
 
-                <button class="sound-card" id="sndWarning" data-src="assets/sounds/Aero/stereo/dialog-warning.ogg">
+                <button class="sound-card" id="sndWarning" data-ogg="assets/sounds/Aero/stereo/dialog-warning.ogg" data-wav="windows/assets/sounds/Windows Notify.wav">
                     <div class="sound-orb-visual"><span class="play-icon">▶</span></div>
                     <div class="sound-info">
                         <h3>System Exclamation</h3>
@@ -184,7 +212,7 @@
                     </div>
                 </button>
 
-                <button class="sound-card" id="sndError" data-src="assets/sounds/Aero/stereo/dialog-error.ogg">
+                <button class="sound-card" id="sndError" data-ogg="assets/sounds/Aero/stereo/dialog-error.ogg" data-wav="windows/assets/sounds/Windows Error.wav">
                     <div class="sound-orb-visual"><span class="play-icon">▶</span></div>
                     <div class="sound-info">
                         <h3>Critical Stop</h3>
@@ -192,7 +220,7 @@
                     </div>
                 </button>
 
-                <button class="sound-card" id="sndInfo" data-src="assets/sounds/Aero/stereo/dialog-information.ogg">
+                <button class="sound-card" id="sndInfo" data-ogg="assets/sounds/Aero/stereo/dialog-information.ogg" data-wav="windows/assets/sounds/Windows Notify.wav">
                     <div class="sound-orb-visual"><span class="play-icon">▶</span></div>
                     <div class="sound-info">
                         <h3>Recycle Bin / Dialog</h3>
@@ -201,6 +229,78 @@
                 </button>
             </div>
             <audio id="audioPlayer" preload="none"></audio>
+        </section>
+
+        <!-- Wallpaper Gallery Section -->
+        <section class="section-container" id="gallery">
+            <div class="section-header">
+                <span class="section-tag">HIGH-RESOLUTION ASSETS</span>
+                <h2 class="section-title">Aurora Wallpapers Gallery</h2>
+                <p class="section-desc">Included in ultra-high resolution with automated multi-monitor desktop binding.</p>
+            </div>
+
+            <div class="wallpaper-grid">
+                <div class="wallpaper-card glass-card" data-full="assets/wallpapers/wallhaven-yqq26g.png">
+                    <div class="wallpaper-thumb-wrapper">
+                        <img src="assets/wallpapers/wallhaven-yqq26g.png" alt="Frutiger Aero Blue Aurora Wallpaper" loading="lazy" class="wallpaper-thumb">
+                        <div class="wallpaper-overlay">
+                            <span class="wallpaper-zoom-icon">🔍 View Fullscreen</span>
+                        </div>
+                    </div>
+                    <div class="wallpaper-info">
+                        <h3>Aero Blue Horizon</h3>
+                        <a href="assets/wallpapers/wallhaven-yqq26g.png" download class="btn-download-wall">Download 4K</a>
+                    </div>
+                </div>
+
+                <div class="wallpaper-card glass-card" data-full="assets/wallpapers/wallhaven-jew5oq.png">
+                    <div class="wallpaper-thumb-wrapper">
+                        <img src="assets/wallpapers/wallhaven-jew5oq.png" alt="Aquatic Coral Glass Wallpaper" loading="lazy" class="wallpaper-thumb">
+                        <div class="wallpaper-overlay">
+                            <span class="wallpaper-zoom-icon">🔍 View Fullscreen</span>
+                        </div>
+                    </div>
+                    <div class="wallpaper-info">
+                        <h3>Aquatic Coral Glass</h3>
+                        <a href="assets/wallpapers/wallhaven-jew5oq.png" download class="btn-download-wall">Download 4K</a>
+                    </div>
+                </div>
+
+                <div class="wallpaper-card glass-card" data-full="assets/wallpapers/wallhaven-gw9jy3.png">
+                    <div class="wallpaper-thumb-wrapper">
+                        <img src="assets/wallpapers/wallhaven-gw9jy3.png" alt="Organic Emerald Orb Wallpaper" loading="lazy" class="wallpaper-thumb">
+                        <div class="wallpaper-overlay">
+                            <span class="wallpaper-zoom-icon">🔍 View Fullscreen</span>
+                        </div>
+                    </div>
+                    <div class="wallpaper-info">
+                        <h3>Emerald Organic Waves</h3>
+                        <a href="assets/wallpapers/wallhaven-gw9jy3.png" download class="btn-download-wall">Download 4K</a>
+                    </div>
+                </div>
+
+                <div class="wallpaper-card glass-card" data-full="assets/wallpapers/wallhaven-2yp2rg.jpg">
+                    <div class="wallpaper-thumb-wrapper">
+                        <img src="assets/wallpapers/wallhaven-2yp2rg.jpg" alt="Vista Aurora Borealis Wallpaper" loading="lazy" class="wallpaper-thumb">
+                        <div class="wallpaper-overlay">
+                            <span class="wallpaper-zoom-icon">🔍 View Fullscreen</span>
+                        </div>
+                    </div>
+                    <div class="wallpaper-info">
+                        <h3>Vista Classic Aurora</h3>
+                        <a href="assets/wallpapers/wallhaven-2yp2rg.jpg" download class="btn-download-wall">Download 4K</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lightbox Modal -->
+            <div class="lightbox-modal" id="lightboxModal" aria-hidden="true">
+                <div class="lightbox-backdrop" id="lightboxBackdrop"></div>
+                <div class="lightbox-content">
+                    <img src="" alt="Fullscreen Wallpaper Preview" id="lightboxImg" class="lightbox-image">
+                    <button class="lightbox-close-btn" id="lightboxCloseBtn" aria-label="Close Preview">✕</button>
+                </div>
+            </div>
         </section>
 
         <!-- Features Grid Section -->
@@ -298,6 +398,11 @@
             </div>
         </section>
     </main>
+
+    <!-- Floating Back to Top Button -->
+    <button class="back-to-top-btn" id="backToTopBtn" aria-label="Back to top">
+        ↑
+    </button>
 
     <!-- Footer -->
     <footer class="glass-footer">
