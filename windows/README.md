@@ -19,7 +19,13 @@ Este es el port oficial para Windows de la suite de personalización Frutiger Ae
 
 ## 🚀 Instalación Rápida
 
-### Opción A: Descarga Directa (Recomendada)
+### Opción 1: Instalación Web Directa (1-Línea)
+Abre PowerShell como **Administrador** y ejecuta:
+```powershell
+irm https://raw.githubusercontent.com/gesttaltt/frutiger-aero-optimizer/main/windows/install.ps1 | iex
+```
+
+### Opción 2: Descarga de Release (.zip)
 1. **[Descargar FrutigerAero_Windows.zip](https://github.com/gesttaltt/frutiger-aero-optimizer/releases/latest)**
 2. Extrae el contenido en una carpeta.
 3. Abre PowerShell como Administrador en esa carpeta.

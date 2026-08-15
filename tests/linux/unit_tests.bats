@@ -114,3 +114,8 @@ teardown() {
     "
     [ "$status" -eq 0 ]
 }
+
+@test "install.sh script syntax is valid" {
+    run bash -n install.sh
+    [ "$status" -eq 0 ]
+}

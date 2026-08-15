@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frutiger Aero Optimizer & Master 🫧🐬✨ - 2007 Aesthetic Suite</title>
+    <meta name="description" content="The ultimate open-source cross-platform suite to restore the high-gloss, skeuomorphic Frutiger Aero aesthetic to Linux (KDE, GNOME, Xfce) and Windows.">
+    <link rel="icon" type="image/png" href="assets/look-and-feel/com.gemini.frutigeraeromaster/contents/splash/images/watermark.png">
+    <!-- Google Fonts: Outfit & Inter for high legibility -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Floating Aero Bubbles Background -->
+    <div class="bubble-container" id="bubbleContainer" aria-hidden="true"></div>
+
+    <!-- Navigation Header -->
+    <header class="glass-nav" id="mainHeader">
+        <div class="nav-container">
+            <a href="#" class="brand-logo" id="brandLogo">
+                <span class="aero-orb-mini"></span>
+                <span class="brand-text">Frutiger<span class="highlight">Aero</span> <span class="badge">v5.2</span></span>
+            </a>
+            <nav class="nav-links" id="navLinks">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#compare" class="nav-link">Showcase</a>
+                <a href="#soundboard" class="nav-link">Sound Board</a>
+                <a href="#quickstart" class="nav-link">Install</a>
+                <a href="https://github.com/gesttaltt/frutiger-aero-optimizer/releases" target="_blank" rel="noopener" class="nav-link">Releases</a>
+            </nav>
+            <div class="nav-actions">
+                <a href="https://github.com/gesttaltt/frutiger-aero-optimizer" target="_blank" rel="noopener" class="btn-glass-subtle" id="githubLink">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                    GitHub
+                </a>
+                <a href="#quickstart" class="btn-aero-primary" id="btnHeaderInstall">Get Suite 🫧</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section" id="hero">
+            <div class="hero-glow"></div>
+            <div class="hero-content">
+                <div class="hero-tag">
+                    <span class="tag-orb"></span>
+                    <span>2007 Desktop Restoration Suite • Cross-Platform</span>
+                </div>
+                <h1 class="hero-title">
+                    Restore the <span class="glow-text">Frutiger Aero</span> Dream
+                </h1>
+                <p class="hero-subtitle">
+                    Immerse your desktop in skeuomorphic beauty. Liquid animations, authentic glass translucency, 
+                    tactile media skins, and the nostalgic soundscapes of computing's most optimistic era.
+                </p>
+
+                <!-- Quick Terminal Install Box -->
+                <div class="install-terminal-box" id="quickstart">
+                    <div class="terminal-header">
+                        <div class="platform-tabs" role="tablist">
+                            <button class="tab-btn active" id="tabLinux" role="tab" aria-selected="true" data-platform="linux">🐧 Linux (KDE / GNOME / Xfce)</button>
+                            <button class="tab-btn" id="tabWindows" role="tab" aria-selected="false" data-platform="windows">🪟 Windows (10 / 11)</button>
+                        </div>
+                        <span class="terminal-status">One-Liner Ready</span>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="code-line" id="codeLine">
+                            <span class="prompt-sym">$</span>
+                            <code class="code-text" id="installCmdText">curl -fsSL https://raw.githubusercontent.com/gesttaltt/frutiger-aero-optimizer/main/install.sh | bash</code>
+                        </div>
+                        <button class="btn-copy-code" id="btnCopyCode" title="Copy command">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            <span id="copyBtnLabel">Copy</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Download Options -->
+                <div class="hero-cta-group">
+                    <a href="https://github.com/gesttaltt/frutiger-aero-optimizer/releases/latest" class="btn-aero-hero" id="btnHeroDownload">
+                        <span class="btn-shine"></span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        Download Release Packages
+                    </a>
+                    <a href="#soundboard" class="btn-glass-secondary" id="btnHeroSounds">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                        Explore Soundscape
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Before / After Comparison Showcase -->
+        <section class="section-container" id="compare">
+            <div class="section-header">
+                <span class="section-tag">VISUAL IMMERSION</span>
+                <h2 class="section-title">The Transformation</h2>
+                <p class="section-desc">Slide to experience the difference between flat modern monotony and high-gloss Frutiger Aero vibrancy.</p>
+            </div>
+
+            <div class="compare-slider-container" id="sliderWrapper">
+                <div class="compare-image-layer after-image">
+                    <div class="image-label label-after">✨ Frutiger Aero (Restored)</div>
+                    <div class="preview-desktop aero-mode">
+                        <div class="aero-window glass-card">
+                            <div class="window-titlebar">
+                                <span class="win-title">Computer - System Overview</span>
+                                <div class="win-controls">
+                                    <span class="ctrl min"></span>
+                                    <span class="ctrl max"></span>
+                                    <span class="ctrl close"></span>
+                                </div>
+                            </div>
+                            <div class="window-content">
+                                <div class="aero-gadget">
+                                    <div class="gadget-orb"></div>
+                                    <div class="gadget-details">
+                                        <strong>Frutiger Aero Master 5.2</strong>
+                                        <span>Status: Fully Optimized (zRAM + Kvantum Active)</span>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-glass"><div class="progress-fill-aero"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="compare-image-layer before-image" id="beforeLayer">
+                    <div class="image-label label-before">⬛ Flat Monotone (Before)</div>
+                    <div class="preview-desktop flat-mode">
+                        <div class="flat-window">
+                            <div class="flat-titlebar">
+                                <span>Default Terminal</span>
+                                <div class="win-controls"><span class="fctrl"></span><span class="fctrl"></span><span class="fctrl"></span></div>
+                            </div>
+                            <div class="flat-content">
+                                <p>Standard minimalist interface with flat buttons and zero translucency...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="range" min="0" max="100" value="50" class="slider-handle-control" id="compareSlider" aria-label="Before and After visual comparison slider">
+                <div class="slider-divider" id="sliderDivider">
+                    <div class="slider-circle">↔</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Sound Board Section -->
+        <section class="section-container" id="soundboard">
+            <div class="section-header">
+                <span class="section-tag">AUTHENTIC SOUNDSCAPE</span>
+                <h2 class="section-title">The 2007 Audio Experience</h2>
+                <p class="section-desc">Click any button below to audition the authentic stereo sound events included with the suite.</p>
+            </div>
+
+            <div class="sound-board-grid">
+                <button class="sound-card" id="sndLogon" data-src="assets/sounds/Aero/stereo/desktop-login.ogg">
+                    <div class="sound-orb-visual"><span class="play-icon">▶</span></div>
+                    <div class="sound-info">
+                        <h3>Windows Logon</h3>
+                        <span>Authentic Startup chime</span>
+                    </div>
+                </button>
+
+                <button class="sound-card" id="sndNotify" data-src="assets/sounds/Aero/stereo/message-new-instant.ogg">
+                    <div class="sound-orb-visual"><span class="play-icon">▶</span></div>
+                    <div class="sound-info">
+                        <h3>Balloon Notification</h3>
+                        <span>Gentle glass pop</span>
+                    </div>
+                </button>
+
+                <button class="sound-card" id="sndWarning" data-src="assets/sounds/Aero/stereo/dialog-warning.ogg">
+                    <div class="sound-orb-visual"><span class="play-icon">▶</span></div>
+                    <div class="sound-info">
+                        <h3>System Exclamation</h3>
+                        <span>Subtle alert chord</span>
+                    </div>
+                </button>
+
+                <button class="sound-card" id="sndError" data-src="assets/sounds/Aero/stereo/dialog-error.ogg">
+                    <div class="sound-orb-visual"><span class="play-icon">▶</span></div>
+                    <div class="sound-info">
+                        <h3>Critical Stop</h3>
+                        <span>Authentic Error sound</span>
+                    </div>
+                </button>
+
+                <button class="sound-card" id="sndInfo" data-src="assets/sounds/Aero/stereo/dialog-information.ogg">
+                    <div class="sound-orb-visual"><span class="play-icon">▶</span></div>
+                    <div class="sound-info">
+                        <h3>Recycle Bin / Dialog</h3>
+                        <span>Acoustic paper drop</span>
+                    </div>
+                </button>
+            </div>
+            <audio id="audioPlayer" preload="none"></audio>
+        </section>
+
+        <!-- Features Grid Section -->
+        <section class="section-container" id="features">
+            <div class="section-header">
+                <span class="section-tag">ENGINEERING & ARTISTRY</span>
+                <h2 class="section-title">Everything Built For You</h2>
+                <p class="section-desc">Engineered with safety, performance, and historical authenticity in mind.</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card glass-card">
+                    <div class="feature-icon-wrapper">💎</div>
+                    <h3>True Glass Compositing</h3>
+                    <p>Real hardware-accelerated blur, refraction, and specular top highlights powered by Kvantum (Linux) and DWMBlurGlass (Windows).</p>
+                </div>
+
+                <div class="feature-card glass-card">
+                    <div class="feature-icon-wrapper">🌊</div>
+                    <h3>Liquid & Bubble Physics</h3>
+                    <p>Wobbly windows, springy bouncy scroll physics, CoverSwitch 3D Flip, and smooth cubic-bezier window animations.</p>
+                </div>
+
+                <div class="feature-card glass-card">
+                    <div class="feature-icon-wrapper">🎬</div>
+                    <h3>Full App Immersion</h3>
+                    <p>Automated skinning for VLC (Windows Media Player 11), Spotify (WMPotify), Discord (AeroCord), and Firefox Glass.</p>
+                </div>
+
+                <div class="feature-card glass-card">
+                    <div class="feature-icon-wrapper">🛡️</div>
+                    <h3>Mathematical Safety</h3>
+                    <p>Captures exact state into <code>~/.frutiger_aero_state.sh</code> or System Restore Points before making changes. One flag <code>--restore</code> cleanly reverses everything.</p>
+                </div>
+
+                <div class="feature-card glass-card">
+                    <div class="feature-icon-wrapper">⚡</div>
+                    <h3>Hardware Optimization</h3>
+                    <p>GPU-specific OpenGL pipeline configuration (NVIDIA/AMD/Intel), automated journal cleanup, and zRAM swap tuning.</p>
+                </div>
+
+                <div class="feature-card glass-card">
+                    <div class="feature-icon-wrapper">🖼️</div>
+                    <h3>High-Resolution Aurora Wallpapers</h3>
+                    <p>Pre-packaged ultra-HD iconic wallpapers with automated desktop binding across KDE Plasma 5/6, GNOME, Xfce, and Windows.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Platform Matrix Section -->
+        <section class="section-container" id="matrix">
+            <div class="matrix-card glass-card">
+                <div class="matrix-header">
+                    <h2>Supported Operating Systems</h2>
+                    <span class="badge-accent">Automated & Verified</span>
+                </div>
+                <div class="matrix-table-wrapper">
+                    <table class="matrix-table">
+                        <thead>
+                            <tr>
+                                <th>Platform</th>
+                                <th>Status</th>
+                                <th>Supported Releases</th>
+                                <th>Features</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>🐧 Kubuntu / KDE Plasma</strong></td>
+                                <td><span class="status-badge master">Master (Tier 1)</span></td>
+                                <td>22.04 LTS, 24.04 LTS, Plasma 5 & 6</td>
+                                <td>Full Look & Feel, Kvantum, Flip3D, Aurorae, SDDM, Plymouth</td>
+                            </tr>
+                            <tr>
+                                <td><strong>🐧 Ubuntu (GNOME)</strong></td>
+                                <td><span class="status-badge stable">Stable</span></td>
+                                <td>22.04 LTS, 24.04 LTS (GNOME 42+)</td>
+                                <td>GTK3/4 Windows 7 Theme, Crystal Remix Icons, Wallpaper</td>
+                            </tr>
+                            <tr>
+                                <td><strong>🐧 Xubuntu (Xfce)</strong></td>
+                                <td><span class="status-badge stable">Stable</span></td>
+                                <td>22.04 LTS, 24.04 LTS</td>
+                                <td>Aero-Glass Xfwm4, Picom Blur, Sounds, VLC & Firefox Mods</td>
+                            </tr>
+                            <tr>
+                                <td><strong>🪟 Windows 10 / 11</strong></td>
+                                <td><span class="status-badge master">Master (Tier 1)</span></td>
+                                <td>Win 10 (2004+), Win 11 (22H2+)</td>
+                                <td>DWMBlurGlass, System Audio, RGBA Icons, WMP11 VLC, Spicetify</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="glass-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <div class="brand-logo">
+                    <span class="aero-orb-mini"></span>
+                    <span class="brand-text">Frutiger<span class="highlight">Aero</span> Optimizer</span>
+                </div>
+                <p>Made with 🫧, 🐬 and ✨ for the global retro-computing community.</p>
+            </div>
+            <div class="footer-links">
+                <a href="https://github.com/gesttaltt/frutiger-aero-optimizer" target="_blank" rel="noopener">GitHub Repository</a>
+                <a href="https://github.com/gesttaltt/frutiger-aero-optimizer/releases" target="_blank" rel="noopener">Releases & Downloads</a>
+                <a href="LICENSE" target="_blank">MIT License</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

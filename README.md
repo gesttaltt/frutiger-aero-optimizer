@@ -58,7 +58,24 @@ Don't want to clone the repository? Download the latest pre-packaged version for
 
 ## 🚀 Quick Start
 
-### 🐧 Linux (Bash)
+### ⚡ One-Liner Web Installation (Recommended)
+
+#### 🐧 Linux (Bash)
+```bash
+curl -fsSL https://raw.githubusercontent.com/gesttaltt/frutiger-aero-optimizer/main/install.sh | bash
+```
+*(Optionally append flags: `| bash -s -- --auto` or `| bash -s -- --verify`)*
+
+#### 🪟 Windows (PowerShell Admin)
+```powershell
+irm https://raw.githubusercontent.com/gesttaltt/frutiger-aero-optimizer/main/windows/install.ps1 | iex
+```
+
+---
+
+### 📦 Manual Git Clone
+
+#### 🐧 Linux
 ```bash
 git clone https://github.com/gesttaltt/frutiger-aero-optimizer.git
 cd frutiger-aero-optimizer
@@ -66,7 +83,7 @@ chmod +x optimize_and_aero.sh
 ./optimize_and_aero.sh --auto
 ```
 
-### 🪟 Windows (PowerShell Admin)
+#### 🪟 Windows (PowerShell Admin)
 ```powershell
 git clone https://github.com/gesttaltt/frutiger-aero-optimizer.git
 cd frutiger-aero-optimizer
