@@ -2,9 +2,15 @@
 
 Todas las novedades y cambios notables de este proyecto serán documentados en este archivo.
 
-## [5.2-modular] - Modular Architecture & Vista Experience - 2026-05-23
+## [5.2-modular] - Modular Architecture, Multi-Flavor & Vista Experience - 2026-05-23
 ### Añadido
-- **🧩 Arquitectura Modular (`lib/`):** Descomposición del script monolítico en módulos especializados (`core`, `deps`, `assets`, `apps`, `optimizer`, `theme_kde`, `theme_gnome`, `theme_xfce`, `theme_boot`, `animations`, `bubble`, `sidebar`, `vista_experience`, `vista_enhancements`, `restore`).
+- **🧩 Arquitectura Modular (`lib/`):** Descomposición del script monolítico en módulos especializados (`core`, `deps`, `assets`, `apps`, `optimizer`, `theme_kde`, `theme_gnome`, `theme_xfce`, `theme_cinnamon`, `theme_mate`, `theme_boot`, `animations`, `bubble`, `sidebar`, `vista_experience`, `vista_enhancements`, `restore`).
+- **🖥️ Soporte para Linux Mint (Cinnamon) y MATE:** Modificación completa de temas GTK/Cinnamon/Marco, Desklets estilo Vista (reloj analógico de cristal) y wallpapers.
+- **🎛️ Centro de Control Gráfico (`--gui`):** Interfaz gráfica interactiva mediante KDialog o Zenity con selección modular de componentes.
+- **💻 VS Code / VSCodium Glass:** Inyección de CSS para pestañas translúcidas con brillo, barra de estado luminosa y fondo frosted.
+- **📝 LibreOffice & Thunderbird 2007:** Interfaz clásica Ribbon/Notebookbar para LibreOffice y estilo Windows Live Mail para Thunderbird.
+- **🌊 Motor DreamScene:** Soporte universal para fondos de pantalla animados en video con aceleración por hardware en Wayland (`mpvpaper`) y X11 (`xwinwrap` + `mpv`).
+- **🔊 Clics Acústicos de Navegación:** Audio feedback táctil al abrir directorios en Dolphin y gestores de archivos.
 - **🫧 Bubbly & Liquid Aero FX:** Efectos de esquinas redondeadas, scroll kinético elástico y Cubo 3D para KDE KWin.
 - **✨ 16 Nuevas Mejoras Estilo Vista:** Ajuste fino de animaciones, cuadrícula de iconos estilo Windows 7, agrupación de barras de tareas, menús contextuales glass y tinte de ventanas activas.
 - **📟 Perfil y Esquema de Color Konsole:** Generación automática de `AeroBlue.colorscheme` con 78% de opacidad y desenfoque.

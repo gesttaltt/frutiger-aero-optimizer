@@ -18,8 +18,10 @@
 | Platform | Support Level | Versions | Core Desktop Environments |
 | :--- | :--- | :--- | :--- |
 | **Kubuntu** | **Master (Tier 1)** | 22.04, 23.10, 24.04, 24.10 | Plasma 5.24+ & Plasma 6 |
+| **Linux Mint** | **Master (Tier 1)** | 21.x, 22.x | Cinnamon 5.x / 6.x (Desklets & Glass) |
 | **Ubuntu** | **Stable** | 22.04, 24.04 | GNOME 42+ |
-| **Xubuntu** | **Stable** | 22.04, 24.04 | Xfce 4.16+ |
+| **Xubuntu** | **Stable** | 22.04, 24.04 | Xfce 4.16+ (Picom & Xfwm4) |
+| **Ubuntu MATE** | **Stable** | 22.04, 24.04 | MATE Desktop (Marco / Compiz) |
 | **Windows** | **Master (Tier 1)** | 10 (2004+), 11 (22H2+) | Explorer Shell |
 
 ---
@@ -28,12 +30,15 @@
 
 ### 🎨 System-Wide Theming
 - **💎 Glass Engine:** Real transparency & blur via **Kvantum** (Linux) and **DWMBlurGlass** (Windows).
-- **🌀 Master Sequence:** 13-step orchestrated installation for 100% asset-theme binding.
+- **🎛️ GUI Control Center:** Graphical component selector (`--gui`) powered by **KDialog** and **Zenity**.
+- **🌊 DreamScene Engine:** Hardware-accelerated animated video wallpaper engine for Wayland (`mpvpaper`) and X11 (`xwinwrap` + `mpv`).
 - **🖥️ Boot & Login:** **SDDM** glass login & **Plymouth** glowing orb boot animations.
-- **🖱️ Authentic Assets:** Authentic semi-transparent Aero cursors and **Crystal Remix** icon set.
+- **🖱️ Authentic Assets & Audio:** Semi-transparent Aero cursors, **Crystal Remix** icons, and acoustic Explorer navigation click sounds.
 
 ### 🎧 Application Immersion
+- **💻 VS Code / VSCodium Glass:** Translucent frosted editor tabs, glowing cyan status bar, and curved glass minimap.
 - **🦊 Firefox Glass:** Automated `userChrome.css` for glassy tabs and legacy buttons.
+- **📝 LibreOffice & Thunderbird:** Office 2007 classic Ribbon/Notebookbar interface and Windows Live Mail theme.
 - **💬 Discord Aero:** Full client modification via **Vencord** + **AeroCord** theme.
 - **🎵 Spotify Gloss:** **Spicetify** integration with **WMPotify** (WMP11 style) skin.
 - **🎬 VLC Legacy:** Integrated **Windows Media Player 11** skeuomorphic skin.

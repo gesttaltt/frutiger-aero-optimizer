@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# --- APPLICATION THEMES ---
+# --- APPLICATION THEMES (AERO SUITE) ---
 
 apply_firefox_glass() {
     log_message "INFO" "Instalando Firefox Aero Glass..."
@@ -103,5 +103,83 @@ apply_vlc_skin() {
             echo "skins2-last=$VLC_SKINS/WMP11.vlt" >> "$VLCRC"
         fi
         log_message "SUCCESS" "VLC Skin WMP11 aplicado."
+    fi
+}
+
+apply_vscode_glass() {
+    log_message "INFO" "Configurando tema Aero Glass para VS Code / VSCodium..."
+    local config_dirs=("$HOME/.config/Code/User" "$HOME/.config/VSCodium/User" "$HOME/.var/app/com.visualstudio.code/config/Code/User")
+    
+    for dir in "${config_dirs[@]}"; do
+        if [ -d "$(dirname "$dir")" ]; then
+            mkdir -p "$dir"
+            local css_file="$dir/aero-glass.css"
+            cat <<'EOF' > "$css_file"
+/* Frutiger Aero Glass for VS Code 🫧 */
+.monaco-workbench {
+    background: radial-gradient(circle at 50% 10%, rgba(13, 75, 117, 0.85) 0%, rgba(6, 35, 58, 0.95) 100%) !important;
+    backdrop-filter: blur(20px) !important;
+}
+.monaco-workbench .part.titlebar {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(0, 0, 0, 0.2) 100%) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+.monaco-workbench .part.activitybar {
+    background: rgba(4, 21, 37, 0.75) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+.monaco-workbench .part.statusbar {
+    background: linear-gradient(180deg, #00d2ff 0%, #0077b6 60%, #023e8a 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 -2px 10px rgba(0, 210, 255, 0.4) !important;
+}
+.tab {
+    border-radius: 8px 8px 0 0 !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.4) !important;
+}
+.tab.active {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, rgba(0, 119, 182, 0.4) 100%) !important;
+    border-top: 2px solid #00d2ff !important;
+    box-shadow: 0 0 12px rgba(0, 210, 255, 0.3) !important;
+}
+EOF
+            log_message "SUCCESS" "Hoja de estilo Aero Glass para VS Code generada en $css_file."
+        fi
+    done
+}
+
+apply_libreoffice_2007() {
+    log_message "INFO" "Configurando LibreOffice estilo Office 2007 (Ribbon / Iconos)..."
+    local LO_DIR="$HOME/.config/libreoffice/4/user"
+    if [ -d "$LO_DIR" ]; then
+        local REG_FILE="$LO_DIR/registrymodifications.xcu"
+        if [ -f "$REG_FILE" ]; then
+            sed -i 's/<item oor:path="\/org.openoffice.Office.UI.ToolbarMode\/Active"><value>.*<\/value><\/item>/<item oor:path="\/org.openoffice.Office.UI.ToolbarMode\/Active"><value>Notebookbar<\/value><\/item>/' "$REG_FILE" 2>/dev/null || true
+        fi
+        log_message "SUCCESS" "LibreOffice configurado con interfaz Ribbon 2007."
+    fi
+}
+
+apply_thunderbird_glass() {
+    log_message "INFO" "Configurando Thunderbird estilo Windows Live Mail 2008..."
+    local TB_DIR="$HOME/.thunderbird"
+    if [ -d "$TB_DIR" ]; then
+        local TB_PROFILE
+        TB_PROFILE=$(find "$TB_DIR" -maxdepth 2 -name "prefs.js" | head -n 1)
+        if [ -n "$TB_PROFILE" ]; then
+            local PROFILE_DIR
+            PROFILE_DIR=$(dirname "$TB_PROFILE")
+            local CHROME_DIR="$PROFILE_DIR/chrome"
+            mkdir -p "$CHROME_DIR"
+            cat <<'EOF' > "$CHROME_DIR/userChrome.css"
+/* Thunderbird Aero Glass */
+#navigation-toolbox, #tabs-toolbar {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, rgba(0, 119, 182, 0.2) 100%) !important;
+    backdrop-filter: blur(12px) !important;
+}
+EOF
+            log_message "SUCCESS" "Thunderbird Glass configurado en $PROFILE_DIR."
+        fi
     fi
 }

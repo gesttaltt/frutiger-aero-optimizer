@@ -108,6 +108,8 @@ detect_system() {
     
     case "$raw_de" in
         *kde*|*plasma*)   DE_TYPE="kde" ;;
+        *cinnamon*)       DE_TYPE="cinnamon" ;;
+        *mate*)           DE_TYPE="mate" ;;
         *gnome*|*ubuntu*) DE_TYPE="gnome" ;;
         *xfce*)           DE_TYPE="xfce" ;;
         *)                DE_TYPE="unknown" ;;
@@ -213,7 +215,7 @@ save_setting() {
         local value=""
         case "$type" in
             "kde")   value=$($KREAD --file "$file" --group "$group" --key "$key" 2>/dev/null || echo "") ;;
-            "gnome") value=$(gsettings get "$file" "$group" 2>/dev/null | tr -d "'") ;;
+            "gnome"|"cinnamon"|"mate") value=$(gsettings get "$file" "$group" 2>/dev/null | tr -d "'") ;;
             "xfce")  value=$(xfconf-query -c "$file" -p "$group" 2>/dev/null || echo "") ;;
         esac
         local escaped_value="${value//\"/\\\"}"
@@ -234,7 +236,7 @@ restore_setting() {
             "kde")
                 if [ -n "$value" ]; then $KWRITE --file "$file" --group "$group" --key "$key" "$value"
                 else $KWRITE --file "$file" --group "$group" --key "$key" --delete; fi ;;
-            "gnome") gsettings set "$file" "$group" "$value" ;;
+            "gnome"|"cinnamon"|"mate") gsettings set "$file" "$group" "$value" ;;
             "xfce")  xfconf-query -c "$file" -p "$group" -s "$value" ;;
         esac
     fi

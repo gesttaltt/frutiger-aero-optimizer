@@ -35,6 +35,26 @@ teardown() {
     [[ "$output" =~ "kde" ]]
 }
 
+@test "detect_system identifies cinnamon and mate" {
+    run bash -c "
+        source ./optimize_and_aero.sh
+        export XDG_CURRENT_DESKTOP='X-Cinnamon'
+        detect_system
+        echo \"\$DE_TYPE\"
+    "
+    [ "$status" -eq 0 ]
+    [[ "$output" =~ "cinnamon" ]]
+
+    run bash -c "
+        source ./optimize_and_aero.sh
+        export XDG_CURRENT_DESKTOP='MATE'
+        detect_system
+        echo \"\$DE_TYPE\"
+    "
+    [ "$status" -eq 0 ]
+    [[ "$output" =~ "mate" ]]
+}
+
 @test "log_message creates log file" {
     LOG_FILE="/tmp/test_aero.log"
     rm -f "$LOG_FILE"
@@ -65,6 +85,7 @@ teardown() {
     [ "$status" -eq 0 ]
     [[ "$output" =~ "Opciones:" ]]
     [[ "$output" =~ "--auto" ]]
+    [[ "$output" =~ "--gui" ]]
     [[ "$output" =~ "--verify" ]]
 }
 
@@ -103,6 +124,20 @@ teardown() {
     [ -f "$TEST_HOME/.config/vlc/vlcrc" ]
     grep -q "intf=skins2" "$TEST_HOME/.config/vlc/vlcrc"
     grep -q "skins2-last=" "$TEST_HOME/.config/vlc/vlcrc"
+    rm -rf "$TEST_HOME"
+}
+
+@test "apply_vscode_glass creates aero css file" {
+    TEST_HOME="$(mktemp -d)"
+    mkdir -p "$TEST_HOME/.config/Code/User"
+    run bash -c "
+        source ./optimize_and_aero.sh
+        HOME=\"$TEST_HOME\"
+        apply_vscode_glass
+    "
+    [ "$status" -eq 0 ]
+    [ -f "$TEST_HOME/.config/Code/User/aero-glass.css" ]
+    grep -q "Frutiger Aero Glass for VS Code" "$TEST_HOME/.config/Code/User/aero-glass.css"
     rm -rf "$TEST_HOME"
 }
 
