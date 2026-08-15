@@ -5,7 +5,7 @@
 #>
 
 # --- CONFIGURACION ---
-$ErrorActionPreference = "Stop" # More resilient error handling
+$ErrorActionPreference = "Stop"
 $OutputEncoding = [System.Text.Encoding]::UTF8
 
 # Load Modules
@@ -29,9 +29,10 @@ function Show-Header {
 }
 
 # Argumentos
-$Global:DEBUG = $args -contains "--debug"
+$Global:DEBUG = $args -contains "--debug" -or $args -contains "-d"
 $AutoMode = $args -contains "--auto" -or $args -contains "-a"
 $RestoreMode = $args -contains "--restore" -or $args -contains "-r"
+$WallpaperMode = $args -contains "--wallpaper" -or $args -contains "-w"
 
 # START
 if ($MyInvocation.InvocationName -ne '.' -and $MyInvocation.InvocationName -ne '&') {
@@ -46,6 +47,11 @@ if ($RestoreMode) {
     exit 0
 }
 
+if ($WallpaperMode) {
+    Apply-AeroWallpaper
+    exit 0
+}
+
 Show-Header
 
 if ($AutoMode) {
@@ -53,6 +59,7 @@ if ($AutoMode) {
     Create-RestorePoint
     Install-Dependencies
     Apply-AeroAssets
+    Apply-AeroWallpaper
     Apply-AeroAnimations
     Install-SpotifyGlass
     Apply-VlcSkin

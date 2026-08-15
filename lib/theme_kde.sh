@@ -43,7 +43,6 @@ apply_global_theme() {
         fi
 
         # Fallback: Write directly to config
-        $KWRITE --file lookandfeeelrc --group "KDE" --key "LookAndFeelPackage" "$THEME_ID"
         $KWRITE --file kdeglobals --group "KDE" --key "LookAndFeelPackage" "$THEME_ID"
         $KWRITE --file plasmarc --group "Theme" --key "name" "FrutigerAero"
         
@@ -140,6 +139,87 @@ apply_konsole_glass() {
     local PROFILE_DIR="$HOME/.local/share/konsole"
     mkdir -p "$PROFILE_DIR"
     
+    # 1. Esquema de Colores AeroBlue (Vidrio Translúcido con Blur)
+    local COLOR_FILE="$PROFILE_DIR/AeroBlue.colorscheme"
+    if [ ! -f "$COLOR_FILE" ]; then
+        cat <<EOF > "$COLOR_FILE"
+[General]
+Description=AeroBlue
+Blur=true
+Opacity=0.78
+Wallpaper=
+
+[Background]
+Color=15,35,65
+
+[BackgroundFaint]
+Color=10,25,45
+
+[BackgroundIntense]
+Color=25,55,95
+
+[Foreground]
+Color=240,248,255
+
+[ForegroundFaint]
+Color=180,210,230
+
+[ForegroundIntense]
+Color=255,255,255
+
+[Color0]
+Color=20,35,55
+
+[Color0Intense]
+Color=70,100,130
+
+[Color1]
+Color=230,70,90
+
+[Color1Intense]
+Color=255,100,120
+
+[Color2]
+Color=50,195,120
+
+[Color2Intense]
+Color=80,230,150
+
+[Color3]
+Color=240,190,60
+
+[Color3Intense]
+Color=255,220,90
+
+[Color4]
+Color=40,140,230
+
+[Color4Intense]
+Color=80,180,255
+
+[Color5]
+Color=180,100,230
+
+[Color5Intense]
+Color=210,140,255
+
+[Color6]
+Color=60,200,220
+
+[Color6Intense]
+Color=100,235,255
+
+[Color7]
+Color=220,235,245
+
+[Color7Intense]
+Color=255,255,255
+EOF
+        mkdir -p "$HOME/.local/share/color-schemes"
+        cp "$COLOR_FILE" "$HOME/.local/share/color-schemes/" 2>/dev/null || true
+    fi
+
+    # 2. Perfil Konsole AeroGlass
     local PROFILE_FILE="$PROFILE_DIR/AeroGlass.profile"
     if [ ! -f "$PROFILE_FILE" ]; then
         cat <<EOF > "$PROFILE_FILE"
@@ -155,5 +235,5 @@ Parent=FALLBACK/
 HistoryMode=2
 EOF
     fi
-    log_message "SUCCESS" "Perfil Konsole Glass creado."
+    log_message "SUCCESS" "Perfil y esquema de color Konsole Glass creados."
 }

@@ -48,11 +48,17 @@ restore_system() {
     done
 
     rm -rf ~/.local/share/plasma/look-and-feel/com.gemini.frutigeraeromaster
+    rm -rf ~/.local/share/plasma/desktoptheme/FrutigerAero
     rm -rf ~/.local/share/aurorae/themes/Ten-Aero
     rm -rf ~/.local/share/icons/AeroCursors
     rm -rf ~/.local/share/icons/crystal-remix-icon-theme-diinki-version
     rm -rf ~/.local/share/sounds/Aero
     rm -rf ~/.config/Kvantum/Windows7Aero
+    rm -f ~/.local/share/konsole/AeroGlass.profile
+    rm -f ~/.local/share/konsole/AeroBlue.colorscheme
+    rm -f ~/.local/share/color-schemes/AeroBlue.colorscheme
+    rm -f ~/.config/autostart/vista_startup.desktop
+    rm -f "$HOME/Desktop/vista-welcome.desktop" "$HOME/Escritorio/vista-welcome.desktop"
     # Uninstall compiled KDE-Rounded-Corners plugin if installed
     local RC_PKG="kwin4_effect_shapecorners"
     if dpkg -l "$RC_PKG" 2>/dev/null | grep -q "^ii"; then
@@ -75,7 +81,7 @@ restore_system() {
     sudo rm -f /etc/sddm.conf.d/aero.conf
     sudo update-alternatives --remove default.plymouth /usr/share/plymouth/themes/PlymouthVista/PlymouthVista.plymouth 2>/dev/null || true
 
-    rm "$STATE_FILE"
+    rm -f "$STATE_FILE"
     log_message "SUCCESS" "Restauración completada."
     exit 0
 }

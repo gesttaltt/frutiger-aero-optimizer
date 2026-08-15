@@ -2,6 +2,16 @@
 
 Todas las novedades y cambios notables de este proyecto serán documentados en este archivo.
 
+## [5.2-modular] - Modular Architecture & Vista Experience - 2026-05-23
+### Añadido
+- **🧩 Arquitectura Modular (`lib/`):** Descomposición del script monolítico en módulos especializados (`core`, `deps`, `assets`, `apps`, `optimizer`, `theme_kde`, `theme_gnome`, `theme_xfce`, `theme_boot`, `animations`, `bubble`, `sidebar`, `vista_experience`, `vista_enhancements`, `restore`).
+- **🫧 Bubbly & Liquid Aero FX:** Efectos de esquinas redondeadas, scroll kinético elástico y Cubo 3D para KDE KWin.
+- **✨ 16 Nuevas Mejoras Estilo Vista:** Ajuste fino de animaciones, cuadrícula de iconos estilo Windows 7, agrupación de barras de tareas, menús contextuales glass y tinte de ventanas activas.
+- **📟 Perfil y Esquema de Color Konsole:** Generación automática de `AeroBlue.colorscheme` con 78% de opacidad y desenfoque.
+- **🔊 Soporte Sonoro Extendido:** Mapeo de eventos estándar Freedesktop (`trash-empty`, `dialog-question`, `audio-volume-change`, `bell`, `service-login`) y fallback jerárquico.
+- **🖥️ Compatibilidad Plasma 6:** Descriptor `metadata.json` para Look & Feel.
+- **🪟 Windows Icons Rebuilt:** Generación de archivos `.ico` de 32 bits RGBA con 7 resoluciones (16x16 a 256x256).
+
 ## [5.1-stable] - Multi-Flavor & Windows Port - 2026-05-10
 ### Añadido
 - **🎨 Soporte Multi-Sabor:** Transformación completa para **Ubuntu (GNOME)** y **Xubuntu (Xfce)**.

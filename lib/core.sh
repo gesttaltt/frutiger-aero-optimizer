@@ -160,7 +160,7 @@ detect_hardware() {
 
 check_connectivity() {
     log_message "DEBUG" "Checking internet connectivity..."
-    if ! curl -s --head --request GET http://www.google.com | grep "200 OK" > /dev/null; then
+    if ! curl -s -L --connect-timeout 5 --max-time 8 -I https://www.google.com 2>/dev/null | grep -E "HTTP/[0-9.]+ (200|301|302|304)" > /dev/null; then
         log_message "WARNING" "No se detectó conexión a internet. Algunas descargas fallarán."
         return 1
     fi

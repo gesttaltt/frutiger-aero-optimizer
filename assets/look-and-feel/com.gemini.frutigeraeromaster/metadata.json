@@ -1,0 +1,19 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "gestalt@example.com",
+                "Name": "Gemini CLI & Gestalt"
+            }
+        ],
+        "Category": "Plasma Look And Feel",
+        "Description": "The ultimate Frutiger Aero experience. Glossy, Glassy, and Organic.",
+        "Id": "com.gemini.frutigeraeromaster",
+        "License": "GPL",
+        "Name": "Frutiger Aero Master",
+        "ServiceTypes": [
+            "Plasma/LookAndFeel"
+        ],
+        "Version": "1.0"
+    }
+}

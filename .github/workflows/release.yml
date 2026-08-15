@@ -36,7 +36,8 @@ jobs:
       - name: Prepare Linux Package
         run: |
           mkdir -p release-linux
-          cp optimize_and_aero.sh README.md CHANGELOG.md LICENSE release-linux/
+          cp optimize_and_aero.sh verify_aero.sh README.md CHANGELOG.md LICENSE release-linux/
+          cp -r lib release-linux/
           cp -r assets release-linux/
           tar -czvf FrutigerAero_Linux.tar.gz -C release-linux .
 
@@ -61,7 +62,9 @@ jobs:
           cp windows/optimize_and_aero.ps1 release-windows/
           cp windows/README.md release-windows/
           cp CHANGELOG.md LICENSE release-windows/
+          cp -r windows/lib release-windows/
           cp -r windows/assets release-windows/
+          cp -r assets/wallpapers release-windows/assets/wallpapers
           zip -r FrutigerAero_Windows.zip release-windows/*
 
       - name: Upload Windows Asset

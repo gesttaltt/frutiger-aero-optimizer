@@ -111,8 +111,27 @@ apply_flavor_aero() {
 
 # --- LÓGICA PRINCIPAL ---
 
+show_help() {
+    echo -e "${CYAN}Frutiger Aero Optimizer & KDE Master v5.2-modular 🫧🐬✨${NC}"
+    echo -e "Uso: $0 [OPCIONES]\n"
+    echo "Opciones:"
+    echo "  -a, --auto       Ejecutar instalación completa e inatendida."
+    echo "  -r, --restore    Restaurar la configuración original del sistema."
+    echo "  -v, --verify     Verificar el estado e integridad de los componentes instalados."
+    echo "  -d, --debug      Activar modo depuración con registros detallados."
+    echo "  -f, --force      Omitir comprobación de compatibilidad de distribución."
+    echo "  -h, --help       Mostrar este mensaje de ayuda."
+    echo "  --version        Mostrar la versión del programa."
+    exit 0
+}
+
+show_version() {
+    echo "Frutiger Aero Optimizer & KDE Master v5.2-modular"
+    exit 0
+}
+
 show_header() {
-    clear
+    clear 2>/dev/null || true
     echo -e "${CYAN}############################################################${NC}"
     echo -e "${CYAN}#                                                          #${NC}"
     echo -e "${CYAN}#   ${WHITE}🫧  FRUTIGER AERO OPTIMIZER v5.2-modular  🐬${CYAN}         #${NC}"
@@ -123,33 +142,49 @@ show_header() {
     echo -e "${BLUE}GPU: $GPU_VENDOR | CPU: $CPU_MODEL${NC}\n"
 }
 
-# START
-detect_system
-detect_hardware
-check_sudo
-check_assets
-check_connectivity || true
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    # Procesar argumentos CLI
+    AUTO_MODE=false
+    DEBUG=false
+    FORCE_MODE=false
 
-if [[ "$1" == "--restore" ]] || [[ "$1" == "-r" ]]; then restore_system; fi
+    for arg in "$@"; do
+        case "$arg" in
+            --help|-h) show_help ;;
+            --version) show_version ;;
+            --verify|-v) 
+                detect_system
+                bash "$SCRIPT_DIR/verify_aero.sh"
+                exit 0
+                ;;
+            --restore|-r)
+                detect_system
+                restore_system
+                exit 0
+                ;;
+            --auto|-a) AUTO_MODE=true ;;
+            --debug|-d) DEBUG=true ;;
+            --force|-f) FORCE_MODE=true ;;
+        esac
+    done
 
-AUTO_MODE=false
-if [[ "$1" == "--auto" ]] || [[ "$1" == "-a" ]]; then
-    AUTO_MODE=true
-    log_message "INFO" "Ejecutando en MODO AUTOMÁTICO..."
-fi
+    # START
+    detect_system
+    detect_hardware
+    check_sudo
+    check_assets
+    check_connectivity || true
 
-DEBUG=false
-if [[ "$1" == "--debug" ]]; then
-    DEBUG=true
-    log_message "INFO" "Ejecutando en MODO DEBUG..."
-fi
+    if [ "$DEBUG" = true ]; then
+        log_message "INFO" "Ejecutando en MODO DEBUG..."
+    fi
 
-# Comprobación de sistema
-if [[ "$OS_NAME" != "ubuntu" && "$OS_NAME" != "debian" && "$OS_NAME" != "linuxmint" ]]; then
-    log_message "WARNING" "Este script está optimizado para la familia Debian/Ubuntu."
-fi
+    # Comprobación de sistema
+    if [[ "$OS_NAME" != "ubuntu" && "$OS_NAME" != "debian" && "$OS_NAME" != "linuxmint" && "$OS_NAME" != "neon" && "$OS_NAME" != "pop" && "$OS_NAME" != "zorin" && "$FORCE_MODE" != "true" ]]; then
+        log_message "WARNING" "Este script está optimizado para la familia Debian/Ubuntu (Kubuntu, Neon, Mint, Pop, Zorin)."
+    fi
 
-check_dependencies
+    check_dependencies
 
 if [ "$AUTO_MODE" = true ]; then
     apply_flavor_aero
@@ -217,7 +252,8 @@ else
                 "\"SERVICES\"") apply_service_tuning ;;
             esac
         done
-        fi    elif [[ "$DE_TYPE" == "gnome" || "$DE_TYPE" == "xfce" ]]; then
+        fi
+    elif [[ "$DE_TYPE" == "gnome" || "$DE_TYPE" == "xfce" ]]; then
         if (whiptail --title "Aero Restoration" --yesno "Se detectó $DE_TYPE. ¿Deseas aplicar la transformación completa?" 10 60); then
             apply_flavor_aero
         fi
@@ -230,3 +266,4 @@ fi
 echo -e "\n${GREEN}############################################################${NC}"
 echo -e "${GREEN}#   ¡OPERACIÓN COMPLETADA! 🫧🐬✨                          #${NC}"
 echo -e "${GREEN}############################################################${NC}"
+fi

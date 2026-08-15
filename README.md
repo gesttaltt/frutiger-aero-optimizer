@@ -1,6 +1,6 @@
-# 🫧 Frutiger Aero Optimizer & KDE Master v5.1 🐬✨
+# 🫧 Frutiger Aero Optimizer & KDE Master v5.2 🐬✨
 [![CI Status](https://github.com/gesttaltt/frutiger-aero-optimizer/actions/workflows/ci.yml/badge.svg)](https://github.com/gesttaltt/frutiger-aero-optimizer/actions)
-[![Version](https://img.shields.io/badge/version-5.1--stable-blue.svg)](https://github.com/gesttaltt/frutiger-aero-optimizer/releases)
+[![Version](https://img.shields.io/badge/version-5.2--modular-blue.svg)](https://github.com/gesttaltt/frutiger-aero-optimizer/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Ubuntu%20%7C%20Windows%20%7C%20KDE%20%7C%20GNOME-orange.svg)](https://ubuntu.com/)
 

@@ -81,14 +81,26 @@ apply_vlc_skin() {
     log_message "INFO" "Aplicando skin WMP11 a VLC..."
     local VLC_SKINS="$HOME/.local/share/vlc/skins2"
     mkdir -p "$VLC_SKINS"
+    mkdir -p "$HOME/.config/vlc"
     
     local SKIN_SOURCE="$SCRIPT_DIR/assets/vlc/WMP11.vlt"
     if [ -f "$SKIN_SOURCE" ]; then
         cp "$SKIN_SOURCE" "$VLC_SKINS/"
         local VLCRC="$HOME/.config/vlc/vlcrc"
         if [ -f "$VLCRC" ]; then
-            sed -i 's/^#intf=/intf=skins2/' "$VLCRC"
-            sed -i "s|^#skins2-last=|skins2-last=$VLC_SKINS/WMP11.vlt|" "$VLCRC"
+            if grep -q "^#\?intf=" "$VLCRC"; then
+                sed -i 's/^#\?intf=.*/intf=skins2/' "$VLCRC"
+            else
+                echo "intf=skins2" >> "$VLCRC"
+            fi
+            if grep -q "^#\?skins2-last=" "$VLCRC"; then
+                sed -i "s|^#\?skins2-last=.*|skins2-last=$VLC_SKINS/WMP11.vlt|" "$VLCRC"
+            else
+                echo "skins2-last=$VLC_SKINS/WMP11.vlt" >> "$VLCRC"
+            fi
+        else
+            echo "intf=skins2" > "$VLCRC"
+            echo "skins2-last=$VLC_SKINS/WMP11.vlt" >> "$VLCRC"
         fi
         log_message "SUCCESS" "VLC Skin WMP11 aplicado."
     fi

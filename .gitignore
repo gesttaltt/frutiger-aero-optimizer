@@ -1,4 +1,10 @@
 *.log
 *.bak
+*.tmp
+.DS_Store
 .sisyphus/
 package-lock.json
+release-linux/
+release-windows/
+*.tar.gz
+*.zip

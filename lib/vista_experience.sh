@@ -81,23 +81,40 @@ apply_dreamscene() {
 }
 
 apply_aurora_wallpapers() {
-    log_message "INFO" "Descargando fondos de pantalla Aurora originales..."
+    log_message "INFO" "Instalando y aplicando fondos de pantalla Frutiger Aero..."
     local WALL_DIR="$HOME/.local/share/wallpapers/AeroAurora"
     mkdir -p "$WALL_DIR"
     
-    # Sourcing high-res Aurora backgrounds
-    local WALLPAPERS=(
-        "https://images.wallpapersden.com/image/download/windows-vista-original_aWlsZmaUmZqaraWkpJRmbmdlrWZnZWU.jpg"
-        "https://wallpaperaccess.com/download/windows-vista-aurora-3829013"
-    )
-    
-    for wall in "${WALLPAPERS[@]}"; do
-        local name=$(basename "$wall")
-        if [ ! -f "$WALL_DIR/$name" ]; then
-            curl -L "$wall" -o "$WALL_DIR/$name" || true
+    # 1. Copiar wallpapers locales de alta resolución
+    if [ -d "$SCRIPT_DIR/assets/wallpapers" ]; then
+        cp -r "$SCRIPT_DIR/assets/wallpapers/"* "$WALL_DIR/" 2>/dev/null || true
+    fi
+
+    # 2. Aplicar el fondo principal
+    local MAIN_WALL="$SCRIPT_DIR/assets/wallpapers/wallhaven-yqq26g.png"
+    if [ ! -f "$MAIN_WALL" ]; then
+        MAIN_WALL=$(find "$WALL_DIR" -type f \( -name "*.png" -o -name "*.jpg" \) 2>/dev/null | head -n 1)
+    fi
+
+    if [ -n "$MAIN_WALL" ] && [ -f "$MAIN_WALL" ]; then
+        if [[ "$DE_TYPE" == "kde" ]]; then
+            if command -v plasma-apply-wallpaperimage &>/dev/null; then
+                plasma-apply-wallpaperimage "$MAIN_WALL" 2>/dev/null || true
+            fi
+        elif [[ "$DE_TYPE" == "gnome" ]]; then
+            gsettings set org.gnome.desktop.background picture-uri "file://$MAIN_WALL" 2>/dev/null || true
+            gsettings set org.gnome.desktop.background picture-uri-dark "file://$MAIN_WALL" 2>/dev/null || true
+        elif [[ "$DE_TYPE" == "xfce" ]]; then
+            local xfce_props
+            xfce_props=$(xfconf-query -c xfce4-desktop -l 2>/dev/null | grep "last-image" || echo "")
+            for prop in $xfce_props; do
+                xfconf-query -c xfce4-desktop -p "$prop" -s "$MAIN_WALL" 2>/dev/null || true
+            done
         fi
-    done
-    log_message "SUCCESS" "Colección de fondos Aurora descargada en $WALL_DIR."
+        log_message "SUCCESS" "Colección de fondos instalada y fondo principal aplicado ($MAIN_WALL)."
+    else
+        log_message "SUCCESS" "Colección de fondos Aurora descargada en $WALL_DIR."
+    fi
 }
 
 apply_glassy_notifications() {
