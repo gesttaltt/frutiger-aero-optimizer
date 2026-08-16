@@ -1,11 +1,6 @@
 [%General]
 author=DrGordBord, WackyIdeas, Gamer95875
 comment=Port Of Windows 7's theme to modern KDE
-round=10
-dialog_round=14
-menu_round=10
-tab_round=10
-tooltip_round=8
 left_tabs=true
 min_width=16
 min_height=16
