@@ -157,6 +157,16 @@ apply_bubble_widgets() {
         sed -i 's/scroll_width=17/scroll_width=20/' "$KV_CONFIG" 2>/dev/null || true
         sed -i 's/scroll_min_extent=32/scroll_min_extent=40/' "$KV_CONFIG" 2>/dev/null || true
 
+        # Configuración de esquinas redondeadas máximas
+        for key in round=10 dialog_round=14 menu_round=10 tab_round=10 tooltip_round=8; do
+            local k_name="${key%%=*}"
+            if grep -q "^$k_name=" "$KV_CONFIG"; then
+                sed -i "s/^$k_name=.*/$key/" "$KV_CONFIG"
+            else
+                sed -i "/\[%General\]/a $key" "$KV_CONFIG"
+            fi
+        done
+
         sed -i 's/animate_states=false/animate_states=true/' "$KV_CONFIG" 2>/dev/null || true
         sed -i 's/composite=false/composite=true/' "$KV_CONFIG" 2>/dev/null || true
         sed -i 's/menu_shadow_depth=5/menu_shadow_depth=8/' "$KV_CONFIG" 2>/dev/null || true
@@ -166,7 +176,17 @@ apply_bubble_widgets() {
         sed -i 's/frame.left=3/frame.left=5/' "$KV_CONFIG" 2>/dev/null || true
         sed -i 's/frame.right=3/frame.right=5/' "$KV_CONFIG" 2>/dev/null || true
 
-        log_message "SUCCESS" "Widgets redondeados configurados en Kvantum."
+        # Redondeo en aplicaciones GTK3
+        local GTK_CSS="$HOME/.config/gtk-3.0/gtk.css"
+        mkdir -p "$(dirname "$GTK_CSS")"
+        cat <<'EOF' >> "$GTK_CSS"
+/* Frutiger Aero High-Radius Rounding */
+window.ssd headerbar, .window-frame { border-radius: 12px 12px 0 0 !important; }
+dialog, messagedialog, .dialog-frame { border-radius: 14px !important; }
+button, .button { border-radius: 8px !important; }
+EOF
+
+        log_message "SUCCESS" "Esquinas y widgets redondeados configurados al máximo radio."
     else
         log_message "WARNING" "No se encontró configuración Kvantum para modificar."
     fi
