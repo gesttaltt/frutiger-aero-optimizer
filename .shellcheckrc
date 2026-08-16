@@ -1,0 +1,3 @@
+# .shellcheckrc - ShellCheck configuration for Frutiger Aero Optimizer 🫧🐬
+disable=SC1090,SC1091,SC2034,SC2148,SC2154,SC2086,SC2046
+severity=error

@@ -37,7 +37,7 @@ echo -e "${BLUE}[*] Preparando directorio de instalación en: ${INSTALL_DIR}...$
 mkdir -p "$INSTALL_DIR"
 
 # Check if latest release tarball is available, else clone repository
-DOWNLOADED=false
+DOWNLOADED="false"
 TARBALL_URL=$(curl -sL "$RELEASE_API" | grep "browser_download_url.*FrutigerAero_Linux.tar.gz" | cut -d '"' -f 4 || true)
 
 if [ -n "$TARBALL_URL" ]; then
@@ -45,12 +45,12 @@ if [ -n "$TARBALL_URL" ]; then
     if curl -sL "$TARBALL_URL" -o /tmp/FrutigerAero_Linux.tar.gz; then
         tar -xzf /tmp/FrutigerAero_Linux.tar.gz -C "$INSTALL_DIR"
         rm -f /tmp/FrutigerAero_Linux.tar.gz
-        DOWNLOADED=true
+        DOWNLOADED="true"
         echo -e "${GREEN}[V] Release descargada y extraída con éxito.${NC}"
     fi
 fi
 
-if [ "$DOWNLOADED" = false ]; then
+if [ "$DOWNLOADED" = "false" ]; then
     echo -e "${YELLOW}[?] Descargando via Git Clone...${NC}"
     if command -v git &>/dev/null; then
         rm -rf "$INSTALL_DIR"
