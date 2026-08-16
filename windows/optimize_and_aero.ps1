@@ -35,37 +35,37 @@ $RestoreMode = $args -contains "--restore" -or $args -contains "-r"
 $WallpaperMode = $args -contains "--wallpaper" -or $args -contains "-w"
 
 # START
-if ($MyInvocation.InvocationName -ne '.' -and $MyInvocation.InvocationName -ne '&') {
+if ($MyInvocation.InvocationName -ne '.' -and $MyInvocation.InvocationName -ne '&' -and (-not $env:PESTER_TESTING)) {
     Get-SystemInfo
     Check-Admin
     Check-Assets
-}
 
-if ($RestoreMode) {
-    Write-AeroLog "WARNING" "Modo Restauracion..."
-    Write-AeroLog "INFO" "Usa 'rstrui.exe' para volver al punto de restauracion."
-    exit 0
-}
+    if ($RestoreMode) {
+        Write-AeroLog "WARNING" "Modo Restauracion..."
+        Write-AeroLog "INFO" "Usa 'rstrui.exe' para volver al punto de restauracion."
+        exit 0
+    }
 
-if ($WallpaperMode) {
-    Apply-AeroWallpaper
-    exit 0
-}
+    if ($WallpaperMode) {
+        Apply-AeroWallpaper
+        exit 0
+    }
 
-Show-Header
+    Show-Header
 
-if ($AutoMode) {
-    Write-AeroLog "INFO" "Ejecutando en MODO AUTOMATICO..."
-    Create-RestorePoint
-    Install-Dependencies
-    Apply-AeroAssets
-    Apply-AeroWallpaper
-    Apply-AeroAnimations
-    Install-SpotifyGlass
-    Apply-VlcSkin
-    Refresh-Shell
-    Optimize-System
-    Write-AeroLog "SUCCESS" "TRANSFORMACION COMPLETADA! Disfruta del brillo."
-} else {
-    Write-AeroLog "INFO" "Inicia el script con --auto para una instalacion rapida."
+    if ($AutoMode) {
+        Write-AeroLog "INFO" "Ejecutando en MODO AUTOMATICO..."
+        Create-RestorePoint
+        Install-Dependencies
+        Apply-AeroAssets
+        Apply-AeroWallpaper
+        Apply-AeroAnimations
+        Install-SpotifyGlass
+        Apply-VlcSkin
+        Refresh-Shell
+        Optimize-System
+        Write-AeroLog "SUCCESS" "TRANSFORMACION COMPLETADA! Disfruta del brillo."
+    } else {
+        Write-AeroLog "INFO" "Inicia el script con --auto para una instalacion rapida."
+    }
 }

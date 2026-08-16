@@ -28,11 +28,20 @@ function Check-Assets {
 
 function Get-SystemInfo {
     Write-AeroLog "DEBUG" "Detecting system info..."
-    $OS = Get-WmiObject Win32_OperatingSystem
-    $Global:OS_NAME = $OS.Caption
-    $Global:OS_VER = $OS.Version
-    $Global:IS_WIN11 = $OS_NAME -like "*Windows 11*"
-    Write-AeroLog "INFO" "Sistema detectado: $OS_NAME ($OS_VER)"
+    try {
+        $OS = if (Get-Command Get-CimInstance -ErrorAction SilentlyContinue) {
+            Get-CimInstance Win32_OperatingSystem
+        } else {
+            Get-WmiObject Win32_OperatingSystem
+        }
+        $Global:OS_NAME = $OS.Caption
+        $Global:OS_VER = $OS.Version
+    } catch {
+        $Global:OS_NAME = "Microsoft Windows"
+        $Global:OS_VER = "10.0"
+    }
+    $Global:IS_WIN11 = $Global:OS_NAME -like "*Windows 11*"
+    Write-AeroLog "INFO" "Sistema detectado: $Global:OS_NAME ($Global:OS_VER)"
 }
 
 function Check-Admin {

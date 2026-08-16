@@ -1,5 +1,6 @@
 Describe "Frutiger Aero Optimizer Windows Port" {
     BeforeAll {
+        $env:PESTER_TESTING = "true"
         # Initialize variables by explicitly calling detection
         . "$PSScriptRoot/../optimize_and_aero.ps1"
         # Manually call Get-SystemInfo for testing
