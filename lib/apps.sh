@@ -4,17 +4,22 @@
 
 apply_firefox_glass() {
     log_message "INFO" "Instalando Firefox Aero Glass..."
-    local FF_DIR="$HOME/.mozilla/firefox"
-    if [ ! -d "$FF_DIR" ]; then return; fi
+    local candidate_dirs=(
+        "$HOME/.mozilla/firefox"
+        "$HOME/snap/firefox/common/.mozilla/firefox"
+        "$HOME/.var/app/org.mozilla.firefox/.mozilla/firefox"
+    )
 
-    local PROFILE_PATH
-    PROFILE_PATH=$(grep -E '^Path=' "$FF_DIR/profiles.ini" | head -n 1 | cut -d'=' -f2)
-    local PROFILE_DIR="$FF_DIR/$PROFILE_PATH"
-
-    if [ ! -d "$PROFILE_DIR" ]; then return; fi
-
-    local USER_JS="$PROFILE_DIR/user.js"
-    cat <<EOF >> "$USER_JS"
+    for FF_DIR in "${candidate_dirs[@]}"; do
+        if [ -d "$FF_DIR" ] && [ -f "$FF_DIR/profiles.ini" ]; then
+            local PROFILE_PATHS
+            PROFILE_PATHS=$(grep -E '^Path=' "$FF_DIR/profiles.ini" | cut -d'=' -f2)
+            
+            for P_PATH in $PROFILE_PATHS; do
+                local PROFILE_DIR="$FF_DIR/$P_PATH"
+                if [ -d "$PROFILE_DIR" ]; then
+                    local USER_JS="$PROFILE_DIR/user.js"
+                    cat <<EOF >> "$USER_JS"
 user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
 user_pref("layers.acceleration.force-enabled", true);
 user_pref("gfx.webrender.all", true);
@@ -23,16 +28,47 @@ user_pref("general.smoothScroll", true);
 user_pref("general.smoothScroll.msdPhysics.enabled", true);
 user_pref("mousewheel.min_line_scroll_amount", 30);
 EOF
+                    local CHROME_DIR="$PROFILE_DIR/chrome"
+                    mkdir -p "$CHROME_DIR"
+                    
+                    cat <<'EOF' > "$CHROME_DIR/userChrome.css"
+/* Frutiger Aero Glass for Firefox 🫧🐬 */
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
 
-    local CHROME_DIR="$PROFILE_DIR/chrome"
-    mkdir -p "$CHROME_DIR"
-    
-    local TEMP_FF="/tmp/aero_firefox"
-    rm -rf "$TEMP_FF"
-    if resilient_clone "https://github.com/Aero-UserChrome/Aero-UserChrome.git" "$TEMP_FF"; then
-        cp -r "$TEMP_FF/"* "$CHROME_DIR/"
-        log_message "SUCCESS" "Firefox Aero Glass instalado."
-    fi
+:root {
+  --tab-border-radius: 8px 8px 0 0 !important;
+}
+
+#nav-bar {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.1) 50%, rgba(0, 119, 182, 0.15) 100%) !important;
+  backdrop-filter: blur(14px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.tab-background {
+  border-radius: 8px 8px 0 0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  border-bottom: none !important;
+}
+
+.tabbrowser-tab[selected="true"] .tab-background {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(0, 210, 255, 0.35) 60%, rgba(0, 119, 182, 0.4) 100%) !important;
+  border-top: 2px solid #00d2ff !important;
+  box-shadow: 0 0 12px rgba(0, 210, 255, 0.4), inset 0 1px 2px #ffffff !important;
+}
+
+#urlbar-background {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid rgba(0, 119, 182, 0.4) !important;
+  border-radius: 20px !important;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+}
+EOF
+                    log_message "SUCCESS" "Firefox Aero Glass instalado en $PROFILE_DIR."
+                fi
+            done
+        fi
+    done
 }
 
 apply_discord_glass() {
@@ -57,19 +93,19 @@ apply_discord_glass() {
 apply_spotify_glass() {
     log_message "INFO" "Instalando Spotify Aero Glass (Spicetify)..."
     if ! command -v spicetify &> /dev/null; then
-        curl -fsSL https://raw.githubusercontent.com/spicetify/cli/main/install.sh | sh || true
+        curl -fsSL https://raw.githubusercontent.com/spicetify/cli/main/install.sh | sh 2>/dev/null || true
     fi
 
-    local SPICETIFY_THEMES="$HOME/.config/spicetify/Themes"
+    local SPICETIFY_THEMES="$HOME/.config/spicetify/Themes/WMPotify"
     mkdir -p "$SPICETIFY_THEMES"
     
     local TEMP_SP="/tmp/aero_spotify"
     rm -rf "$TEMP_SP"
     if resilient_clone "https://github.com/Ingan121/WMPotify.git" "$TEMP_SP" 2; then
-        cp -r "$TEMP_SP/"* "$SPICETIFY_THEMES/WMPotify/"
+        cp -r "$TEMP_SP/"* "$SPICETIFY_THEMES/" 2>/dev/null || true
         if command -v spicetify &> /dev/null; then
-            spicetify config current_theme WMPotify || true
-            spicetify backup apply || true
+            spicetify config current_theme WMPotify 2>/dev/null || true
+            spicetify backup apply 2>/dev/null || true
         fi
         log_message "SUCCESS" "Spotify Aero Glass configurado."
     else

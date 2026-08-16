@@ -48,6 +48,6 @@ if [ -f "$DOLPHINRC" ]; then
 fi
 
 # 5. Firefox
-check_status "Firefox Glass & Physics" $(grep -r "smoothScroll" "$HOME/.mozilla/firefox" 2>/dev/null | grep -q "true" && echo "true" || echo "false")
+check_status "Firefox Glass & Physics" $(grep -r "smoothScroll" "$HOME/.mozilla/firefox" "$HOME/snap/firefox/common/.mozilla/firefox" "$HOME/.var/app/org.mozilla.firefox/.mozilla/firefox" 2>/dev/null | grep -q "true" && echo "true" || echo "false")
 
 echo -e "\n--- Verificación Completada ---"

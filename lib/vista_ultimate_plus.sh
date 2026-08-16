@@ -46,6 +46,7 @@ apply_welcome_center() {
     log_message "INFO" "Creando el Welcome Center de Vista..."
     local DESKTOP_DIR="$HOME/Desktop"
     [ -d "$DESKTOP_DIR" ] || DESKTOP_DIR="$HOME/Escritorio"
+    mkdir -p "$DESKTOP_DIR"
     
     local WELCOME_PATH="$HOME/.local/share/applications/vista-welcome.desktop"
     mkdir -p "$(dirname "$WELCOME_PATH")"
@@ -61,8 +62,8 @@ Type=Application
 Categories=System;
 EOF
     
-    cp "$WELCOME_PATH" "$DESKTOP_DIR/"
-    chmod +x "$DESKTOP_DIR/$(basename "$WELCOME_PATH")"
+    cp "$WELCOME_PATH" "$DESKTOP_DIR/" 2>/dev/null || true
+    chmod +x "$DESKTOP_DIR/$(basename "$WELCOME_PATH")" 2>/dev/null || true
     log_message "SUCCESS" "Welcome Center añadido al escritorio."
 }
 

@@ -33,13 +33,14 @@ apply_flip3d() {
     init_state
     save_setting kde kwinrc TabBox LayoutName
     
+    local kw="${KWRITE:-kwriteconfig5}"
     # Configurar CoverSwitch
-    $KWRITE --file kwinrc --group "TabBox" --key "LayoutName" "coverswitch"
-    $KWRITE --file kwinrc --group "TabBox" --key "ShowTabBox" "true"
-    $KWRITE --file kwinrc --group "TabBox" --key "HighlightWindows" "true"
+    $kw --file "$HOME/.config/kwinrc" --group "TabBox" --key "LayoutName" "coverswitch"
+    $kw --file "$HOME/.config/kwinrc" --group "TabBox" --key "ShowTabBox" "true"
+    $kw --file "$HOME/.config/kwinrc" --group "TabBox" --key "HighlightWindows" "true"
     
     # Enlazar Meta+Tab (Igual que Flip3D en Windows Vista/7)
-    $KWRITE --file kglobalshortcutsrc --group "kwin" --key "Walk Through Windows (Forward)" "Meta+Tab,Alt+Tab,Walk Through Windows (Forward)"
+    $kw --file "$HOME/.config/kglobalshortcutsrc" --group "kwin" --key "Walk Through Windows (Forward)" "Meta+Tab,Alt+Tab,Walk Through Windows (Forward)"
     
     if command -v qdbus &> /dev/null; then
         QDBUS_CMD=$(command -v qdbus-qt6 || command -v qdbus-qt5 || command -v qdbus)
@@ -50,13 +51,14 @@ apply_flip3d() {
 
 apply_aero_peek() {
     log_message "INFO" "Configurando Aero Peek y Taskbar Previews..."
+    local kw="${KWRITE:-kwriteconfig5}"
     
     # Aumentar tamaño de miniaturas de la barra de tareas
-    $KWRITE --file plasmashellrc --group "TaskBar" --key "ToolTipWidth" "300"
-    $KWRITE --file plasmashellrc --group "TaskBar" --key "ToolTipHeight" "200"
+    $kw --file plasmashellrc --group "TaskBar" --key "ToolTipWidth" "300"
+    $kw --file plasmashellrc --group "TaskBar" --key "ToolTipHeight" "200"
     
     # Habilitar Aero Peek
-    $KWRITE --file kwinrc --group "Plugins" --key "peekEnabled" "true"
+    $kw --file kwinrc --group "Plugins" --key "peekEnabled" "true"
     
     log_message "SUCCESS" "Aero Peek configurado."
 }
